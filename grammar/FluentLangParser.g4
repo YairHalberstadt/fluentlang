@@ -12,8 +12,12 @@ open_directives
 	;
 
 open_directive
-	: OPEN UPPERCASE_IDENTIFIER SEMICOLON
+	: OPEN qualified_name SEMICOLON
 	;
+
+qualified_name
+    : UPPERCASE_IDENTIFIER (DOT UPPERCASE_IDENTIFIER)*
+    ;
 
 namespace_member_declarations
     : namespace_member_declaration+
@@ -26,7 +30,7 @@ namespace_member_declaration
 	;
 
 namespace_declaration
-    : NAMESPACE UPPERCASE_IDENTIFIER OPEN_BRACE namespace_member_declaration* CLOSE_BRACE
+    : NAMESPACE qualified_name OPEN_BRACE namespace_member_declaration* CLOSE_BRACE
     ;
 
 interface_declaration
@@ -34,17 +38,12 @@ interface_declaration
     ;
 
 anonymous_interface_declaration
-    : simple_anonymous_interface_declaration ((PLUS | MINUS) simple_anonymous_interface_declaration)*
+    : simple_anonymous_interface_declaration (PLUS simple_anonymous_interface_declaration)*
     ;
 
 simple_anonymous_interface_declaration
-    : empty_interface
-    | OPEN_BRACE interface_member_declaration+ CLOSE_BRACE
-    | UPPERCASE_IDENTIFIER
-    ;
-
-empty_interface
-    : OPEN_BRACE CLOSE_BRACE
+    : OPEN_BRACE interface_member_declaration* CLOSE_BRACE
+    | qualified_name
     ;
 
 interface_member_declaration
@@ -68,7 +67,7 @@ type_declaration
     ;
 
 type
-    : UPPERCASE_IDENTIFIER
+    : qualified_name
     | base_type
     | anonymous_interface_declaration
     ;
@@ -106,15 +105,19 @@ return_statement
 
 expression
     : empty_interface                                                     #new_object_expression
-    | expression (PLUS object_patch)+                           #object_patching_expression
+    | expression (PLUS object_patch)+                                     #object_patching_expression
     | expression operator expression                                      #binary_operator_expression
     | literal                                                             #literal_expression
-    | fully_qualified_name invocation                                     #static_invocation_expression
+    | qualified_name invocation                                           #static_invocation_expression
     | expression DOT UPPERCASE_IDENTIFIER invocation                      #member_invocation_expression
     | IF OPEN_PARENS expression CLOSE_PARENS expression ELSE expression   #conditional_expression
     | OPEN_PARENS expression CLOSE_PARENS                                 #parenthesized_expression
     | LOWERCASE_IDENTIFIER                                                #variable_expression
     | THIS                                                                #variable_expression
+    ;
+
+empty_interface
+    : OPEN_BRACE CLOSE_BRACE
     ;
 
 object_patch
@@ -123,8 +126,8 @@ object_patch
     ;
 
 fully_qualified_method
-    : fully_qualified_name OPEN_PARENS fully_qualified_method_parameters CLOSE_PARENS type_declaration
-    | fully_qualified_name
+    : qualified_name OPEN_PARENS fully_qualified_method_parameters CLOSE_PARENS type_declaration
+    | qualified_name
     ;
 
 fully_qualified_method_parameters
@@ -154,10 +157,6 @@ literal
     | REAL_LITERAL
     | CHARACTER_LITERAL
     | REGULAR_STRING
-    ;
-
-fully_qualified_name
-    : UPPERCASE_IDENTIFIER (DOT UPPERCASE_IDENTIFIER)*
     ;
 
 invocation

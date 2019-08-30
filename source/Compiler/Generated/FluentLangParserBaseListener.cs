@@ -72,6 +72,18 @@ public partial class FluentLangParserBaseListener : IFluentLangParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitOpen_directive([NotNull] FluentLangParser.Open_directiveContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="FluentLangParser.qualified_name"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterQualified_name([NotNull] FluentLangParser.Qualified_nameContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="FluentLangParser.qualified_name"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitQualified_name([NotNull] FluentLangParser.Qualified_nameContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.namespace_member_declarations"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -143,18 +155,6 @@ public partial class FluentLangParserBaseListener : IFluentLangParserListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitSimple_anonymous_interface_declaration([NotNull] FluentLangParser.Simple_anonymous_interface_declarationContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by <see cref="FluentLangParser.empty_interface"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterEmpty_interface([NotNull] FluentLangParser.Empty_interfaceContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="FluentLangParser.empty_interface"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitEmpty_interface([NotNull] FluentLangParser.Empty_interfaceContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.interface_member_declaration"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -426,6 +426,18 @@ public partial class FluentLangParserBaseListener : IFluentLangParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitObject_patching_expression([NotNull] FluentLangParser.Object_patching_expressionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="FluentLangParser.empty_interface"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterEmpty_interface([NotNull] FluentLangParser.Empty_interfaceContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="FluentLangParser.empty_interface"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitEmpty_interface([NotNull] FluentLangParser.Empty_interfaceContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.object_patch"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -485,18 +497,6 @@ public partial class FluentLangParserBaseListener : IFluentLangParserListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitLiteral([NotNull] FluentLangParser.LiteralContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by <see cref="FluentLangParser.fully_qualified_name"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterFully_qualified_name([NotNull] FluentLangParser.Fully_qualified_nameContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="FluentLangParser.fully_qualified_name"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitFully_qualified_name([NotNull] FluentLangParser.Fully_qualified_nameContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.invocation"/>.
 	/// <para>The default implementation does nothing.</para>

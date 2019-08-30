@@ -62,6 +62,16 @@ public interface IFluentLangParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitOpen_directive([NotNull] FluentLangParser.Open_directiveContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="FluentLangParser.qualified_name"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterQualified_name([NotNull] FluentLangParser.Qualified_nameContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="FluentLangParser.qualified_name"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitQualified_name([NotNull] FluentLangParser.Qualified_nameContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.namespace_member_declarations"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -121,16 +131,6 @@ public interface IFluentLangParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitSimple_anonymous_interface_declaration([NotNull] FluentLangParser.Simple_anonymous_interface_declarationContext context);
-	/// <summary>
-	/// Enter a parse tree produced by <see cref="FluentLangParser.empty_interface"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterEmpty_interface([NotNull] FluentLangParser.Empty_interfaceContext context);
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="FluentLangParser.empty_interface"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitEmpty_interface([NotNull] FluentLangParser.Empty_interfaceContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.interface_member_declaration"/>.
 	/// </summary>
@@ -360,6 +360,16 @@ public interface IFluentLangParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitObject_patching_expression([NotNull] FluentLangParser.Object_patching_expressionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="FluentLangParser.empty_interface"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterEmpty_interface([NotNull] FluentLangParser.Empty_interfaceContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="FluentLangParser.empty_interface"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitEmpty_interface([NotNull] FluentLangParser.Empty_interfaceContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.object_patch"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -409,16 +419,6 @@ public interface IFluentLangParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitLiteral([NotNull] FluentLangParser.LiteralContext context);
-	/// <summary>
-	/// Enter a parse tree produced by <see cref="FluentLangParser.fully_qualified_name"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterFully_qualified_name([NotNull] FluentLangParser.Fully_qualified_nameContext context);
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="FluentLangParser.fully_qualified_name"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitFully_qualified_name([NotNull] FluentLangParser.Fully_qualified_nameContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.invocation"/>.
 	/// </summary>

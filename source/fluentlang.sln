@@ -5,7 +5,18 @@ VisualStudioVersion = 16.0.29111.141
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Compiler", "Compiler\Compiler.csproj", "{84B525AD-1188-4E7D-8E97-A4EFE9CB92D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compiler.Tests.Unit", "Compiler.Tests.Unit\Compiler.Tests.Unit.csproj", "{CE33A55B-D617-4391-A6A0-A832454088B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Compiler.Tests.Unit", "Compiler.Tests.Unit\Compiler.Tests.Unit.csproj", "{CE33A55B-D617-4391-A6A0-A832454088B7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "g4", "g4", "{1FB5BA86-E497-499C-8F66-3D58BAD1FCC2}"
+	ProjectSection(SolutionItems) = preProject
+		..\grammar\FluentLangLexer.g4 = ..\grammar\FluentLangLexer.g4
+		..\grammar\FluentLangParser.g4 = ..\grammar\FluentLangParser.g4
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DA6862B5-CB14-421D-B036-0B340A5D677D}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -51,6 +51,12 @@ public interface IFluentLangParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitOpen_directive([NotNull] FluentLangParser.Open_directiveContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="FluentLangParser.qualified_name"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitQualified_name([NotNull] FluentLangParser.Qualified_nameContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="FluentLangParser.namespace_member_declarations"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -86,12 +92,6 @@ public interface IFluentLangParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitSimple_anonymous_interface_declaration([NotNull] FluentLangParser.Simple_anonymous_interface_declarationContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="FluentLangParser.empty_interface"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitEmpty_interface([NotNull] FluentLangParser.Empty_interfaceContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="FluentLangParser.interface_member_declaration"/>.
 	/// </summary>
@@ -228,6 +228,12 @@ public interface IFluentLangParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitObject_patching_expression([NotNull] FluentLangParser.Object_patching_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="FluentLangParser.empty_interface"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitEmpty_interface([NotNull] FluentLangParser.Empty_interfaceContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="FluentLangParser.object_patch"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -257,12 +263,6 @@ public interface IFluentLangParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitLiteral([NotNull] FluentLangParser.LiteralContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="FluentLangParser.fully_qualified_name"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitFully_qualified_name([NotNull] FluentLangParser.Fully_qualified_nameContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="FluentLangParser.invocation"/>.
 	/// </summary>

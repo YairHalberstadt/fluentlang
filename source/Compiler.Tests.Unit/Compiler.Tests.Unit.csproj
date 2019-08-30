@@ -3,8 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <RootNamespace>FluentLang.Compiler.Tests.Unit</RootNamespace>
-    <Nullable>Enable</Nullable>
+    <Nullable>enable</Nullable>
     <LangVersion>8.0</LangVersion>
+    <NoWarn>xUnit1019</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
