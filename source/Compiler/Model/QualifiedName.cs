@@ -54,8 +54,7 @@ namespace FluentLang.Compiler.Model
 		{
 			if (Parent is null)
 				return Name;
-			return
-			Parent.ToString() + "." + Name;
+			return Parent.ToString() + "." + Name;
 		}
 
 		public static bool operator ==(QualifiedName? a, QualifiedName? b)

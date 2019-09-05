@@ -15,9 +15,9 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 
 		public List<(string name, TypeKeyBuilder type)> Parameters { get; } = new List<(string name, TypeKeyBuilder type)>();
 
-		public InterfaceMethod Build()
+		public IInterfaceMethod Build()
 		{
-			return new InterfaceMethod(
+			return new TestInterfaceMethod(
 				Name ?? throw new InvalidOperationException($"{nameof(Name)} is null"),
 				ReturnType?.Build() ?? throw new InvalidOperationException($"{nameof(ReturnType)} is null"),
 				Parameters.Select(x => new Parameter(x.name, x.type.Build())).ToImmutableArray());

@@ -8,16 +8,22 @@ namespace FluentLang.Compiler.Model
 {
 	public class SemanticModel : ISemanticModel
 	{
-		private readonly ImmutableDictionary<QualifiedName, Interface> _interfaces;
+		private readonly ImmutableDictionary<QualifiedName, IInterface> _interfaces;
+		private readonly ImmutableDictionary<QualifiedName, Method> _methods;
 
-		private SemanticModel(ImmutableDictionary<QualifiedName, Interface> interfaces)
+		private SemanticModel(
+			ImmutableDictionary<QualifiedName, IInterface> interfaces,
+			ImmutableDictionary<QualifiedName, Method> methods)
 		{
 			_interfaces = interfaces;
+			_methods = methods;
 		}
 
-		public static SemanticModel Empty { get; } = new SemanticModel(ImmutableDictionary<QualifiedName, Interface>.Empty);
+		public static SemanticModel Empty { get; } = new SemanticModel(
+			ImmutableDictionary<QualifiedName, IInterface>.Empty,
+			ImmutableDictionary<QualifiedName, Method>.Empty);
 
-		public ISemanticModel With(Interface i)
+		public ISemanticModel With(IInterface i)
 		{
 			var model = TryWith(i);
 			if (model is null)
@@ -26,7 +32,7 @@ namespace FluentLang.Compiler.Model
 
 		}
 
-		public ISemanticModel? TryWith(Interface i)
+		public ISemanticModel? TryWith(IInterface i)
 		{
 			if (i.FullyQualifiedName is null)
 				throw new ArgumentException($"{nameof(i)} must be a named type to add it to a semantic model");
@@ -36,10 +42,23 @@ namespace FluentLang.Compiler.Model
 				return null;
 			}
 			var updatedInterfaces = _interfaces.Add(i.FullyQualifiedName, i);
-			return new SemanticModel(updatedInterfaces);
+			return new SemanticModel(updatedInterfaces, _methods);
 		}
 
-		public bool TryGetInterface(QualifiedName fullyQualifiedName, out Interface i)
+		public ISemanticModel? TryWith(Method m)
+		{
+			if (m.FullyQualifiedName is null)
+				throw new ArgumentException($"{nameof(m)} must be a named type to add it to a semantic model");
+
+			if (_methods.ContainsKey(m.FullyQualifiedName))
+			{
+				return null;
+			}
+			var updatedMethods = _methods.Add(m.FullyQualifiedName, m);
+			return new SemanticModel(_interfaces, updatedMethods);
+		}
+
+		public bool TryGetInterface(QualifiedName fullyQualifiedName, out IInterface i)
 		{
 			return _interfaces.TryGetValue(fullyQualifiedName, out i);
 		}

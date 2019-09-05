@@ -129,11 +129,11 @@ public interface IFluentLangParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitType([NotNull] FluentLangParser.TypeContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="FluentLangParser.base_type"/>.
+	/// Visit a parse tree produced by <see cref="FluentLangParser.primitive_type"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitBase_type([NotNull] FluentLangParser.Base_typeContext context);
+	Result VisitPrimitive_type([NotNull] FluentLangParser.Primitive_typeContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="FluentLangParser.method_declaration"/>.
 	/// </summary>
@@ -245,12 +245,6 @@ public interface IFluentLangParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitFully_qualified_method([NotNull] FluentLangParser.Fully_qualified_methodContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="FluentLangParser.fully_qualified_method_parameters"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitFully_qualified_method_parameters([NotNull] FluentLangParser.Fully_qualified_method_parametersContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="FluentLangParser.operator"/>.
 	/// </summary>

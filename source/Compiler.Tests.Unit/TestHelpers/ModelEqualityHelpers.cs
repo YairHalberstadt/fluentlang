@@ -6,7 +6,7 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 {
 	public static class ModelEqualityHelpers
 	{
-		public static bool AreEqual(Interface? a, Interface? b)
+		public static bool AreEqual(IInterface? a, IInterface? b)
 		{
 			if (a is null || b is null)
 				return ReferenceEquals(a, b);
@@ -41,7 +41,7 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 			return true;
 		}
 
-		public static bool AreEqual(InterfaceMethodSet? a, InterfaceMethodSet? b)
+		public static bool AreEqual(IInterfaceMethodSet? a, IInterfaceMethodSet? b)
 		{
 			if (a is null || b is null)
 				return ReferenceEquals(a, b);
@@ -61,7 +61,7 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 			return true;
 		}
 
-		public static bool AreEqual(InterfaceMethod? a, InterfaceMethod? b)
+		public static bool AreEqual(IInterfaceMethod? a, IInterfaceMethod? b)
 		{
 			if (a is null || b is null)
 				return ReferenceEquals(a, b);

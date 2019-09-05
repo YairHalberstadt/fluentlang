@@ -6,7 +6,7 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 {
 	public static class InterfaceBuilderGenerator
 	{
-		public static void Generate(Interface @interface, StringBuilder stringBuilder)
+		public static void Generate(IInterface @interface, StringBuilder stringBuilder)
 		{
 			stringBuilder.AppendLine("new InterfaceBuilder");
 			stringBuilder.AppendLine("{");
@@ -56,9 +56,16 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 			stringBuilder.Append("}");
 		}
 
-		public static void Generate(InterfaceMethodSet methodSet, StringBuilder stringBuilder)
+		public static void Generate(IInterfaceMethodSet methodSet, StringBuilder stringBuilder)
 		{
-			stringBuilder.AppendLine("new[]");
+			if (methodSet.Methods.Length > 0)
+			{
+				stringBuilder.AppendLine("new[]");
+			}
+			else
+			{
+				stringBuilder.AppendLine("new InterfaceMethodBuilder[]");
+			}
 			stringBuilder.AppendLine("{");
 			foreach (var method in methodSet.Methods)
 			{
@@ -68,7 +75,7 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 			stringBuilder.Append("}");
 		}
 
-		public static void Generate(InterfaceMethod method, StringBuilder stringBuilder)
+		public static void Generate(IInterfaceMethod method, StringBuilder stringBuilder)
 		{
 			stringBuilder.AppendLine("new InterfaceMethodBuilder");
 			stringBuilder.AppendLine("{");

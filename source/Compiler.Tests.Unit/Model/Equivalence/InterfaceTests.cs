@@ -1,4 +1,5 @@
 ﻿using FluentLang.Compiler.Model;
+using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -19,106 +20,137 @@ namespace FluentLang.Compiler.Tests.Unit.Model.Equivalence
 			new [] { Primitive.String },
 		};
 
-		public static Func<string, Interface>[][] InterfaceFuncs()
+		public static Func<string, IInterface>[][] InterfaceFuncs()
 		{
 			return new[]
 			{
-				new Func<string, Interface>[] { EmptyInterface },
-				new Func<string, Interface>[] { s => AdditiveToEmptyInterface(s, s) },
-				new Func<string, Interface>[] { EmptyInterfaceWithEmptyMethodSet },
-				new Func<string, Interface> [] {s => InterfaceWithOneMethod(s, new TypeKey(Primitive.Bool), new TypeKey(Primitive.Bool)) },
-				new Func<string, Interface> [] {s => InterfaceWithOneMethod(s, new TypeKey(EmptyInterface(null)), new TypeKey(EmptyInterface(null))) },
-				new Func<string, Interface> [] {s => InterfaceWithOneMethod(s, TypeKey(s), TypeKey(s)) }
+				new Func<string, IInterface>[] { s => EmptyInterface(s).Build() },
+				new Func<string, IInterface>[] { s => AdditiveToEmptyInterface(s, s).Build() },
+				new Func<string, IInterface>[] { s => EmptyInterfaceWithEmptyMethodSet(s).Build() },
+				new Func<string, IInterface> [] {s => InterfaceWithOneMethod(s, new TypeKeyBuilder(Primitive.Bool), new TypeKeyBuilder(Primitive.Bool)).Build() },
+				new Func<string, IInterface> [] {s => InterfaceWithOneMethod(s, new TypeKeyBuilder(EmptyInterface(null)), new TypeKeyBuilder(EmptyInterface(null))).Build() },
+				new Func<string, IInterface> [] {s => InterfaceWithOneMethod(s, TypeKey(s), TypeKey(s)).Build() }
 			};
 		}
 
-		public static Interface[][] InterfaceWithOneMethods()
+		public static IInterface[][] InterfaceWithOneMethods()
 		{
 			return new[]
 			{
-				new Interface[] {InterfaceWithOneMethod("interfaceWithOneMethod", new TypeKey(Primitive.Bool), new TypeKey(Primitive.Bool)) },
-				new Interface[] {InterfaceWithOneMethod("interfaceWithOneMethod", new TypeKey(EmptyInterface(null)), new TypeKey(EmptyInterface(null))) },
-				new Interface[] {InterfaceWithOneMethod("interfaceWithOneMethod", TypeKey("interfaceWithOneMethod"), TypeKey("interfaceWithOneMethod")) }
+				new IInterface[] {InterfaceWithOneMethod("interfaceWithOneMethod", new TypeKeyBuilder(Primitive.Bool), new TypeKeyBuilder(Primitive.Bool)).Build() },
+				new IInterface[] {InterfaceWithOneMethod("interfaceWithOneMethod", new TypeKeyBuilder(EmptyInterface(null)), new TypeKeyBuilder(EmptyInterface(null))).Build() },
+				new IInterface[] {InterfaceWithOneMethod("interfaceWithOneMethod", TypeKey("interfaceWithOneMethod"), TypeKey("interfaceWithOneMethod")).Build() }
 			};
 		}
 
-		public static Interface[][] InterfaceWithOneMethodPairs()
+		public static IInterface[][] InterfaceWithOneMethodPairs()
 		{
 			return new[]
 			{
-				new Interface[] 
+				new IInterface[] 
 				{
-					InterfaceWithOneMethod("interfaceWithOneMethodA", new TypeKey(Primitive.Bool), new TypeKey(Primitive.Bool)),
-					InterfaceWithOneMethod("interfaceWithOneMethodB", new TypeKey(EmptyInterface(null)), new TypeKey(EmptyInterface(null))),
+					InterfaceWithOneMethod("interfaceWithOneMethodA", new TypeKeyBuilder(Primitive.Bool), new TypeKeyBuilder(Primitive.Bool)).Build(),
+					InterfaceWithOneMethod("interfaceWithOneMethodB", new TypeKeyBuilder(EmptyInterface(null)), new TypeKeyBuilder(EmptyInterface(null))).Build(),
 				},
-				new Interface[]
+				new IInterface[]
 				{
-					InterfaceWithOneMethod("interfaceWithOneMethodA", new TypeKey(Primitive.Bool), new TypeKey(Primitive.Bool)),
-					InterfaceWithOneMethod("interfaceWithOneMethodB", TypeKey("interfaceWithOneMethodB"), TypeKey("interfaceWithOneMethodB")),
+					InterfaceWithOneMethod("interfaceWithOneMethodA", new TypeKeyBuilder(Primitive.Bool), new TypeKeyBuilder(Primitive.Bool)).Build(),
+					InterfaceWithOneMethod("interfaceWithOneMethodB", TypeKey("interfaceWithOneMethodB"), TypeKey("interfaceWithOneMethodB")).Build(),
 				},
-				new Interface[]
+				new IInterface[]
 				{
-					InterfaceWithOneMethod("interfaceWithOneMethodA", new TypeKey(EmptyInterface(null)), new TypeKey(EmptyInterface(null))),
-					InterfaceWithOneMethod("interfaceWithOneMethodB", new TypeKey(Primitive.Bool), new TypeKey(Primitive.Bool)),
+					InterfaceWithOneMethod("interfaceWithOneMethodA", new TypeKeyBuilder(EmptyInterface(null)), new TypeKeyBuilder(EmptyInterface(null))).Build(),
+					InterfaceWithOneMethod("interfaceWithOneMethodB", new TypeKeyBuilder(Primitive.Bool), new TypeKeyBuilder(Primitive.Bool)).Build(),
 
 				},
-				new Interface[]
+				new IInterface[]
 				{
-					InterfaceWithOneMethod("interfaceWithOneMethodA", new TypeKey(EmptyInterface(null)), new TypeKey(EmptyInterface(null))),
-					InterfaceWithOneMethod("interfaceWithOneMethodB", TypeKey("interfaceWithOneMethodB"), TypeKey("interfaceWithOneMethodB")),
+					InterfaceWithOneMethod("interfaceWithOneMethodA", new TypeKeyBuilder(EmptyInterface(null)), new TypeKeyBuilder(EmptyInterface(null))).Build(),
+					InterfaceWithOneMethod("interfaceWithOneMethodB", TypeKey("interfaceWithOneMethodB"), TypeKey("interfaceWithOneMethodB")).Build(),
 				},
-				new Interface[]
+				new IInterface[]
 				{
-					InterfaceWithOneMethod("interfaceWithOneMethodA", TypeKey("interfaceWithOneMethodA"), TypeKey("interfaceWithOneMethodA")),
-					InterfaceWithOneMethod("interfaceWithOneMethodB", new TypeKey(Primitive.Bool), new TypeKey(Primitive.Bool)),
+					InterfaceWithOneMethod("interfaceWithOneMethodA", TypeKey("interfaceWithOneMethodA"), TypeKey("interfaceWithOneMethodA")).Build(),
+					InterfaceWithOneMethod("interfaceWithOneMethodB", new TypeKeyBuilder(Primitive.Bool), new TypeKeyBuilder(Primitive.Bool)).Build(),
 
 				},
-				new Interface[]
+				new IInterface[]
 				{
-					InterfaceWithOneMethod("interfaceWithOneMethodA", TypeKey("interfaceWithOneMethodA"), TypeKey("interfaceWithOneMethodA")),
-					InterfaceWithOneMethod("interfaceWithOneMethodB", new TypeKey(EmptyInterface(null)), new TypeKey(EmptyInterface(null))),
+					InterfaceWithOneMethod("interfaceWithOneMethodA", TypeKey("interfaceWithOneMethodA"), TypeKey("interfaceWithOneMethodA")).Build(),
+					InterfaceWithOneMethod("interfaceWithOneMethodB", new TypeKeyBuilder(EmptyInterface(null)), new TypeKeyBuilder(EmptyInterface(null))).Build(),
 				},
 			};
 		}
 
-		public static TypeKey TypeKey(string name) => new TypeKey(new InterfaceReference(ImmutableArray<QualifiedName>.Empty, new QualifiedName(name)));
+		public static TypeKeyBuilder TypeKey(string name) => new TypeKeyBuilder(new InterfaceReferenceBuilder(name));
 
 
-		public static Interface EmptyInterface(string? name) 
-			=> new Interface(
-				ImmutableArray<InterfaceReference>.Empty,
-				ImmutableArray<InterfaceMethodSet>.Empty,
-				name is null ? null : new QualifiedName(name));
+		public static InterfaceBuilder EmptyInterface(string? name) => new InterfaceBuilder
+			{
+				FullyQualifiedName = name,
+			};
 
-		public static Interface AdditiveToEmptyInterface(string? name, string additiveInterfaceName)
-			=> new Interface(
-				ImmutableArray.Create(new InterfaceReference(ImmutableArray<QualifiedName>.Empty, new QualifiedName(additiveInterfaceName))),
-				ImmutableArray<InterfaceMethodSet>.Empty,
-				name is null ? null : new QualifiedName(name));
+		public static InterfaceBuilder AdditiveToEmptyInterface(string? name, string additiveInterfaceName)
+		{
+			return new InterfaceBuilder
+			{
+				FullyQualifiedName = name,
+				AdditiveInterfaces =
+				{
+					new InterfaceReferenceBuilder(additiveInterfaceName),
+				},
+			};
+		}
 
-		public static Interface EmptyInterfaceWithEmptyMethodSet(string? name)
-			=> new Interface(
-				ImmutableArray<InterfaceReference>.Empty,
-				ImmutableArray.Create(new InterfaceMethodSet(ImmutableArray<InterfaceMethod>.Empty)),
-				name is null ? null : new QualifiedName(name));
+		public static InterfaceBuilder EmptyInterfaceWithEmptyMethodSet(string? name)
+		{
+			return new InterfaceBuilder
+			{
+				FullyQualifiedName = name,
+				MethodSets =
+				{
+					new InterfaceMethodBuilder[0]
+				}
+			};
+		}
 
-		public static Interface InterfaceWithOneMethod(string? name, TypeKey returnType, TypeKey parameterType, string methodName = "M")
-			=> new Interface(
-				ImmutableArray<InterfaceReference>.Empty,
-				ImmutableArray.Create(new InterfaceMethodSet(ImmutableArray.Create(new InterfaceMethod(methodName, returnType, ImmutableArray.Create(new Parameter("p", parameterType)))))),
-				name is null ? null : new QualifiedName(name));
+		public static InterfaceBuilder InterfaceWithOneMethod(string? name, TypeKeyBuilder returnType, TypeKeyBuilder parameterType, string methodName = "M")
+		{
+			return new InterfaceBuilder
+			{
+				FullyQualifiedName = name,
+				MethodSets =
+				{
+					new []
+					{
+						new InterfaceMethodBuilder
+						{
+							Name = methodName,
+							ReturnType = returnType,
+							Parameters =
+							{
+								(
+									"p",
+									parameterType
+								)
+							}
+						}
+					}
+				}
+			};
+		}
 
 		[Theory]
 		[MemberData(nameof(Primitives))]
 		public void InterfacesAreNotEquivalentToPrimitives_EvenWithSameName(Primitive primitive)
 		{
-			var i = EmptyInterface(primitive.FullyQualifiedName.ToString());
+			var i = EmptyInterface(primitive.FullyQualifiedName.ToString()).Build();
 			Assert.False(i.IsEquivalentTo(primitive, SemanticModel.Empty.With(i)));
 		}
 
 		[Theory]
 		[MemberData(nameof(InterfaceFuncs))]
-		public void InterfaceIsEquivalentToItself_EvenWithDifferentNames(Func<string, Interface> interfaceFunc)
+		public void InterfaceIsEquivalentToItself_EvenWithDifferentNames(Func<string, IInterface> interfaceFunc)
 		{
 			var a = interfaceFunc("a");
 			var b = interfaceFunc("b");
@@ -132,10 +164,10 @@ namespace FluentLang.Compiler.Tests.Unit.Model.Equivalence
 
 		[Theory]
 		[MemberData(nameof(InterfaceFuncs))]
-		public void InterfaceIsEquivalentAdditiveToEmtyInterface_EvenWithDifferentNames_AndViceVersa(Func<string, Interface> interfaceFunc)
+		public void InterfaceIsEquivalentAdditiveToEmtyInterface_EvenWithDifferentNames_AndViceVersa(Func<string, IInterface> interfaceFunc)
 		{
 			var @interface = interfaceFunc("interface");
-			var additive = AdditiveToEmptyInterface("additive", "interface");
+			var additive = AdditiveToEmptyInterface("additive", "interface").Build();
 
 			var model = SemanticModel.Empty.With(@interface).With(additive);
 
@@ -145,9 +177,9 @@ namespace FluentLang.Compiler.Tests.Unit.Model.Equivalence
 
 		[Theory]
 		[MemberData(nameof(InterfaceWithOneMethods))]
-		public void EmptyInterfaceIsNotEquivalentToInterfaceWithOneMethod(Interface interfaceWithOneMethod)
+		public void EmptyInterfaceIsNotEquivalentToInterfaceWithOneMethod(IInterface interfaceWithOneMethod)
 		{
-			var empty = EmptyInterface("empty");
+			var empty = EmptyInterface("empty").Build();
 
 			var model = SemanticModel.Empty.With(empty).With(interfaceWithOneMethod);
 
@@ -157,7 +189,7 @@ namespace FluentLang.Compiler.Tests.Unit.Model.Equivalence
 
 		[Theory]
 		[MemberData(nameof(InterfaceWithOneMethodPairs))]
-		public void InterfaceWithOneMethodIsNotEquivalentToDifferentInterfaceWithOneMethod(Interface interfaceWithOneMethoda, Interface interfaceWithOneMethodb)
+		public void InterfaceWithOneMethodIsNotEquivalentToDifferentInterfaceWithOneMethod(IInterface interfaceWithOneMethoda, IInterface interfaceWithOneMethodb)
 		{
 			var model = SemanticModel.Empty.With(interfaceWithOneMethoda).With(interfaceWithOneMethodb);
 
@@ -166,11 +198,15 @@ namespace FluentLang.Compiler.Tests.Unit.Model.Equivalence
 
 		[Theory]
 		[MemberData(nameof(InterfaceWithOneMethods))]
-		public void InterfaceWithOneMethodIsNotEquivalentToMatchingInterfaceWithOneMethodWithDifferentMethodName(Interface interfaceWithOneMethod)
+		public void InterfaceWithOneMethodIsNotEquivalentToMatchingInterfaceWithOneMethodWithDifferentMethodName(IInterface interfaceWithOneMethod)
 		{
 			var method = interfaceWithOneMethod.MethodSets.Single().Methods.Single();
-			var methodCopy = new InterfaceMethod(method.Name + "1", method.ReturnType, method.Parameters);
-			var interfaceCopy = new Interface(interfaceWithOneMethod.AdditiveInterfaces, ImmutableArray.Create(new InterfaceMethodSet(ImmutableArray.Create(methodCopy))), new QualifiedName("copy"));
+			var methodCopy = (IInterfaceMethod)new TestInterfaceMethod(method.Name + "1", method.ReturnType, method.Parameters);
+			var interfaceCopy = (IInterface)new TestInterface(
+				interfaceWithOneMethod.AdditiveInterfaces,
+				ImmutableArray.Create((IInterfaceMethodSet)new TestInterfaceMethodSet(ImmutableArray.Create(methodCopy))),
+				scope: null,
+				new QualifiedName("copy"));
 			var model = SemanticModel.Empty.With(interfaceWithOneMethod).With(interfaceCopy);
 
 			Assert.False(interfaceWithOneMethod.IsEquivalentTo(interfaceCopy, model));
@@ -180,14 +216,14 @@ namespace FluentLang.Compiler.Tests.Unit.Model.Equivalence
 		[Fact]
 		public void InterfaceWithOneMethodIsEquivalentRecursivelyA()
 		{
-			var interfaceWithOneMethodA = InterfaceWithOneMethod("interfaceWithOneMethodA", TypeKey("empty"), TypeKey("empty"));
-			var interfaceWithOneMethodB = InterfaceWithOneMethod("interfaceWithOneMethodB", TypeKey("additiveEmpty"), TypeKey("additiveEmpty"));
+			var interfaceWithOneMethodA = InterfaceWithOneMethod("interfaceWithOneMethodA", TypeKey("empty"), TypeKey("empty")).Build();
+			var interfaceWithOneMethodB = InterfaceWithOneMethod("interfaceWithOneMethodB", TypeKey("additiveEmpty"), TypeKey("additiveEmpty")).Build();
 
 			var model = SemanticModel.Empty
 				.With(interfaceWithOneMethodA)
 				.With(interfaceWithOneMethodB)
-				.With(EmptyInterface("empty"))
-				.With(AdditiveToEmptyInterface("additiveEmpty", "empty"));
+				.With(EmptyInterface("empty").Build())
+				.With(AdditiveToEmptyInterface("additiveEmpty", "empty").Build());
 
 			Assert.True(interfaceWithOneMethodA.IsEquivalentTo(interfaceWithOneMethodB, model));
 			Assert.True(interfaceWithOneMethodA.IsEquivalentTo(interfaceWithOneMethodB, model));
@@ -196,8 +232,8 @@ namespace FluentLang.Compiler.Tests.Unit.Model.Equivalence
 		[Fact]
 		public void InterfaceWithOneMethodIsEquivalentRecursivelyB()
 		{
-			var interfaceWithOneMethodA = InterfaceWithOneMethod("interfaceWithOneMethodA", TypeKey("interfaceWithOneMethodA"), TypeKey("interfaceWithOneMethodA"));
-			var interfaceWithOneMethodB = InterfaceWithOneMethod("interfaceWithOneMethodB", TypeKey("interfaceWithOneMethodB"), TypeKey("interfaceWithOneMethodB"));
+			var interfaceWithOneMethodA = InterfaceWithOneMethod("interfaceWithOneMethodA", TypeKey("interfaceWithOneMethodA"), TypeKey("interfaceWithOneMethodA")).Build();
+			var interfaceWithOneMethodB = InterfaceWithOneMethod("interfaceWithOneMethodB", TypeKey("interfaceWithOneMethodB"), TypeKey("interfaceWithOneMethodB")).Build();
 
 			var model = SemanticModel.Empty
 				.With(interfaceWithOneMethodA)
@@ -210,8 +246,8 @@ namespace FluentLang.Compiler.Tests.Unit.Model.Equivalence
 		[Fact]
 		public void InterfaceWithOneMethodIsEquivalentRecursivelyC()
 		{
-			var interfaceWithOneMethodA = InterfaceWithOneMethod("interfaceWithOneMethodB", TypeKey("interfaceWithOneMethodA"), TypeKey("interfaceWithOneMethodA"));
-			var interfaceWithOneMethodB = InterfaceWithOneMethod("interfaceWithOneMethodA", TypeKey("interfaceWithOneMethodB"), TypeKey("interfaceWithOneMethodB"));
+			var interfaceWithOneMethodA = InterfaceWithOneMethod("interfaceWithOneMethodB", TypeKey("interfaceWithOneMethodA"), TypeKey("interfaceWithOneMethodA")).Build();
+			var interfaceWithOneMethodB = InterfaceWithOneMethod("interfaceWithOneMethodA", TypeKey("interfaceWithOneMethodB"), TypeKey("interfaceWithOneMethodB")).Build();
 
 			var model = SemanticModel.Empty
 				.With(interfaceWithOneMethodA)

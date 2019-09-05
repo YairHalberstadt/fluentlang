@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FluentLang.Compiler.Model
 {
-	public sealed class Primitive : Type
+	public sealed class Primitive : IType, IEquatable<Primitive>
 	{
 		public static Primitive Bool { get; } = new Primitive(new QualifiedName("bool"));
 		public static Primitive Int { get; } = new Primitive(new QualifiedName("int"));
@@ -15,16 +17,26 @@ namespace FluentLang.Compiler.Model
 			FullyQualifiedName = fullyQualifiedName;
 		}
 
-		public override QualifiedName FullyQualifiedName { get; }
+		public QualifiedName FullyQualifiedName { get; }
 
-		internal override bool IsEquivalentTo(Type? other, Stack<(Type, Type)>? dependantEqualities, ISemanticModel model)
+		bool IType.IsEquivalentTo(IType? other, Stack<(IType, IType)>? dependantEqualities, ISemanticModel model)
 		{
 			return ReferenceEquals(this, other);
 		}
 
-		public override bool IsSubTypeOf(Type other, ISemanticModel model)
+		bool IType.IsSubTypeOf(IType other, ISemanticModel model)
 		{
-			return IsEquivalentTo(other, model);
+			return ((IType)this).IsEquivalentTo(other, null, model);
+		}
+
+		public bool Equals(Primitive? other)
+		{
+			return ReferenceEquals(this, other);
+		}
+
+		public override string? ToString()
+		{
+			return FullyQualifiedName.ToString();
 		}
 	}
 }

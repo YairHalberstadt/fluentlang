@@ -4,5 +4,6 @@
 	{
 		SyntaxError,
 		DuplicateInterfaceDeclaration,
+		DuplicateMethodDeclaration,
 	}
 }

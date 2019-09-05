@@ -1,4 +1,5 @@
 ﻿using FluentLang.Compiler.Model;
+using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -46,22 +47,22 @@ namespace FluentLang.Compiler.Tests.Unit.Model.Equivalence
 		[MemberData(nameof(Primitives))]
 		public void PrimitivesAreEqualToThemselves(Primitive primitive)
 		{
-			Assert.True(primitive.IsEquivalentTo(primitive, SemanticModel.Empty));
+			Assert.True(((IType)primitive).IsEquivalentTo(primitive, SemanticModel.Empty));
 		}
 
 		[Theory]
 		[MemberData(nameof(PrimitivePairs))]
 		public void PrimitivesAreNotEqualToOtherPrimitives(Primitive a, Primitive b)
 		{
-			Assert.False(a.IsEquivalentTo(b, SemanticModel.Empty));
+			Assert.False(((IType)a).IsEquivalentTo(b, SemanticModel.Empty));
 		}
 
 		[Theory]
 		[MemberData(nameof(Primitives))]
 		public void PrimitivesAreNotEquivalentToInterface_EvenWithSameName(Primitive primitive)
 		{
-			var i = new Interface(ImmutableArray<InterfaceReference>.Empty, ImmutableArray<InterfaceMethodSet>.Empty, primitive.FullyQualifiedName);
-			Assert.False(primitive.IsEquivalentTo(i, SemanticModel.Empty.With(i)));
+			var i = new InterfaceBuilder { FullyQualifiedName = primitive.FullyQualifiedName.ToString() }.Build();
+			Assert.False(((IType)primitive).IsEquivalentTo(i, SemanticModel.Empty.With(i)));
 		}
 	}
 }

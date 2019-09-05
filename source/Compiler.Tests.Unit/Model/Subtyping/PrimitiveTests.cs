@@ -1,11 +1,12 @@
 ﻿using FluentLang.Compiler.Model;
+using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
 using Xunit;
 
-namespace FluentLang.Compiler.Tests.Unit.Subtyping.Equivalence
+namespace FluentLang.Compiler.Tests.Unit.Subtyping
 {
 	public class PrimitiveTests
 	{
@@ -46,22 +47,22 @@ namespace FluentLang.Compiler.Tests.Unit.Subtyping.Equivalence
 		[MemberData(nameof(Primitives))]
 		public void PrimitivesAreSubtypesOfThemselves(Primitive primitive)
 		{
-			Assert.True(primitive.IsSubTypeOf(primitive, SemanticModel.Empty));
+			Assert.True(((IType)primitive).IsSubTypeOf(primitive, SemanticModel.Empty));
 		}
 
 		[Theory]
 		[MemberData(nameof(PrimitivePairs))]
 		public void PrimitivesAreNotSubtypesOfOtherPrimitives(Primitive a, Primitive b)
 		{
-			Assert.False(a.IsSubTypeOf(b, SemanticModel.Empty));
+			Assert.False(((IType)a).IsSubTypeOf(b, SemanticModel.Empty));
 		}
 
 		[Theory]
 		[MemberData(nameof(Primitives))]
 		public void PrimitivesAreNotSubtypesOfInterface_EvenWithSameName(Primitive primitive)
 		{
-			var i = new Interface(ImmutableArray<InterfaceReference>.Empty, ImmutableArray<InterfaceMethodSet>.Empty, primitive.FullyQualifiedName);
-			Assert.False(primitive.IsSubTypeOf(i, SemanticModel.Empty.With(i)));
+			var i = new InterfaceBuilder { FullyQualifiedName = primitive.FullyQualifiedName.ToString() }.Build();
+			Assert.False(((IType)primitive).IsSubTypeOf(i, SemanticModel.Empty.With(i)));
 		}
 	}
 }

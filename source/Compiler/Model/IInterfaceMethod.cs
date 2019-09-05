@@ -1,34 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
 namespace FluentLang.Compiler.Model
 {
-	public class InterfaceMethod
+	public interface IInterfaceMethod
 	{
-		public InterfaceMethod(
-			string name,
-			TypeKey returnType,
-			ImmutableArray<Parameter> parameters)
-		{
-			Name = name;
-			ReturnType = returnType;
-			Parameters = parameters;
-		}
+		string Name { get; }
+		ImmutableArray<Parameter> Parameters { get; }
+		TypeKey ReturnType { get; }
 
-		public string Name { get; }
-
-		public TypeKey ReturnType { get; }
-
-		public ImmutableArray<Parameter> Parameters { get; }
-
-		public bool IsEquivalentTo(InterfaceMethod other, ISemanticModel model)
+		public bool IsEquivalentTo(IInterfaceMethod other, ISemanticModel model)
 		{
 			return IsEquivalentTo(other, null, model);
 		}
 
-		internal bool IsEquivalentTo(InterfaceMethod? other, Stack<(Type, Type)>? dependantEqualities, ISemanticModel model)
+		internal bool IsEquivalentTo(IInterfaceMethod? other, Stack<(IType, IType)>? dependantEqualities, ISemanticModel model)
 		{
 			if (other is null)
 			{

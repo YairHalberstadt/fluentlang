@@ -9,7 +9,7 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 {
 	public static class AssertHelpers
 	{
-		public static void Equal(Interface expected, Interface actual)
+		public static void Equal(IInterface expected, IInterface actual)
 		{
 			if (ModelEqualityHelpers.AreEqual(expected, actual))
 				return;

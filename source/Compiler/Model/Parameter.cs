@@ -1,6 +1,6 @@
 ﻿namespace FluentLang.Compiler.Model
 {
-	public class Parameter
+	public sealed class Parameter
 	{
 		public Parameter(string name, TypeKey type)
 		{

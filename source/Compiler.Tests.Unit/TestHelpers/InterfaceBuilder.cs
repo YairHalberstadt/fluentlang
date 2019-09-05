@@ -13,31 +13,23 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 
 		public string? FullyQualifiedName { get; set; }
 
-		public Interface Build()
+		public IInterface Build()
 		{
-			return new Interface(
+			return new TestInterface(
 				AdditiveInterfaces.Select(x => x.Build()).ToImmutableArray(),
-				MethodSets.Select(x => new InterfaceMethodSet(x.Select(x => x.Build()).ToImmutableArray())).ToImmutableArray(),
+				MethodSets.Select(x => (IInterfaceMethodSet)new TestInterfaceMethodSet(x.Select(x => x.Build()).ToImmutableArray())).ToImmutableArray(),
+				null,
 				FullyQualifiedName is null ? null : TestModelFactory.QualifiedName(FullyQualifiedName));
 		}
 	}
 
-	public class InterfaceReferenceBuilder
+	public class TestInterfaceMethodSet : IInterfaceMethodSet
 	{
-		public InterfaceReferenceBuilder(string partiallyQualifiedName)
+		public TestInterfaceMethodSet(ImmutableArray<IInterfaceMethod> methods)
 		{
-			PartiallyQualifiedName = partiallyQualifiedName;
+			Methods = methods;
 		}
 
-		public string PartiallyQualifiedName { get; }
-
-		public List<string> ImportedNamespaces { get; } = new List<string>();
-
-		public InterfaceReference Build()
-		{
-			return new InterfaceReference(
-				ImportedNamespaces.Select(x => TestModelFactory.QualifiedName(x)).ToImmutableArray(),
-				TestModelFactory.QualifiedName(PartiallyQualifiedName));
-		}
+		public ImmutableArray<IInterfaceMethod> Methods { get; }
 	}
 }

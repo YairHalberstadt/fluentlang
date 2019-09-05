@@ -195,7 +195,7 @@ public partial class FluentLangParserBaseVisitor<Result> : AbstractParseTreeVisi
 	/// <return>The visitor result.</return>
 	public virtual Result VisitType([NotNull] FluentLangParser.TypeContext context) { return VisitChildren(context); }
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="FluentLangParser.base_type"/>.
+	/// Visit a parse tree produced by <see cref="FluentLangParser.primitive_type"/>.
 	/// <para>
 	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
 	/// on <paramref name="context"/>.
@@ -203,7 +203,7 @@ public partial class FluentLangParserBaseVisitor<Result> : AbstractParseTreeVisi
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	public virtual Result VisitBase_type([NotNull] FluentLangParser.Base_typeContext context) { return VisitChildren(context); }
+	public virtual Result VisitPrimitive_type([NotNull] FluentLangParser.Primitive_typeContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="FluentLangParser.method_declaration"/>.
 	/// <para>
@@ -383,16 +383,6 @@ public partial class FluentLangParserBaseVisitor<Result> : AbstractParseTreeVisi
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	public virtual Result VisitFully_qualified_method([NotNull] FluentLangParser.Fully_qualified_methodContext context) { return VisitChildren(context); }
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="FluentLangParser.fully_qualified_method_parameters"/>.
-	/// <para>
-	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
-	/// on <paramref name="context"/>.
-	/// </para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	public virtual Result VisitFully_qualified_method_parameters([NotNull] FluentLangParser.Fully_qualified_method_parametersContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="FluentLangParser.operator"/>.
 	/// <para>

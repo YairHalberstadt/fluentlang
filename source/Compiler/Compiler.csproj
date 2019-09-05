@@ -4,7 +4,8 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <RootNamespace>FluentLang.Compiler</RootNamespace>
     <Nullable>enable</Nullable>
-    <WarningsAsErrors>true</WarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>CS3021</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

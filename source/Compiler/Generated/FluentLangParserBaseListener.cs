@@ -228,17 +228,17 @@ public partial class FluentLangParserBaseListener : IFluentLangParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitType([NotNull] FluentLangParser.TypeContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="FluentLangParser.base_type"/>.
+	/// Enter a parse tree produced by <see cref="FluentLangParser.primitive_type"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterBase_type([NotNull] FluentLangParser.Base_typeContext context) { }
+	public virtual void EnterPrimitive_type([NotNull] FluentLangParser.Primitive_typeContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="FluentLangParser.base_type"/>.
+	/// Exit a parse tree produced by <see cref="FluentLangParser.primitive_type"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitBase_type([NotNull] FluentLangParser.Base_typeContext context) { }
+	public virtual void ExitPrimitive_type([NotNull] FluentLangParser.Primitive_typeContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.method_declaration"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -461,18 +461,6 @@ public partial class FluentLangParserBaseListener : IFluentLangParserListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitFully_qualified_method([NotNull] FluentLangParser.Fully_qualified_methodContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by <see cref="FluentLangParser.fully_qualified_method_parameters"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterFully_qualified_method_parameters([NotNull] FluentLangParser.Fully_qualified_method_parametersContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="FluentLangParser.fully_qualified_method_parameters"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitFully_qualified_method_parameters([NotNull] FluentLangParser.Fully_qualified_method_parametersContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.operator"/>.
 	/// <para>The default implementation does nothing.</para>

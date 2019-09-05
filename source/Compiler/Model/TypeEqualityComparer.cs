@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace FluentLang.Compiler.Model
 {
-	public class TypeEqualityComparer : IEqualityComparer<Type>, IEqualityComparer<TypeKey>
+	public class TypeEqualityComparer : IEqualityComparer<IType>, IEqualityComparer<TypeKey>
 	{
-		private readonly Stack<(Type, Type)>? _dependantEqualities;
+		private readonly Stack<(IType, IType)>? _dependantEqualities;
 		private readonly ISemanticModel _model;
 
 		public TypeEqualityComparer(ISemanticModel model)
@@ -14,25 +14,25 @@ namespace FluentLang.Compiler.Model
 			_model = model;
 		}
 
-		internal TypeEqualityComparer(Stack<(Type, Type)>? dependantEqualities, ISemanticModel model)
+		internal TypeEqualityComparer(Stack<(IType, IType)>? dependantEqualities, ISemanticModel model)
 		{
 			_dependantEqualities = dependantEqualities;
 			_model = model;
 		}
 
-		public bool Equals(Type x, Type y)
+		public bool Equals(IType x, IType y)
 		{
 			if (x is null)
 				return y is null;
 			return x.IsEquivalentTo(y, _dependantEqualities, _model);
 		}
 
-		public int GetHashCode(Type obj)
+		public int GetHashCode(IType obj)
 		{
 			return obj switch
 			{
 				Primitive _ => obj.GetHashCode(),
-				Interface i => i
+				IInterface i => i
 					.AllInterfaceMethods(_dependantEqualities, _model)
 					.Sum(x=> x.Name.GetHashCode() * 17 + x.Parameters.Length),
 				_ => throw new InvalidOperationException(obj.GetType().ToString())

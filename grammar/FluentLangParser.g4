@@ -68,11 +68,11 @@ type_declaration
 
 type
     : qualified_name
-    | base_type
+    | primitive_type
     | anonymous_interface_declaration
     ;
 
-base_type
+primitive_type
     : BOOL
     | INT
     | DOUBLE
@@ -126,13 +126,13 @@ object_patch
     ;
 
 fully_qualified_method
-    : qualified_name OPEN_PARENS fully_qualified_method_parameters CLOSE_PARENS type_declaration
-    | qualified_name
+    : qualified_name
+//  | qualified_name OPEN_PARENS fully_qualified_method_parameters CLOSE_PARENS type_declaration
     ;
 
-fully_qualified_method_parameters
-    : type (COMMA type)*
-    ;
+//fully_qualified_method_parameters
+//    : type (COMMA type)*
+//    ;
 
 operator
     : PLUS

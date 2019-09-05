@@ -11,7 +11,7 @@ namespace FluentLang.Compiler.Model
 			Primitive = primitive;
 		}
 
-		public TypeKey(Interface @interface) : this()
+		public TypeKey(IInterface @interface) : this()
 		{
 			Interface = @interface;
 		}
@@ -23,11 +23,11 @@ namespace FluentLang.Compiler.Model
 
 		public Primitive? Primitive { get; }
 
-		public Interface? Interface { get; }
+		public IInterface? Interface { get; }
 
 		public InterfaceReference? InterfaceReference { get; }
 
-		public IEnumerable<Type> GetPossibleTypes(ISemanticModel model)
+		public IEnumerable<IType> GetPossibleTypes(ISemanticModel model)
 		{
 			if (Primitive != null)
 				return new[] { Primitive };
@@ -38,7 +38,7 @@ namespace FluentLang.Compiler.Model
 			throw new InvalidOperationException($"Do not use the default constructor for {nameof(TypeKey)}");
 		}
 
-		public bool IsEquivalentTo(Type other, ISemanticModel model)
+		public bool IsEquivalentTo(IType other, ISemanticModel model)
 		{
 			return IsEquivalentTo(other, null, model);
 		}
@@ -53,7 +53,7 @@ namespace FluentLang.Compiler.Model
 			return IsEquivalentTo(other, null, model);
 		}
 
-		internal bool IsEquivalentTo(Type other, Stack<(Type, Type)>? dependantEqualities, ISemanticModel model)
+		internal bool IsEquivalentTo(IType other, Stack<(IType, IType)>? dependantEqualities, ISemanticModel model)
 		{
 			var thisType = GetPossibleTypes(model).SingleOrDefault();
 			if (thisType is null)
@@ -61,7 +61,7 @@ namespace FluentLang.Compiler.Model
 			return (thisType.IsEquivalentTo(other, dependantEqualities, model));
 		}
 
-		internal bool IsEquivalentTo(TypeKey other, Stack<(Type, Type)>? dependantEqualities, ISemanticModel model)
+		internal bool IsEquivalentTo(TypeKey other, Stack<(IType, IType)>? dependantEqualities, ISemanticModel model)
 		{
 			var thisType = GetPossibleTypes(model).SingleOrDefault();
 			if (thisType is null)
@@ -72,7 +72,7 @@ namespace FluentLang.Compiler.Model
 			return (thisType.IsEquivalentTo(otherType, dependantEqualities, model));
 		}
 
-		internal bool IsEquivalentTo(InterfaceReference other, Stack<(Type, Type)>? dependantEqualities, ISemanticModel model)
+		internal bool IsEquivalentTo(InterfaceReference other, Stack<(IType, IType)>? dependantEqualities, ISemanticModel model)
 		{
 			var thisType = GetPossibleTypes(model).SingleOrDefault();
 			if (thisType is null)

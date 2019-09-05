@@ -192,15 +192,15 @@ public interface IFluentLangParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitType([NotNull] FluentLangParser.TypeContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="FluentLangParser.base_type"/>.
+	/// Enter a parse tree produced by <see cref="FluentLangParser.primitive_type"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterBase_type([NotNull] FluentLangParser.Base_typeContext context);
+	void EnterPrimitive_type([NotNull] FluentLangParser.Primitive_typeContext context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="FluentLangParser.base_type"/>.
+	/// Exit a parse tree produced by <see cref="FluentLangParser.primitive_type"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitBase_type([NotNull] FluentLangParser.Base_typeContext context);
+	void ExitPrimitive_type([NotNull] FluentLangParser.Primitive_typeContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.method_declaration"/>.
 	/// </summary>
@@ -389,16 +389,6 @@ public interface IFluentLangParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitFully_qualified_method([NotNull] FluentLangParser.Fully_qualified_methodContext context);
-	/// <summary>
-	/// Enter a parse tree produced by <see cref="FluentLangParser.fully_qualified_method_parameters"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterFully_qualified_method_parameters([NotNull] FluentLangParser.Fully_qualified_method_parametersContext context);
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="FluentLangParser.fully_qualified_method_parameters"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitFully_qualified_method_parameters([NotNull] FluentLangParser.Fully_qualified_method_parametersContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.operator"/>.
 	/// </summary>
