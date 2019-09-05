@@ -1,1 +1,175 @@
-# fluentlang
+# FluentLang
+
+FluentLang is an experimental programming language designed to explore the intersection between structural typing, object oriented programming, and functional programming.
+
+Currently it is very much a work in progress.
+
+## Aims
+
+This language is primarily a research language. It is as far as I know completely novel in its design, and is intended as a project to research how feasible the design is in practice.
+
+As such the language prioritizes simplicity of implementation and definition, over features and ease of use. As such it may be a bit awkward to use in practice, and lacks many noble and worthy features, such as generics, downcasting and much more.
+
+At the same time I do try to keep in mind what syntax sugar and extra features I might want to add, and how they interact with the current design, when designing the language.
+
+Performance is not a priority for this language, but at the same time I am trying to keep performance within reason. For that reason certain features (such as including method subtyping in interface subtyping) have been put off till a practical performant design can be worked out for them.
+
+## Concepts
+
+### Types
+
+A type is either an interface or a primitive.
+
+#### Interfaces
+
+An interface is a collection of methods, which may or may not be named. All interfaces are structurally typed. An interface a is equavelent to an interface b, if for every method a defines, b defines an equavelent method, and vice versa. Two methods are equavelent if every parameter and the return type are equavelent. 
+
+An interface a is a subtype of another interface b, if for every method in b, a defines an equivalent method.
+
+If an interface a being equavelent to an interface b would not break this definition, they are considered equavelent, even if it is not required for them to be equivalent to avoid breaking the definition. For example:
+
+```
+interface a
+{
+    M() : a;
+}
+
+interface b
+{
+    M() : b;
+}
+```
+
+Here a and b are equavelent.
+
+Every object has an implicit interface it implements, and and is a subtype of any interface this interface is a subtype of.
+
+#### Primitives
+
+There are currently 5 primitives defined:
+
+bool
+int
+double
+char
+string
+
+This is sufficient for 99% of use cases in my experience. All of these are defined to have the same structure as their C# equivalents.
+
+The primitives implement no interfaces, and cannot be boxed.
+
+A primitive is only equivalent to itself, and only a subtype of itself.
+
+### Methods
+
+Methods take a list of named and typed parameters and return a typed object.
+
+To call a method requires passing in a list of arguments of the same length as the parameters of the method. All the arguments must be statically typed as subtypes of their respective parameter.
+
+Methods can define local methods and interfaces, which are scoped to that method, and it's subMethods/subInterfaces.
+
+Local methods can capture variables. Since all variables are immutable, whether they are captured by value or reference is an implementation detail.
+
+### Objects
+
+There are no such thing as classes in FluentLang.
+
+The only object that can be created is tge empty object `{}`, which implements the empty interface.
+
+It is then possible to bind methods to the object.
+
+```
+M1(param : {}) : {}
+{
+    return param;
+}
+
+M2(param : {}) : int
+{
+    return 5;
+}
+
+...
+
+bound = {} + M1 + M2;
+
+resultM1 = bound.M1();
+resultM2 = bound.M2();
+```
+
+binding creates a new object with the bound methods attached. This new object implements the union of its original interface, and the interface containing the bound methods with their first parameter removed.
+
+It is only possible to bind methods where the type of the returned object from the binding expression is a subtype of the first parameter of the method. For example:
+
+```
+interface Counter
+{
+    Increment() : Counter;
+    Value() : int;
+}
+
+CreateCounter() : Counter
+{
+      return {} + Increment + Value;
+      Increment(counter : Counter) : Counter
+      {
+          value = counter.Value();
+          return counter + Value;
+          Value(counter : {}) : int
+          {
+              return value;
+          }
+      }
+
+      Value(counter : {}) : int
+      {
+          return 0;
+      }
+}
+```
+
+### Immutability
+
+Pure FluentLang is purely immutable. There is no way to change any existing variable. As a result pure FluentLang is also referentially transparent.
+
+Howevers operations such as IO are performed via interop with C# libraries. There is no guarantee as to the behaviour of these libraries.
+
+### Object Oriented Programming
+
+Objects have no fields, only methods. Objects are not instances of a class, but rather are produced in prototypical fashion, by copying and adding methods to existing objects. From that perspective they share a lot in common with Alan Kay's perspective on object oriented programming, although there are of course many differences as well.
+
+## Status
+
+### Completed:
+
+ANTLR4 lexer and parser
+
+### In progress
+
+Creation of Semantic Model
+
+### ToDo
+
+Semantic checks (type checking etc.)
+
+Implement runtime
+
+Implement Emitting of code
+
+Implement Emitting of metadata
+
+Create compiler.exe
+
+## Contributing
+
+For now this is very much a one man project. Once the design is more complete I will update this.
+
+However projects that can be done right now:
+
+1. Set up CI pipeline on Azure
+2. Add more unit tests
+3. Create a blazor based text editor with syntax highlighting and stub methods ready to be hooked into the compiler once it is complete.
+
+
+
+
