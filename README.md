@@ -49,9 +49,13 @@ Every object has an implicit interface it implements, and and is a subtype of an
 There are currently 5 primitives defined:
 
 bool
+
 int
+
 double
+
 char
+
 string
 
 This is sufficient for 99% of use cases in my experience. All of these are defined to have the same structure as their C# equivalents.
@@ -74,7 +78,7 @@ Local methods can capture variables. Since all variables are immutable, whether 
 
 There are no such thing as classes in FluentLang.
 
-The only object that can be created is tge empty object `{}`, which implements the empty interface.
+The only object that can be created is the empty object `{}`, which implements the empty interface.
 
 It is then possible to bind methods to the object.
 
