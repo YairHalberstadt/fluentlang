@@ -27,12 +27,12 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 
 		public InterfaceReferenceBuilder? InterfaceReferenceBuilder { get; }
 
-		public TypeKey Build()
+		public TypeKey Build(Func<IMethod>? scope = null)
 		{
 			if (Primitive != null)
 				return new TypeKey(Primitive);
 			if (InterfaceBuilder != null)
-				return new TypeKey(InterfaceBuilder.Build());
+				return new TypeKey(InterfaceBuilder.Build(scope));
 			if (InterfaceReferenceBuilder != null)
 				return new TypeKey(InterfaceReferenceBuilder.Build());
 			throw new InvalidOperationException("Unreachable");

@@ -85,13 +85,12 @@ method_declaration
     ;
 
 method_body
-    : OPEN_BRACE (method_statement | method_declaration)* CLOSE_BRACE
+    : OPEN_BRACE (method_statement | method_declaration | interface_declaration)* CLOSE_BRACE
     ;
 
  method_statement
     : declaration_statement
     | return_statement
-    | interface_declaration
     ;
 
 declaration_statement

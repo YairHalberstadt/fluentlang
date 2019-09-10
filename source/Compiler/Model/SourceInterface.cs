@@ -17,7 +17,7 @@ namespace FluentLang.Compiler.Model
 		private ImmutableArray<InterfaceReference> _additiveInterfaces;
 		private ImmutableArray<IInterfaceMethodSet> _methodSets;
 
-		public SourceInterface(Anonymous_interface_declarationContext context, ImmutableArray<QualifiedName> openedNamespaces, QualifiedName? fullyQualifiedName = null, Method? scope = null)
+		public SourceInterface(Anonymous_interface_declarationContext context, ImmutableArray<QualifiedName> openedNamespaces, QualifiedName? fullyQualifiedName = null, IMethod? scope = null)
 		{
 			_context = context;
 			_openedNamespaces = openedNamespaces;
@@ -31,7 +31,7 @@ namespace FluentLang.Compiler.Model
 
 		public QualifiedName? FullyQualifiedName { get; }
 
-		public Method? Scope { get; }
+		public IMethod? Scope { get; }
 
 		public ImmutableHashSet<IInterfaceMethod> AllInterfaceMethods(ISemanticModel model)
 		{

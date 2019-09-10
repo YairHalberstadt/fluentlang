@@ -1,15 +1,20 @@
 ﻿using FluentLang.Compiler.Model;
+using System;
 using System.Collections.Immutable;
 
 namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 {
 	public class TestInterface : IInterface
 	{
-		public TestInterface(ImmutableArray<InterfaceReference> additiveInterfaces, ImmutableArray<IInterfaceMethodSet> methodSets, Method? scope, QualifiedName? fullyQualifiedName)
+		public TestInterface(
+			ImmutableArray<InterfaceReference> additiveInterfaces,
+			ImmutableArray<IInterfaceMethodSet> methodSets,
+			Func<IMethod>? scope,
+			QualifiedName? fullyQualifiedName)
 		{
 			AdditiveInterfaces = additiveInterfaces;
 			MethodSets = methodSets;
-			Scope = scope;
+			_scope = scope;
 			FullyQualifiedName = fullyQualifiedName;
 		}
 
@@ -17,7 +22,8 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 
 		public ImmutableArray<IInterfaceMethodSet> MethodSets { get; }
 
-		public Method? Scope { get; }
+		private readonly Func<IMethod>? _scope;
+		public IMethod? Scope => _scope?.Invoke();
 
 		public QualifiedName? FullyQualifiedName { get; }
 	}

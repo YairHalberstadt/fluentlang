@@ -3,8 +3,8 @@
 	public interface ISemanticModel
 	{
 		bool TryGetInterface(QualifiedName fullyQualifiedName, out IInterface i);
+		bool TryGetMethod(QualifiedName fullyQualifiedName, out IMethod m);
 		ISemanticModel? TryWith(IInterface i);
-		ISemanticModel? TryWith(Method m);
-		ISemanticModel With(IInterface i);
+		ISemanticModel? TryWith(IMethod m);
 	}
 }

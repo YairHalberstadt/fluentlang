@@ -9,7 +9,7 @@ namespace FluentLang.Compiler.Model
 	{
 		ImmutableArray<InterfaceReference> AdditiveInterfaces { get; }
 		ImmutableArray<IInterfaceMethodSet> MethodSets { get; }
-		Method? Scope { get; }
+		IMethod? Scope { get; }
 		ImmutableHashSet<IInterfaceMethod> AllInterfaceMethods(ISemanticModel model)
 		{
 			var mutable = AllInterfaceMethods(null, model);

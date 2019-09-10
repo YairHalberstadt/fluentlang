@@ -1,10 +1,11 @@
 ﻿using FluentLang.Compiler.Model;
 using System;
+using System.Collections.Immutable;
 using System.Text;
 
 namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 {
-	public static class InterfaceBuilderGenerator
+	public static class ModelBuilderGenerator
 	{
 		public static void Generate(IInterface @interface, StringBuilder stringBuilder)
 		{
@@ -32,6 +33,38 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 				foreach (var interfaceRef in @interface.AdditiveInterfaces)
 				{
 					Generate(interfaceRef, stringBuilder);
+					stringBuilder.AppendLine(",");
+				}
+				stringBuilder.AppendLine("},");
+			}
+			stringBuilder.Append("}");
+		}
+
+		public static void Generate(IMethod method, StringBuilder stringBuilder)
+		{
+			stringBuilder.Append($"new MethodBuilder(\"{method.FullyQualifiedName}\", ");
+			Generate(method.ReturnType, stringBuilder);
+			stringBuilder.AppendLine(")");
+			stringBuilder.AppendLine("{");
+			Generate(method.Parameters, stringBuilder);
+			if (method.LocalMethods.Length != 0)
+			{
+				stringBuilder.AppendLine("LocalMethods =");
+				stringBuilder.AppendLine("{");
+				foreach (var localMethod in method.LocalMethods)
+				{
+					Generate(localMethod, stringBuilder);
+					stringBuilder.AppendLine(",");
+				}
+				stringBuilder.AppendLine("},");
+			}
+			if (method.LocalInterfaces.Length != 0)
+			{
+				stringBuilder.AppendLine("LocalInterfaces =");
+				stringBuilder.AppendLine("{");
+				foreach (var localInterface in method.LocalInterfaces)
+				{
+					Generate(localInterface, stringBuilder);
 					stringBuilder.AppendLine(",");
 				}
 				stringBuilder.AppendLine("},");
@@ -83,11 +116,17 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 			stringBuilder.Append($"ReturnType = ");
 			Generate(method.ReturnType, stringBuilder);
 			stringBuilder.AppendLine(",");
-			if (method.Parameters.Length != 0)
+			Generate(method.Parameters, stringBuilder);
+			stringBuilder.Append("}");
+		}
+
+		private static void Generate(ImmutableArray<Parameter> parameters, StringBuilder stringBuilder)
+		{
+			if (parameters.Length != 0)
 			{
 				stringBuilder.AppendLine("Parameters =");
 				stringBuilder.AppendLine("{");
-				foreach (var param in method.Parameters)
+				foreach (var param in parameters)
 				{
 					stringBuilder.AppendLine("(");
 					stringBuilder.AppendLine($"\"{param.Name}\",");
@@ -97,7 +136,6 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 				}
 				stringBuilder.AppendLine("},");
 			}
-			stringBuilder.Append("}");
 		}
 
 		public static void Generate(TypeKey returnType, StringBuilder stringBuilder)

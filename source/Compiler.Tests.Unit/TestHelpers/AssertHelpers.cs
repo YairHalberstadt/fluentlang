@@ -15,14 +15,35 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 				return;
 
 			var expectedSB = new StringBuilder();
-			InterfaceBuilderGenerator.Generate(expected, expectedSB);
-			var expectedBuilder = InterfaceBuilderGenerator.Indent(expectedSB.ToString());
+			ModelBuilderGenerator.Generate(expected, expectedSB);
+			var expectedBuilder = ModelBuilderGenerator.Indent(expectedSB.ToString());
 
 			var actualSB = new StringBuilder();
-			InterfaceBuilderGenerator.Generate(actual, actualSB);
-			var actualBuilder = InterfaceBuilderGenerator.Indent(actualSB.ToString());
+			ModelBuilderGenerator.Generate(actual, actualSB);
+			var actualBuilder = ModelBuilderGenerator.Indent(actualSB.ToString());
 
 			Assert.False(true, $@"interfaces are not equal
+expected:
+{expectedBuilder}
+
+actual:
+{actualBuilder}");
+		}
+
+		public static void Equal(IMethod expected, IMethod actual)
+		{
+			if (ModelEqualityHelpers.AreEqual(expected, actual))
+				return;
+
+			var expectedSB = new StringBuilder();
+			ModelBuilderGenerator.Generate(expected, expectedSB);
+			var expectedBuilder = ModelBuilderGenerator.Indent(expectedSB.ToString());
+
+			var actualSB = new StringBuilder();
+			ModelBuilderGenerator.Generate(actual, actualSB);
+			var actualBuilder = ModelBuilderGenerator.Indent(actualSB.ToString());
+
+			Assert.False(true, $@"methods are not equal
 expected:
 {expectedBuilder}
 

@@ -1253,6 +1253,12 @@ public partial class FluentLangParser : Parser {
 		public Method_declarationContext method_declaration(int i) {
 			return GetRuleContext<Method_declarationContext>(i);
 		}
+		public Interface_declarationContext[] interface_declaration() {
+			return GetRuleContexts<Interface_declarationContext>();
+		}
+		public Interface_declarationContext interface_declaration(int i) {
+			return GetRuleContext<Interface_declarationContext>(i);
+		}
 		public Method_bodyContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
@@ -1282,12 +1288,12 @@ public partial class FluentLangParser : Parser {
 			EnterOuterAlt(_localctx, 1);
 			{
 			State = 170; Match(OPEN_BRACE);
-			State = 175;
+			State = 176;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << INTERFACE) | (1L << RETURN) | (1L << EXPORT) | (1L << LET) | (1L << UPPERCASE_IDENTIFIER))) != 0)) {
 				{
-				State = 173;
+				State = 174;
 				ErrorHandler.Sync(this);
 				switch ( Interpreter.AdaptivePredict(TokenStream,15,Context) ) {
 				case 1:
@@ -1300,13 +1306,18 @@ public partial class FluentLangParser : Parser {
 					State = 172; method_declaration();
 					}
 					break;
+				case 3:
+					{
+					State = 173; interface_declaration();
+					}
+					break;
 				}
 				}
-				State = 177;
+				State = 178;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 178; Match(CLOSE_BRACE);
+			State = 179; Match(CLOSE_BRACE);
 			}
 		}
 		catch (RecognitionException re) {
@@ -1326,9 +1337,6 @@ public partial class FluentLangParser : Parser {
 		}
 		public Return_statementContext return_statement() {
 			return GetRuleContext<Return_statementContext>(0);
-		}
-		public Interface_declarationContext interface_declaration() {
-			return GetRuleContext<Interface_declarationContext>(0);
 		}
 		public Method_statementContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -1361,20 +1369,13 @@ public partial class FluentLangParser : Parser {
 			case LET:
 				EnterOuterAlt(_localctx, 1);
 				{
-				State = 180; declaration_statement();
+				State = 181; declaration_statement();
 				}
 				break;
 			case RETURN:
 				EnterOuterAlt(_localctx, 2);
 				{
-				State = 181; return_statement();
-				}
-				break;
-			case INTERFACE:
-			case EXPORT:
-				EnterOuterAlt(_localctx, 3);
-				{
-				State = 182; interface_declaration();
+				State = 182; return_statement();
 				}
 				break;
 			default:
@@ -2364,9 +2365,9 @@ public partial class FluentLangParser : Parser {
 		'\x3', '\x11', '\x3', '\x11', '\x3', '\x11', '\x5', '\x11', '\xA3', '\n', 
 		'\x11', '\x3', '\x12', '\x3', '\x12', '\x3', '\x13', '\x5', '\x13', '\xA8', 
 		'\n', '\x13', '\x3', '\x13', '\x3', '\x13', '\x3', '\x13', '\x3', '\x14', 
-		'\x3', '\x14', '\x3', '\x14', '\a', '\x14', '\xB0', '\n', '\x14', '\f', 
-		'\x14', '\xE', '\x14', '\xB3', '\v', '\x14', '\x3', '\x14', '\x3', '\x14', 
-		'\x3', '\x15', '\x3', '\x15', '\x3', '\x15', '\x5', '\x15', '\xBA', '\n', 
+		'\x3', '\x14', '\x3', '\x14', '\x3', '\x14', '\a', '\x14', '\xB1', '\n', 
+		'\x14', '\f', '\x14', '\xE', '\x14', '\xB4', '\v', '\x14', '\x3', '\x14', 
+		'\x3', '\x14', '\x3', '\x15', '\x3', '\x15', '\x5', '\x15', '\xBA', '\n', 
 		'\x15', '\x3', '\x16', '\x3', '\x16', '\x3', '\x16', '\x5', '\x16', '\xBF', 
 		'\n', '\x16', '\x3', '\x16', '\x3', '\x16', '\x3', '\x16', '\x3', '\x16', 
 		'\x3', '\x16', '\x3', '\x16', '\x3', '\x16', '\x3', '\x16', '\x3', '\x16', 
@@ -2480,16 +2481,16 @@ public partial class FluentLangParser : Parser {
 		'\xA6', '\x3', '\x2', '\x2', '\x2', '\xA7', '\xA8', '\x3', '\x2', '\x2', 
 		'\x2', '\xA8', '\xA9', '\x3', '\x2', '\x2', '\x2', '\xA9', '\xAA', '\x5', 
 		'\x18', '\r', '\x2', '\xAA', '\xAB', '\x5', '&', '\x14', '\x2', '\xAB', 
-		'%', '\x3', '\x2', '\x2', '\x2', '\xAC', '\xB1', '\a', '\x11', '\x2', 
-		'\x2', '\xAD', '\xB0', '\x5', '(', '\x15', '\x2', '\xAE', '\xB0', '\x5', 
-		'$', '\x13', '\x2', '\xAF', '\xAD', '\x3', '\x2', '\x2', '\x2', '\xAF', 
-		'\xAE', '\x3', '\x2', '\x2', '\x2', '\xB0', '\xB3', '\x3', '\x2', '\x2', 
-		'\x2', '\xB1', '\xAF', '\x3', '\x2', '\x2', '\x2', '\xB1', '\xB2', '\x3', 
-		'\x2', '\x2', '\x2', '\xB2', '\xB4', '\x3', '\x2', '\x2', '\x2', '\xB3', 
-		'\xB1', '\x3', '\x2', '\x2', '\x2', '\xB4', '\xB5', '\a', '\x12', '\x2', 
-		'\x2', '\xB5', '\'', '\x3', '\x2', '\x2', '\x2', '\xB6', '\xBA', '\x5', 
-		'*', '\x16', '\x2', '\xB7', '\xBA', '\x5', ',', '\x17', '\x2', '\xB8', 
-		'\xBA', '\x5', '\x10', '\t', '\x2', '\xB9', '\xB6', '\x3', '\x2', '\x2', 
+		'%', '\x3', '\x2', '\x2', '\x2', '\xAC', '\xB2', '\a', '\x11', '\x2', 
+		'\x2', '\xAD', '\xB1', '\x5', '(', '\x15', '\x2', '\xAE', '\xB1', '\x5', 
+		'$', '\x13', '\x2', '\xAF', '\xB1', '\x5', '\x10', '\t', '\x2', '\xB0', 
+		'\xAD', '\x3', '\x2', '\x2', '\x2', '\xB0', '\xAE', '\x3', '\x2', '\x2', 
+		'\x2', '\xB0', '\xAF', '\x3', '\x2', '\x2', '\x2', '\xB1', '\xB4', '\x3', 
+		'\x2', '\x2', '\x2', '\xB2', '\xB0', '\x3', '\x2', '\x2', '\x2', '\xB2', 
+		'\xB3', '\x3', '\x2', '\x2', '\x2', '\xB3', '\xB5', '\x3', '\x2', '\x2', 
+		'\x2', '\xB4', '\xB2', '\x3', '\x2', '\x2', '\x2', '\xB5', '\xB6', '\a', 
+		'\x12', '\x2', '\x2', '\xB6', '\'', '\x3', '\x2', '\x2', '\x2', '\xB7', 
+		'\xBA', '\x5', '*', '\x16', '\x2', '\xB8', '\xBA', '\x5', ',', '\x17', 
 		'\x2', '\xB9', '\xB7', '\x3', '\x2', '\x2', '\x2', '\xB9', '\xB8', '\x3', 
 		'\x2', '\x2', '\x2', '\xBA', ')', '\x3', '\x2', '\x2', '\x2', '\xBB', 
 		'\xBC', '\a', '.', '\x2', '\x2', '\xBC', '\xBE', '\a', '\x30', '\x2', 
@@ -2557,7 +2558,7 @@ public partial class FluentLangParser : Parser {
 		'\x114', '\x3', '\x2', '\x2', '\x2', '\x114', '=', '\x3', '\x2', '\x2', 
 		'\x2', '\x115', '\x113', '\x3', '\x2', '\x2', '\x2', '\x1D', '?', '\x42', 
 		'I', 'T', 'Z', '_', 'g', 'm', 'x', '\x7F', '\x84', '\x8C', '\x96', '\xA2', 
-		'\xA7', '\xAF', '\xB1', '\xB9', '\xBE', '\xCA', '\xE4', '\xEF', '\xF5', 
+		'\xA7', '\xB0', '\xB2', '\xB9', '\xBE', '\xCA', '\xE4', '\xEF', '\xF5', 
 		'\xF7', '\x100', '\x10A', '\x113',
 	};
 

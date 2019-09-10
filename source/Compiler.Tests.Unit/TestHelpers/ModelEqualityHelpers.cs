@@ -38,6 +38,64 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 					return false;
 			}
 
+			// don't actually check for equality to avoid infinite recursion
+			if (a.Scope is null != b.Scope is null)
+				return false;
+
+			return true;
+		}
+
+		public static bool AreEqual(IMethod? a, IMethod? b)
+		{
+			if (a is null || b is null)
+				return ReferenceEquals(a, b);
+
+			if (a.Name != b.Name)
+				return false;
+
+			if (a.Parameters.Length != b.Parameters.Length)
+				return false;
+
+			if (a.LocalMethods.Length != b.LocalMethods.Length)
+				return false;
+
+			if (a.LocalInterfaces.Length != b.LocalInterfaces.Length)
+				return false;
+
+			if (!AreEqual(a.ReturnType, b.ReturnType))
+				return false;
+
+			for (var i = 0; i < a.Parameters.Length; i++)
+			{
+				var aParam = a.Parameters[i];
+				var bParam = b.Parameters[i];
+
+				if (!AreEqual(aParam, bParam))
+					return false;
+			}
+
+			for (var i = 0; i < a.LocalMethods.Length; i++)
+			{
+				var aMethod = a.LocalMethods[i];
+				var bMethod = b.LocalMethods[i];
+
+				if (!AreEqual(aMethod, bMethod))
+					return false;
+			}
+
+			for (var i = 0; i < a.LocalInterfaces.Length; i++)
+			{
+				var aInterface = a.LocalInterfaces[i];
+				var bInterface = b.LocalInterfaces[i];
+
+				if (!AreEqual(aInterface, bInterface))
+					return false;
+			}
+
+			// don't actually check for equality to avoid infinite recursion
+			if (a.Scope is null != b.Scope is null)
+				return false;
+
 			return true;
 		}
 

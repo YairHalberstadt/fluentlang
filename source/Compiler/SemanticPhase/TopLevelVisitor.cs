@@ -12,9 +12,9 @@ using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.SemanticPhase
 {
-	public class TopLevelMetadataVisitor : FluentLangParserBaseVisitor<object>
+	public class TopLevelVisitor : FluentLangParserBaseVisitor<object>
 	{
-		private static object _dummyReturn = new object();
+		private static readonly object _dummyReturn = new object();
 
 		public ISemanticModel SemanticModel { get; private set; }
 		public ImmutableList<Diagnostic> Diagnostics { get; private set; }
@@ -23,7 +23,7 @@ namespace FluentLang.Compiler.SemanticPhase
 
 		private readonly List<QualifiedName> _openDirectives = new List<QualifiedName>();
 
-		public TopLevelMetadataVisitor(ISemanticModel semanticModel, ImmutableList<Diagnostic> diagnostics)
+		public TopLevelVisitor(ISemanticModel semanticModel, ImmutableList<Diagnostic> diagnostics)
 		{
 			SemanticModel = semanticModel;
 			Diagnostics = diagnostics;
@@ -80,6 +80,21 @@ namespace FluentLang.Compiler.SemanticPhase
 
 		public override object VisitMethod_declaration([NotNull] Method_declarationContext context)
 		{
+			var method = context.BindMethod(OpenedNamespaces, null, _currentNameSpace);
+
+			var model = SemanticModel.TryWith(method);
+			if (model is null)
+			{
+				Diagnostics = Diagnostics.Add(new Diagnostic(
+					new Location(context.method_signature().UPPERCASE_IDENTIFIER()),
+					ErrorCode.DuplicateMethodDeclaration,
+					ImmutableArray.Create<object>(method.FullyQualifiedName!)));
+			}
+			else
+			{
+				SemanticModel = model;
+			}
+
 			return DefaultResult;
 		}
 

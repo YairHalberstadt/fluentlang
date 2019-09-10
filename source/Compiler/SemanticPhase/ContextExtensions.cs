@@ -14,7 +14,7 @@ namespace FluentLang.Compiler.SemanticPhase
 		public static IInterface BindInterface(
 			this Interface_declarationContext context,
 			ImmutableArray<QualifiedName> openedNamespaces,
-			Method? scope,
+			IMethod? scope,
 			QualifiedName? currentNamespace)
 		{
 			var nameSymbol = context.UPPERCASE_IDENTIFIER().Symbol;
@@ -26,7 +26,7 @@ namespace FluentLang.Compiler.SemanticPhase
 		public static IInterface BindInterface(
 			this Anonymous_interface_declarationContext context,
 			ImmutableArray<QualifiedName> openedNamespaces,
-			Method? scope,
+			IMethod? scope,
 			QualifiedName? fullyQualifiedName)
 		{
 			return new SourceInterface(context, openedNamespaces, fullyQualifiedName, scope);
@@ -35,7 +35,7 @@ namespace FluentLang.Compiler.SemanticPhase
 		public static ImmutableArray<InterfaceReference> BindAdditiveInterfaces(
 			this Anonymous_interface_declarationContext context,
 			ImmutableArray<QualifiedName> openedNamespaces,
-			Method? scope)
+			IMethod? scope)
 		{
 			return context
 				.simple_anonymous_interface_declaration()
@@ -48,7 +48,7 @@ namespace FluentLang.Compiler.SemanticPhase
 		public static ImmutableArray<IInterfaceMethodSet> BindMethodSets(
 			this Anonymous_interface_declarationContext context,
 			ImmutableArray<QualifiedName> openedNamespaces,
-			Method? scope)
+			IMethod? scope)
 		{
 			return context
 				.simple_anonymous_interface_declaration()
@@ -61,7 +61,7 @@ namespace FluentLang.Compiler.SemanticPhase
 		public static IInterfaceMethod BindMethod(
 			this Interface_member_declarationContext context,
 			ImmutableArray<QualifiedName> openedNamespaces,
-			Method? scope)
+			IMethod? scope)
 		{
 			return new SourceInterfaceMethod(context, openedNamespaces, scope);
 		}
@@ -71,7 +71,7 @@ namespace FluentLang.Compiler.SemanticPhase
 		public static TypeKey BindReturnType(
 			this Method_signatureContext context,
 			ImmutableArray<QualifiedName> openedNamespaces,
-			Method? scope)
+			IMethod? scope)
 		{
 			return context.type_declaration().type().BindType(openedNamespaces, scope);
 		}
@@ -79,7 +79,7 @@ namespace FluentLang.Compiler.SemanticPhase
 		public static ImmutableArray<Parameter> BindParameters(
 			this Method_signatureContext context,
 			ImmutableArray<QualifiedName> openedNamespaces,
-			Method? scope)
+			IMethod? scope)
 		{
 			return context.parameters()?.BindParameters(openedNamespaces, scope) ?? ImmutableArray<Parameter>.Empty;
 		}
@@ -87,7 +87,7 @@ namespace FluentLang.Compiler.SemanticPhase
 		public static ImmutableArray<Parameter> BindParameters(
 			this ParametersContext context,
 			ImmutableArray<QualifiedName> openedNamespaces,
-			Method? scope)
+			IMethod? scope)
 		{
 			return context.parameter().Select(x => x.BindParameter(openedNamespaces, scope)).ToImmutableArray();
 		}
@@ -95,7 +95,7 @@ namespace FluentLang.Compiler.SemanticPhase
 		public static Parameter BindParameter(
 			this ParameterContext context,
 			ImmutableArray<QualifiedName> openedNamespaces,
-			Method? scope)
+			IMethod? scope)
 		{
 			return new Parameter(
 				context.LOWERCASE_IDENTIFIER().Symbol.Text,
@@ -105,7 +105,7 @@ namespace FluentLang.Compiler.SemanticPhase
 		public static TypeKey BindType(
 			this TypeContext context,
 			ImmutableArray<QualifiedName> openedNamespaces,
-			Method? scope)
+			IMethod? scope)
 		{
 			if (context.qualified_name() is { } name)
 				return new TypeKey(new InterfaceReference(openedNamespaces, name.GetQualifiedName(), scope));
@@ -136,6 +136,42 @@ namespace FluentLang.Compiler.SemanticPhase
 			if (context.CHAR() != null)
 				return Model.Primitive.Char;
 			throw Release.Fail($"unexpected primitive: {context}");
+		}
+
+		public static IMethod BindMethod(
+			this Method_declarationContext context,
+			ImmutableArray<QualifiedName> openedNamespaces,
+			IMethod? scope,
+			QualifiedName? currentNamespace)
+		{
+			var name = context.method_signature().GetName();
+			var fullyQualifiedName = new QualifiedName(name, currentNamespace);
+
+			return new SourceMethod(context, openedNamespaces, fullyQualifiedName, scope);
+		}
+
+		public static ImmutableArray<IInterface> BindInterfaces(
+			this Method_declarationContext context,
+			ImmutableArray<QualifiedName> openedNamespaces,
+			IMethod scope)
+		{
+			return context
+				.method_body()
+				.interface_declaration()
+				.Select(x => x.BindInterface(openedNamespaces, scope, null))
+				.ToImmutableArray();
+		}
+
+		public static ImmutableArray<IMethod> BindMethods(
+			this Method_declarationContext context,
+			ImmutableArray<QualifiedName> openedNamespaces,
+			IMethod scope)
+		{
+			return context
+				.method_body()
+				.method_declaration()
+				.Select(x => x.BindMethod(openedNamespaces, scope, null))
+				.ToImmutableArray();
 		}
 	}
 }

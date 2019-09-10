@@ -10,11 +10,11 @@ namespace FluentLang.Compiler.Model
 	{
 		private readonly FluentLangParser.Interface_member_declarationContext[] _context;
 		private readonly ImmutableArray<QualifiedName> _openedNamespaces;
-		private readonly Method? _scope;
+		private readonly IMethod? _scope;
 
 		private ImmutableArray<IInterfaceMethod> _methods;
 
-		public SourceInterfaceMethodSet(FluentLangParser.Interface_member_declarationContext[] context, ImmutableArray<QualifiedName> openedNamespaces, Method? scope)
+		public SourceInterfaceMethodSet(FluentLangParser.Interface_member_declarationContext[] context, ImmutableArray<QualifiedName> openedNamespaces, IMethod? scope)
 		{
 			_context = context;
 			_openedNamespaces = openedNamespaces;

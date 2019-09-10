@@ -23,12 +23,17 @@ namespace FluentLang.Compiler.Tests.Unit.SemanticPhase
 			return _semanticModel.TryGetInterface(fullyQualifiedName, out i);
 		}
 
+		public bool TryGetMethod(QualifiedName fullyQualifiedName, out IMethod m)
+		{
+			return _semanticModel.TryGetMethod(fullyQualifiedName, out m);
+		}
+
 		public ISemanticModel? TryWith(IInterface i)
 		{
 			throw new System.NotImplementedException();
 		}
 
-		public ISemanticModel? TryWith(Method m)
+		public ISemanticModel? TryWith(IMethod m)
 		{
 			throw new System.NotImplementedException();
 		}
@@ -41,16 +46,11 @@ namespace FluentLang.Compiler.Tests.Unit.SemanticPhase
 				return x.ErrorCode == y.ErrorCode;
 			}).Where(x => !x).Any(),
 				$@"expected: 
-{string.Concat("\n", diagnostics.Select(x => "new Diagnostic (new Location (), " + x.ErrorCode.ToString() + ")"))}
+{string.Concat("\n", diagnostics.Select(x => "new Diagnostic(new Location(), " + x.ErrorCode.ToString() + ")"))}
 
 actual:
-{string.Concat("\n", _diagnostics.Select(x => "new Diagnostic (new Location (), " + x.ErrorCode.ToString() + ")"))}
+{string.Concat("\n", _diagnostics.Select(x => "new Diagnostic(new Location(), " + x.ErrorCode.ToString() + ")"))}
 ");
-		}
-
-		public ISemanticModel With(IInterface i)
-		{
-			throw new System.NotImplementedException();
 		}
 	}
 }

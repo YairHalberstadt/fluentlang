@@ -4,18 +4,19 @@ using System.Collections.Immutable;
 using System.Linq;
 using FluentLang.Compiler.Generated;
 using FluentLang.Compiler.SemanticPhase;
+using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.Model
 {
 	internal sealed class SourceInterfaceMethod : IInterfaceMethod
 	{
-		private readonly FluentLangParser.Interface_member_declarationContext _context;
+		private readonly Interface_member_declarationContext _context;
 		private readonly ImmutableArray<QualifiedName> _openedNamespaces;
-		private readonly Method? _scope;
+		private readonly IMethod? _scope;
 		private TypeKey? _returnType;
 		private ImmutableArray<Parameter> _parameters;
 
-		public SourceInterfaceMethod(FluentLangParser.Interface_member_declarationContext context, ImmutableArray<QualifiedName> openedNamespaces, Method? scope)
+		public SourceInterfaceMethod(Interface_member_declarationContext context, ImmutableArray<QualifiedName> openedNamespaces, IMethod? scope)
 		{
 			_context = context;
 			_openedNamespaces = openedNamespaces;
