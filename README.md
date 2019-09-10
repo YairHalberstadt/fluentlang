@@ -1,5 +1,7 @@
 # FluentLang
 
+[![Build Status](https://dev.azure.com/yairhalberstadt/FluentLang/_apis/build/status/YairHalberstadt.fluentlang?branchName=master)](https://dev.azure.com/yairhalberstadt/FluentLang/_build/latest?definitionId=3&branchName=master)
+
 FluentLang is an experimental programming language designed to explore the intersection between structural typing, object oriented programming, and functional programming.
 
 Currently it is very much a work in progress.
