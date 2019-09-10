@@ -16,7 +16,6 @@ steps:
 - task: DotNetCoreInstaller@0
   displayName: 'Install .net core 3.0 (preview)'
   inputs:
-    version: '3.x'
-    includePreviewVersions: true
+    version: '3.0.100-preview9-014004'
 - script: dotnet build source/fluentlang.sln --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
