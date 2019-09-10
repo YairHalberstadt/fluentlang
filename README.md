@@ -150,13 +150,15 @@ Objects have no fields, only methods. Objects are not instances of a class, but 
 
 ANTLR4 lexer and parser
 
+Set up CI pipeline on Azure
+
 ### In progress
 
 Creation of Semantic Model
 
-### ToDo
-
 Semantic checks (type checking etc.)
+
+### ToDo
 
 Implement runtime
 
@@ -172,9 +174,8 @@ For now this is very much a one man project. Once the design is more complete I 
 
 However projects that can be done right now:
 
-1. Set up CI pipeline on Azure
-2. Add more unit tests
-3. Create a blazor based text editor with syntax highlighting and stub methods ready to be hooked into the compiler once it is complete.
+1. Add more unit tests
+2. Create a blazor based text editor with syntax highlighting and stub methods ready to be hooked into the compiler once it is complete.
 
 
 
