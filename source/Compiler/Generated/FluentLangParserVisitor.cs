@@ -57,12 +57,6 @@ public interface IFluentLangParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitQualified_name([NotNull] FluentLangParser.Qualified_nameContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="FluentLangParser.namespace_member_declarations"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitNamespace_member_declarations([NotNull] FluentLangParser.Namespace_member_declarationsContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="FluentLangParser.namespace_member_declaration"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

@@ -3,12 +3,11 @@ parser grammar FluentLangParser;
 options {   tokenVocab = FluentLangLexer; }
 
 compilation_unit
-	: open_directives?
-	  namespace_member_declarations? EOF
+	: open_directives namespace_member_declaration* EOF
 	;
 
 open_directives
-	: open_directive+
+	: open_directive*
 	;
 
 open_directive
@@ -17,10 +16,6 @@ open_directive
 
 qualified_name
     : UPPERCASE_IDENTIFIER (DOT UPPERCASE_IDENTIFIER)*
-    ;
-
-namespace_member_declarations
-    : namespace_member_declaration+
     ;
 
 namespace_member_declaration
@@ -51,11 +46,11 @@ interface_member_declaration
     ;
 
 method_signature
-    : UPPERCASE_IDENTIFIER OPEN_PARENS parameters? CLOSE_PARENS type_declaration
+    : UPPERCASE_IDENTIFIER OPEN_PARENS parameters CLOSE_PARENS type_declaration
     ;
 
 parameters
-    : parameter (COMMA parameter)*
+    : (parameter (COMMA parameter)*)?
     ;
 
 parameter

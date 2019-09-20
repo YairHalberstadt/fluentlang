@@ -72,16 +72,6 @@ public interface IFluentLangParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitQualified_name([NotNull] FluentLangParser.Qualified_nameContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="FluentLangParser.namespace_member_declarations"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterNamespace_member_declarations([NotNull] FluentLangParser.Namespace_member_declarationsContext context);
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="FluentLangParser.namespace_member_declarations"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitNamespace_member_declarations([NotNull] FluentLangParser.Namespace_member_declarationsContext context);
-	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.namespace_member_declaration"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

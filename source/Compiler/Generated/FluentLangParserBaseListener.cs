@@ -84,18 +84,6 @@ public partial class FluentLangParserBaseListener : IFluentLangParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitQualified_name([NotNull] FluentLangParser.Qualified_nameContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="FluentLangParser.namespace_member_declarations"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterNamespace_member_declarations([NotNull] FluentLangParser.Namespace_member_declarationsContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="FluentLangParser.namespace_member_declarations"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitNamespace_member_declarations([NotNull] FluentLangParser.Namespace_member_declarationsContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.namespace_member_declaration"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
