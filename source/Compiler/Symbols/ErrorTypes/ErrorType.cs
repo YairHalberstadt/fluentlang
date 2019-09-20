@@ -1,5 +1,7 @@
-﻿using FluentLang.Compiler.Symbols.Interfaces;
+﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Symbols.Interfaces;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace FluentLang.Compiler.Symbols.ErrorTypes
 {
@@ -7,7 +9,7 @@ namespace FluentLang.Compiler.Symbols.ErrorTypes
 	{
 		private ErrorType() { }
 
-		public static ErrorType Instance { get; }
+		public static ErrorType Instance { get; } = new ErrorType();
 
 		bool IType.IsEquivalentTo(IType other, Stack<(IType, IType)>? dependantEqualities)
 		{
