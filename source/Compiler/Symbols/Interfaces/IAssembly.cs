@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace FluentLang.Compiler.Symbols.Interfaces
 {
-	public interface IAssembly
+	public interface IAssembly : ISymbol
 	{
 		public QualifiedName Name { get; }
 		public Version Version { get; }

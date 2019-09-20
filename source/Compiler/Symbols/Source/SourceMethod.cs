@@ -12,12 +12,14 @@ namespace FluentLang.Compiler.Symbols.Source
 		private readonly Method_declarationContext _context;
 		private readonly SourceSymbolContext _sourceSymbolContext;
 		private SourceSymbolContext? _childSourceSymbolContext;
-		private readonly DiagnosticBag _diagnostics;
 
 		private readonly Lazy<IType> _returnType;
 		private readonly Lazy<ImmutableArray<IParameter>> _parameters;
 		private readonly Lazy<ImmutableArray<IInterface>> _localInterfaces;
 		private readonly Lazy<ImmutableArray<IMethod>> _localMethods;
+
+		private readonly DiagnosticBag _diagnostics;
+		private readonly Lazy<ImmutableArray<Diagnostic>> _allDiagnostics;
 
 		public SourceMethod(
 			Method_declarationContext context,
@@ -26,14 +28,20 @@ namespace FluentLang.Compiler.Symbols.Source
 		{
 			_context = context;
 			_sourceSymbolContext = sourceSymbolContext;
+			_diagnostics = diagnostics.CreateChildBag(this);
 			var @namespace = _sourceSymbolContext.Scope is null ? _sourceSymbolContext.NameSpace : null;
 			FullyQualifiedName = new QualifiedName(context.method_signature().UPPERCASE_IDENTIFIER().Symbol.Text, @namespace);
-			_diagnostics = diagnostics.CreateChildBag();
 
 			_returnType = new Lazy<IType>(BindReturnType);
 			_parameters = new Lazy<ImmutableArray<IParameter>>(BindParameters);
 			_localInterfaces = new Lazy<ImmutableArray<IInterface>>(BindLocalInterfaces);
 			_localMethods = new Lazy<ImmutableArray<IMethod>>(BindLocalMethods);
+
+			_allDiagnostics = new Lazy<ImmutableArray<Diagnostic>>(() =>
+			{
+				_diagnostics.EnsureAllDiagnosticsCollectedForSymbol();
+				return _diagnostics.ToImmutableArray();
+			});
 		}
 
 		private IType BindReturnType()
@@ -87,6 +95,18 @@ namespace FluentLang.Compiler.Symbols.Source
 		public ImmutableArray<IMethod> LocalMethods => _localMethods.Value;
 
 		public IMethod? DeclaringMethod => _sourceSymbolContext.Scope;
+
+		public ImmutableArray<Diagnostic> AllDiagnostics => _allDiagnostics.Value;
+
+		void ISymbol.EnsureAllLocalDiagnosticsCollected()
+		{
+			// Touch all lazy fields to force binding;
+
+			_ = _returnType.Value;
+			_ = _parameters.Value;
+			_ = _localInterfaces.Value;
+			_ = _localMethods.Value;
+		}
 	}
 }
 

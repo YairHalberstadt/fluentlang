@@ -2,7 +2,7 @@
 
 namespace FluentLang.Compiler.Symbols.Interfaces
 {
-	public interface IType
+	public interface IType : ISymbol
 	{
 		public sealed bool IsEquivalentTo(IType other) => IsEquivalentTo(other, null);
 

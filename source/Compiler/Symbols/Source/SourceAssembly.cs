@@ -13,16 +13,19 @@ namespace FluentLang.Compiler.Symbols.Source
 	internal class SourceAssembly : IAssembly
 	{
 		private readonly Lazy<ImmutableArray<IAssembly>> _referencedAssemblies;
-		private readonly Lazy<ImmutableArray<ParsedDocument>> _documents;
+		private readonly Lazy<ImmutableArray<IDocument>> _documents;
 		private readonly Lazy<IReadOnlyDictionary<QualifiedName, IInterface>> _interfacesByName;
 		private readonly Lazy<ImmutableArray<IInterface>> _interfaces;
 		private readonly Lazy<IReadOnlyDictionary<QualifiedName, IMethod>> _methodsByName;
 		private readonly Lazy<ImmutableArray<IMethod>> _methods;
 
-		private readonly DiagnosticBag _diagnostics = new DiagnosticBag();
+		private readonly DiagnosticBag _diagnostics;
+		private readonly Lazy<ImmutableArray<Diagnostic>> _allDiagnostics;
 
 		public SourceAssembly(QualifiedName name, Interfaces.Version version, ImmutableArray<IAssembly> directlyReferencedAssemblies, ImmutableArray<IDocument> documents)
 		{
+			_diagnostics = new DiagnosticBag(this);
+
 			_referencedAssemblies = new Lazy<ImmutableArray<IAssembly>>(() =>
 				directlyReferencedAssemblies
 				.SelectMany(x => x.ReferencedAssemblies)
@@ -32,14 +35,15 @@ namespace FluentLang.Compiler.Symbols.Source
 				.Append(this)
 				.ToImmutableArray());
 
-			_documents = new Lazy<ImmutableArray<ParsedDocument>>(() =>
+			_documents = new Lazy<ImmutableArray<IDocument>>(() =>
 				documents.Select(x =>
 				{
-					var diagnostics = _diagnostics.CreateChildBag();
-					var syntaxTree = x.GetSyntaxTree(diagnostics);
-					if (diagnostics.Any())
+					if (x.Diagnostics.Length > 0)
+					{
+						_diagnostics.AddRange(x.Diagnostics);
 						return null; //TODO: Come up with a better error recovery strategy
-					return new ParsedDocument(x.FullName, syntaxTree);
+					}
+					return x;
 				}).Where(x => x != null)
 				.ToImmutableArray()!);
 
@@ -49,6 +53,12 @@ namespace FluentLang.Compiler.Symbols.Source
 			_methods = new Lazy<ImmutableArray<IMethod>>(() => _methodsByName.Value.Values.ToImmutableArray());
 			Name = name;
 			Version = version;
+
+			_allDiagnostics = new Lazy<ImmutableArray<Diagnostic>>(() => 
+			{
+				_diagnostics.EnsureAllDiagnosticsCollectedForSymbol();
+				return _diagnostics.ToImmutableArray();
+			});
 		}
 
 		public ImmutableArray<IAssembly> ReferencedAssemblies => _referencedAssemblies.Value;
@@ -60,6 +70,8 @@ namespace FluentLang.Compiler.Symbols.Source
 		public QualifiedName Name { get; }
 
 		public Interfaces.Version Version { get; }
+
+		public ImmutableArray<Diagnostic> AllDiagnostics => _allDiagnostics.Value;
 
 		private IReadOnlyDictionary<QualifiedName, IInterface> GenerateInterfaces()
 		{
@@ -145,7 +157,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			}
 		}
 
-		private ImmutableArray<QualifiedName> BindImports(ParsedDocument document)
+		private ImmutableArray<QualifiedName> BindImports(IDocument document)
 		{
 			return
 				document
@@ -159,6 +171,18 @@ namespace FluentLang.Compiler.Symbols.Source
 		public bool TryGetInterface(QualifiedName fullyQualifiedName, [NotNullWhen(true)] out IInterface? @interface)
 		{
 			return _interfacesByName.Value.TryGetValue(fullyQualifiedName, out @interface);
+		}
+
+		void ISymbol.EnsureAllLocalDiagnosticsCollected()
+		{
+			// Touch all lazy fields to force binding;
+
+			_ = _referencedAssemblies.Value;
+			_ = _documents.Value;
+			_ = _interfacesByName.Value;
+			_ = _interfaces.Value;
+			_ = _methodsByName.Value;
+			_ = _methods.Value;
 		}
 	}
 }

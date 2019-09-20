@@ -1,4 +1,5 @@
-﻿using FluentLang.Compiler.Symbols;
+﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Source;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
@@ -21,14 +22,14 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols
 		public void IgnoresDocumentsWithIrrecoverableSyntaxErrors()
 		{
 			var assembly = CreateAssembly(@"
-interface I { M() : () bool; }");
+interface I { M() : () bool; }").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.SyntaxError));
 
 			Assert.Empty(assembly.Interfaces);
 
 			assembly = CreateAssembly(new string[] {
 				"interface I1 { M() : () bool; }",
 				"interface I2 { M() : bool; }",
-			});
+			}).VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.SyntaxError));
 
 			var @interface = Assert.Single(assembly.Interfaces);
 			Assert.Equal("I2", @interface.FullyQualifiedName!.ToString());
@@ -60,7 +61,7 @@ interface I { M() : () bool; }");
 		{
 			var assembly = CreateAssembly(@"
 interface I1 { M() : bool; }
-interface I2 { M() : int; }");
+interface I2 { M() : int; }").VerifyDiagnostics();
 
 			Assert.Equal(2, assembly.Interfaces.Length);
 			Assert.Equal(new[] { "I1", "I2" }, assembly.Interfaces.Select(x => x.FullyQualifiedName!.ToString()).OrderBy(x => x));
@@ -71,7 +72,7 @@ interface I2 { M() : int; }");
 		{
 			var assembly = CreateAssembly(@"
 M1() : int {}
-M2() : int {}");
+M2() : int {}").VerifyDiagnostics();
 
 			Assert.Equal(2, assembly.Methods.Length);
 			Assert.Equal(new[] { "M1", "M2" }, assembly.Methods.Select(x => x.FullyQualifiedName.ToString()).OrderBy(x => x));
@@ -89,7 +90,7 @@ namespace A.B.C
 	{
 		interface I3 { M() : string; }
 	}
-}");
+}").VerifyDiagnostics();
 
 			Assert.True(assembly.TryGetInterface(QualifiedName("I1"), out var i1));
 			Assert.Equal(i1!.FullyQualifiedName, QualifiedName("I1"));
@@ -143,6 +144,12 @@ namespace A.B.C
 			{
 				@interface = Interfaces.FirstOrDefault(x => x.FullyQualifiedName == fullyQualifiedName);
 				return @interface != null;
+			}
+
+			public ImmutableArray<Diagnostic> AllDiagnostics { get; set; } = ImmutableArray<Diagnostic>.Empty;
+
+			void ISymbol.EnsureAllLocalDiagnosticsCollected()
+			{
 			}
 		}
 	}

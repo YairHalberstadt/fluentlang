@@ -5,23 +5,39 @@ using FluentLang.Compiler.Parsing;
 using FluentLang.Compiler.Symbols.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Text;
+using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 {
 	public class TestDocument : IDocument
 	{
 		private readonly string _source;
+		private readonly Lazy<Compilation_unitContext> _syntaxTree;
+		private ImmutableArray<Diagnostic> _diagnostics;
 
 		public TestDocument(string source)
 		{
 			_source = source;
+			_syntaxTree = new Lazy<Compilation_unitContext>(GetSyntaxTree);
 		}
 
 		public string FullName => "test.cs";
 
-		public FluentLangParser.Compilation_unitContext GetSyntaxTree(DiagnosticBag diagnostics)
+		public Compilation_unitContext SyntaxTree => _syntaxTree.Value;
+
+		public ImmutableArray<Diagnostic> Diagnostics
+		{
+			get
+			{
+				_ = _syntaxTree.Value;
+				return _diagnostics;
+			}
+		}
+
+		public Compilation_unitContext GetSyntaxTree()
 		{
 			using var reader = new StringReader(_source);
 
@@ -32,9 +48,12 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 			var parser = new FluentLangParser(tokenStream);
 
 			// pick up any syntax errors
+			var diagnostics = new DiagnosticBag(null!);
 			var errorStrategy = new ErrorStrategy(diagnostics);
 			parser.ErrorHandler = errorStrategy;
-			return parser.compilation_unit();
+			var compilationUnit = parser.compilation_unit();
+			_diagnostics = diagnostics.ToImmutableArray();
+			return compilationUnit;
 		}
 	}
 }

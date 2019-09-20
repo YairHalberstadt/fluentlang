@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace FluentLang.Compiler.Symbols.Interfaces
 {
-	public interface IInterfaceMethod
+	public interface IInterfaceMethod : ISymbol
 	{
 		public string Name { get; }
 		public IType ReturnType { get; }

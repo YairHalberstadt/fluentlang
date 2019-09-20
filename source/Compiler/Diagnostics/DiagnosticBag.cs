@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using FluentLang.Compiler.Symbols.Interfaces;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
@@ -6,70 +7,72 @@ namespace FluentLang.Compiler.Diagnostics
 {
 	public class DiagnosticBag : IEnumerable<Diagnostic>
 	{
-		private DiagnosticBag? _parent;
 		private readonly ConcurrentBag<Diagnostic> _topLevelDiagnostics = new ConcurrentBag<Diagnostic>();
 		private readonly ConcurrentBag<DiagnosticBag> _childDiagnosticBags = new ConcurrentBag<DiagnosticBag>();
+		private readonly ISymbol _forSymbol;
 
-		public DiagnosticBag()
+		public DiagnosticBag(ISymbol forSymbol)
 		{
-		}
-
-		private DiagnosticBag(DiagnosticBag parent)
-		{
-			_parent = parent;
-		}
-
-		private void AttachToParent()
-		{
-			if (_parent is null)
-				return;
-
-			_parent._childDiagnosticBags.Add(this);
-			_parent.AttachToParent();
-			_parent = null;
+			_forSymbol = forSymbol;
 		}
 
 		public void Add(Diagnostic diagnostic)
 		{
-			AttachToParent();
 			_topLevelDiagnostics.Add(diagnostic);
 		}
 
 		public void AddRange(IEnumerable<Diagnostic> diagnostics)
 		{
-			AttachToParent();
 			foreach (var diagnostic in diagnostics)
 			{
 				_topLevelDiagnostics.Add(diagnostic);
 			}
 		}
 
-		public DiagnosticBag CreateChildBag()
+		public DiagnosticBag CreateChildBag(ISymbol forSymbol)
 		{
-			var child = new DiagnosticBag(this);
+			var child = new DiagnosticBag(forSymbol);
 			_childDiagnosticBags.Add(child);
 			return child;
 		}
 
 		public IEnumerator<Diagnostic> GetEnumerator()
 		{
-			foreach (var diagnostic in _topLevelDiagnostics)
-			{
-				yield return diagnostic;
-			}
+			// https://stackoverflow.com/a/20335369/7607408
+			// this will be more efficient for large trees.
 
-			foreach (var diagnosticBag in _childDiagnosticBags)
+			var stack = new Stack<DiagnosticBag>();
+			stack.Push(this);
+			while (stack.Count > 0)
 			{
-				foreach (var diagnostic in diagnosticBag)
-				{
+				var current = stack.Pop();
+				foreach (var diagnostic in current._topLevelDiagnostics)
 					yield return diagnostic;
-				}
+				foreach (var child in current._childDiagnosticBags)
+					stack.Push(child);
 			}
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
+		}
+
+		private bool _allCollected;
+
+		public void EnsureAllDiagnosticsCollectedForSymbol()
+		{
+			if (_allCollected)
+				return;
+
+			_forSymbol.EnsureAllLocalDiagnosticsCollected();
+
+			foreach (var childBag in _childDiagnosticBags)
+			{
+				childBag.EnsureAllDiagnosticsCollectedForSymbol();
+			}
+
+			_allCollected = true;
 		}
 	}
 }

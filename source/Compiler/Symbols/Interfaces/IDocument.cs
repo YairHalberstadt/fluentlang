@@ -7,6 +7,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 	public interface IDocument
 	{
 		public string FullName { get; }
-		public Compilation_unitContext GetSyntaxTree(DiagnosticBag diagnostics);
+		public Compilation_unitContext SyntaxTree { get; }
+		public ImmutableArray<Diagnostic> Diagnostics { get; }
 	}
 }

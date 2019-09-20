@@ -1,4 +1,5 @@
-﻿using FluentLang.Compiler.Symbols.ErrorTypes;
+﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Symbols.ErrorTypes;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -35,7 +36,7 @@ namespace B {
 			}
 		}
 	}
-}");
+}").VerifyDiagnostics();
 			var expected = assembly.Methods.Single().LocalMethods.Single().LocalMethods.Single().LocalInterfaces.Single();
 			var actual = assembly.Methods.Single().LocalMethods.Single().LocalMethods.Single().LocalMethods.Single().ReturnType;
 			Assert.Equal(expected, actual);
@@ -67,7 +68,7 @@ namespace B {
 			}
 		}
 	}
-}");
+}").VerifyDiagnostics();
 			var expected = assembly.Methods.Single().LocalMethods.Single().LocalInterfaces.Single();
 			var actual = assembly.Methods.Single().LocalMethods.Single().LocalMethods.Single().LocalMethods.Single().ReturnType;
 			Assert.Equal(expected, actual);
@@ -98,7 +99,7 @@ namespace B {
 			}
 		}
 	}
-}");
+}").VerifyDiagnostics();
 			var expected = assembly.Methods.Single().LocalInterfaces.Single();
 			var actual = assembly.Methods.Single().LocalMethods.Single().LocalMethods.Single().LocalMethods.Single().ReturnType;
 			Assert.Equal(expected, actual);
@@ -128,7 +129,7 @@ namespace B {
 			}
 		}
 	}
-}");
+}").VerifyDiagnostics();
 			Assert.True(assembly.TryGetInterface(QualifiedName("B.C.I"), out var expected));
 			var actual = assembly.Methods.Single().LocalMethods.Single().LocalMethods.Single().LocalMethods.Single().ReturnType;
 			Assert.Equal(expected, actual);
@@ -157,7 +158,7 @@ namespace B {
 			}
 		}
 	}
-}");
+}").VerifyDiagnostics();
 			Assert.True(assembly.TryGetInterface(QualifiedName("B.I"), out var expected));
 			var actual = assembly.Methods.Single().LocalMethods.Single().LocalMethods.Single().LocalMethods.Single().ReturnType;
 			Assert.Equal(expected, actual);
@@ -185,7 +186,7 @@ namespace B {
 			}
 		}
 	}
-}");
+}").VerifyDiagnostics();
 			Assert.True(assembly.TryGetInterface(QualifiedName("I"), out var expected));
 			var actual = assembly.Methods.Single().LocalMethods.Single().LocalMethods.Single().LocalMethods.Single().ReturnType;
 			Assert.Equal(expected, actual);
@@ -211,7 +212,7 @@ namespace B {
 			}
 		}
 	}
-}");
+}").VerifyDiagnostics();
 			Assert.True(assembly.TryGetInterface(QualifiedName("A.I"), out var expected));
 			var actual = assembly.Methods.Single().LocalMethods.Single().LocalMethods.Single().LocalMethods.Single().ReturnType;
 			Assert.Equal(expected, actual);
@@ -227,7 +228,7 @@ namespace A.B {
 	interface I {}
 }
 
-M() : I {}");
+M() : I {}").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InterfaceNotFound));
 			Assert.True(assembly.Methods.Single().ReturnType is IErrorType);
 		}
 
@@ -246,7 +247,8 @@ namespace B {
 	interface I {}
 }
 
-M() : I {}");
+M() : I {}").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InterfaceNotFound));
+
 			Assert.True(assembly.Methods.Single().ReturnType is IErrorType);
 		}
 	}

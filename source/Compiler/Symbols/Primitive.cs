@@ -1,5 +1,7 @@
-﻿using FluentLang.Compiler.Symbols.Interfaces;
+﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Symbols.Interfaces;
 using System;
+using System.Collections.Immutable;
 
 namespace FluentLang.Compiler.Symbols
 {
@@ -46,6 +48,12 @@ namespace FluentLang.Compiler.Symbols
 		public override string? ToString()
 		{
 			return FullyQualifiedName.ToString();
+		}
+
+		ImmutableArray<Diagnostic> ISymbol.AllDiagnostics => ImmutableArray<Diagnostic>.Empty;
+
+		void ISymbol.EnsureAllLocalDiagnosticsCollected()
+		{
 		}
 	}
 }

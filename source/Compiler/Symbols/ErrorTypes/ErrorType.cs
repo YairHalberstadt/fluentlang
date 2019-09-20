@@ -11,6 +11,8 @@ namespace FluentLang.Compiler.Symbols.ErrorTypes
 
 		public static ErrorType Instance { get; } = new ErrorType();
 
+		public ImmutableArray<Diagnostic> AllDiagnostics => ImmutableArray<Diagnostic>.Empty;
+
 		bool IType.IsEquivalentTo(IType other, Stack<(IType, IType)>? dependantEqualities)
 		{
 			// We use ReferenceEquals since it ensures that AreEquavalent maintains an Equivalence Relation
@@ -23,6 +25,10 @@ namespace FluentLang.Compiler.Symbols.ErrorTypes
 			// We use ReferenceEquals since it ensures that IsSubtypeOf maintains a partial ordering
 			// If we want to treat ErrorTypes differently, we should explicitly check for IErrorType
 			return ReferenceEquals(this, other);
+		}
+
+		void ISymbol.EnsureAllLocalDiagnosticsCollected()
+		{
 		}
 	}
 }

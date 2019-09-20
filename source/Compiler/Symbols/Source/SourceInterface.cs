@@ -14,9 +14,12 @@ namespace FluentLang.Compiler.Symbols.Source
 	{
 		private readonly Anonymous_interface_declarationContext _context;
 		private readonly SourceSymbolContext _sourceSymbolContext;
-		private readonly DiagnosticBag _diagnostics;
 
 		private readonly Lazy<ImmutableArray<IInterfaceMethod>> _methods;
+
+		private readonly DiagnosticBag _diagnostics;
+		private readonly Lazy<ImmutableArray<Diagnostic>> _allDiagnostics;
+
 
 		public SourceInterface(
 			Anonymous_interface_declarationContext context,
@@ -26,17 +29,25 @@ namespace FluentLang.Compiler.Symbols.Source
 		{
 			_context = context;
 			_sourceSymbolContext = sourceSymbolContext;
+			_diagnostics = diagnostics.CreateChildBag(this);
 			FullyQualifiedName = fullyQualifiedName;
-			_diagnostics = diagnostics.CreateChildBag();
 
 			_methods = new Lazy<ImmutableArray<IInterfaceMethod>>(GenerateMethods);
 
 			Release.Assert(fullyQualifiedName?.Parent is null || fullyQualifiedName.Parent == _sourceSymbolContext.NameSpace);
+
+			_allDiagnostics = new Lazy<ImmutableArray<Diagnostic>>(() =>
+			{
+				_diagnostics.EnsureAllDiagnosticsCollectedForSymbol();
+				return _diagnostics.ToImmutableArray();
+			});
 		}
 
 		public QualifiedName? FullyQualifiedName { get; }
 
 		public ImmutableArray<IInterfaceMethod> Methods => _methods.Value;
+
+		public ImmutableArray<Diagnostic> AllDiagnostics => _allDiagnostics.Value;
 
 		private ImmutableArray<IInterfaceMethod> GenerateMethods()
 		{
@@ -107,6 +118,13 @@ namespace FluentLang.Compiler.Symbols.Source
 			 * b defines an equavalent method. But we get the same result even if these methods are duplicated.
 			 * Similiarly applies for subtyping.
 			 */
+		}
+
+		void ISymbol.EnsureAllLocalDiagnosticsCollected()
+		{
+			// Touch all lazy fields to force binding;
+
+			_ = _methods.Value;
 		}
 	}
 }

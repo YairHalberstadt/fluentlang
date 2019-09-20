@@ -2,7 +2,7 @@
 
 namespace FluentLang.Compiler.Symbols.Interfaces
 {
-	public interface IMethod
+	public interface IMethod : ISymbol
 	{
 		public QualifiedName FullyQualifiedName { get; }
 		public string Name => FullyQualifiedName.Name;
