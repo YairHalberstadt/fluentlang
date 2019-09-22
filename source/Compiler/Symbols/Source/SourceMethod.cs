@@ -59,10 +59,26 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		private ImmutableArray<IInterface> BindLocalInterfaces()
 		{
-			return
+			var interfaceDeclarations =
 				_context
 				.method_body()
-				.interface_declaration()
+				.interface_declaration();
+
+			foreach (var duplicateGroup in interfaceDeclarations
+				.GroupBy(x => x.UPPERCASE_IDENTIFIER().Symbol.Text)
+				.Where(x => x.Count() > 1))
+			{
+				foreach(var duplicate in duplicateGroup)
+				{
+					_diagnostics.Add(new Diagnostic(
+							new Location(duplicate.UPPERCASE_IDENTIFIER()),
+							ErrorCode.DuplicateInterfaceDeclaration,
+							ImmutableArray.Create<object?>(duplicateGroup.Key)));
+				}
+			}
+
+			return
+				interfaceDeclarations
 				.Select(x => new SourceInterface(
 					x.anonymous_interface_declaration(),
 					_childSourceSymbolContext ??= _sourceSymbolContext.WithScope(this),
@@ -73,10 +89,26 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		private ImmutableArray<IMethod> BindLocalMethods()
 		{
-			return
+			var methodDeclarations =
 				_context
 				.method_body()
-				.method_declaration()
+				.method_declaration();
+
+			foreach (var duplicateGroup in methodDeclarations
+				.GroupBy(x => x.method_signature().UPPERCASE_IDENTIFIER().Symbol.Text)
+				.Where(x => x.Count() > 1))
+			{
+				foreach (var duplicate in duplicateGroup)
+				{
+					_diagnostics.Add(new Diagnostic(
+							new Location(duplicate.method_signature().UPPERCASE_IDENTIFIER()),
+							ErrorCode.DuplicateMethodDeclaration,
+							ImmutableArray.Create<object?>(duplicateGroup.Key)));
+				}
+			}
+
+			return
+				methodDeclarations
 				.Select(x => new SourceMethod(
 					x,
 					_childSourceSymbolContext ??= _sourceSymbolContext.WithScope(this),
