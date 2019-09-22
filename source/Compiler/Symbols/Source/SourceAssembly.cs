@@ -10,7 +10,7 @@ using FluentLang.Compiler.Diagnostics;
 
 namespace FluentLang.Compiler.Symbols.Source
 {
-	internal class SourceAssembly : IAssembly
+	internal sealed class SourceAssembly : IAssembly
 	{
 		private readonly Lazy<ImmutableArray<IAssembly>> _referencedAssemblies;
 		private readonly Lazy<ImmutableArray<IDocument>> _documents;
@@ -22,7 +22,11 @@ namespace FluentLang.Compiler.Symbols.Source
 		private readonly DiagnosticBag _diagnostics;
 		private readonly Lazy<ImmutableArray<Diagnostic>> _allDiagnostics;
 
-		public SourceAssembly(QualifiedName name, Interfaces.Version version, ImmutableArray<IAssembly> directlyReferencedAssemblies, ImmutableArray<IDocument> documents)
+		public SourceAssembly(
+			QualifiedName name,
+			Interfaces.Version version,
+			ImmutableArray<IAssembly> directlyReferencedAssemblies,
+			ImmutableArray<IDocument> documents)
 		{
 			_diagnostics = new DiagnosticBag(this);
 

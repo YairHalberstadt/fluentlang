@@ -7,7 +7,7 @@ using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.Symbols.Source
 {
-	internal class SourceMethod : IMethod
+	internal sealed class SourceMethod : SymbolBase, IMethod
 	{
 		private readonly Method_declarationContext _context;
 		private readonly SourceSymbolContext _sourceSymbolContext;
@@ -18,17 +18,13 @@ namespace FluentLang.Compiler.Symbols.Source
 		private readonly Lazy<ImmutableArray<IInterface>> _localInterfaces;
 		private readonly Lazy<ImmutableArray<IMethod>> _localMethods;
 
-		private readonly DiagnosticBag _diagnostics;
-		private readonly Lazy<ImmutableArray<Diagnostic>> _allDiagnostics;
-
 		public SourceMethod(
 			Method_declarationContext context,
 			SourceSymbolContext sourceSymbolContext,
-			DiagnosticBag diagnostics)
+			DiagnosticBag diagnostics) : base(diagnostics)
 		{
 			_context = context;
 			_sourceSymbolContext = sourceSymbolContext;
-			_diagnostics = diagnostics.CreateChildBag(this);
 			var @namespace = _sourceSymbolContext.Scope is null ? _sourceSymbolContext.NameSpace : null;
 			FullyQualifiedName = new QualifiedName(context.method_signature().UPPERCASE_IDENTIFIER().Symbol.Text, @namespace);
 
@@ -36,12 +32,6 @@ namespace FluentLang.Compiler.Symbols.Source
 			_parameters = new Lazy<ImmutableArray<IParameter>>(BindParameters);
 			_localInterfaces = new Lazy<ImmutableArray<IInterface>>(BindLocalInterfaces);
 			_localMethods = new Lazy<ImmutableArray<IMethod>>(BindLocalMethods);
-
-			_allDiagnostics = new Lazy<ImmutableArray<Diagnostic>>(() =>
-			{
-				_diagnostics.EnsureAllDiagnosticsCollectedForSymbol();
-				return _diagnostics.ToImmutableArray();
-			});
 		}
 
 		private IType BindReturnType()
@@ -128,9 +118,7 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		public IMethod? DeclaringMethod => _sourceSymbolContext.Scope;
 
-		public ImmutableArray<Diagnostic> AllDiagnostics => _allDiagnostics.Value;
-
-		void ISymbol.EnsureAllLocalDiagnosticsCollected()
+		protected override void EnsureAllLocalDiagnosticsCollected()
 		{
 			// Touch all lazy fields to force binding;
 

@@ -10,44 +10,31 @@ using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.Symbols.Source
 {
-	internal class SourceInterface : IInterface
+	internal sealed class SourceInterface : SymbolBase, IInterface
 	{
 		private readonly Anonymous_interface_declarationContext _context;
 		private readonly SourceSymbolContext _sourceSymbolContext;
 
 		private readonly Lazy<ImmutableArray<IInterfaceMethod>> _methods;
 
-		private readonly DiagnosticBag _diagnostics;
-		private readonly Lazy<ImmutableArray<Diagnostic>> _allDiagnostics;
-
-
 		public SourceInterface(
 			Anonymous_interface_declarationContext context,
 			SourceSymbolContext sourceSymbolContext,
 			QualifiedName? fullyQualifiedName,
-			DiagnosticBag diagnostics)
+			DiagnosticBag diagnostics) : base(diagnostics)
 		{
 			_context = context;
 			_sourceSymbolContext = sourceSymbolContext;
-			_diagnostics = diagnostics.CreateChildBag(this);
 			FullyQualifiedName = fullyQualifiedName;
 
 			_methods = new Lazy<ImmutableArray<IInterfaceMethod>>(GenerateMethods);
 
 			Release.Assert(fullyQualifiedName?.Parent is null || fullyQualifiedName.Parent == _sourceSymbolContext.NameSpace);
-
-			_allDiagnostics = new Lazy<ImmutableArray<Diagnostic>>(() =>
-			{
-				_diagnostics.EnsureAllDiagnosticsCollectedForSymbol();
-				return _diagnostics.ToImmutableArray();
-			});
 		}
 
 		public QualifiedName? FullyQualifiedName { get; }
 
 		public ImmutableArray<IInterfaceMethod> Methods => _methods.Value;
-
-		public ImmutableArray<Diagnostic> AllDiagnostics => _allDiagnostics.Value;
 
 		private ImmutableArray<IInterfaceMethod> GenerateMethods()
 		{
@@ -120,7 +107,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			 */
 		}
 
-		void ISymbol.EnsureAllLocalDiagnosticsCollected()
+		protected override void EnsureAllLocalDiagnosticsCollected()
 		{
 			// Touch all lazy fields to force binding;
 

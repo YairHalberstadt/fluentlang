@@ -12,7 +12,6 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 		public ImmutableArray<IInterface> LocalInterfaces { get; }
 		public ImmutableArray<IMethod> LocalMethods { get; }
 		public IMethod? DeclaringMethod { get; }
-
 	}
 }
 
