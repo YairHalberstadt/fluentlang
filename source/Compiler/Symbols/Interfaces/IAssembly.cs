@@ -11,6 +11,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 		public ImmutableArray<IInterface> Interfaces { get; }
 		public ImmutableArray<IMethod> Methods { get; }
 		public bool TryGetInterface(QualifiedName fullyQualifiedName, [NotNullWhen(true)] out IInterface? @interface);
+		public bool TryGetMethod(QualifiedName fullyQualifiedName, [NotNullWhen(true)] out IMethod? method);
 	}
 }
 

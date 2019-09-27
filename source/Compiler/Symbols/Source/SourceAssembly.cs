@@ -177,6 +177,11 @@ namespace FluentLang.Compiler.Symbols.Source
 			return _interfacesByName.Value.TryGetValue(fullyQualifiedName, out @interface);
 		}
 
+		public bool TryGetMethod(QualifiedName fullyQualifiedName, [NotNullWhen(true)] out IMethod? method)
+		{
+			return _methodsByName.Value.TryGetValue(fullyQualifiedName, out method);
+		}
+
 		void ISymbol.EnsureAllLocalDiagnosticsCollected()
 		{
 			// Touch all lazy fields to force binding;

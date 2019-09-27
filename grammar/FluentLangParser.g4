@@ -54,7 +54,7 @@ parameters
     ;
 
 parameter
-    : (LOWERCASE_IDENTIFIER | THIS) type_declaration
+    : LOWERCASE_IDENTIFIER type_declaration
     ;
 
 type_declaration
@@ -106,8 +106,7 @@ expression
     | expression DOT UPPERCASE_IDENTIFIER invocation                      #member_invocation_expression
     | IF OPEN_PARENS expression CLOSE_PARENS expression ELSE expression   #conditional_expression
     | OPEN_PARENS expression CLOSE_PARENS                                 #parenthesized_expression
-    | LOWERCASE_IDENTIFIER                                                #variable_expression
-    | THIS                                                                #variable_expression
+    | LOWERCASE_IDENTIFIER                                                #local_reference_expression
     ;
 
 empty_interface
@@ -130,8 +129,6 @@ fully_qualified_method
 
 operator
     : PLUS
-    | MINUS
-    | PLUS
     | MINUS
     | STAR
     | DIV

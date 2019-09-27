@@ -1,5 +1,5 @@
 ﻿using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Symbols.ErrorTypes;
+using FluentLang.Compiler.Symbols.ErrorSymbols;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;

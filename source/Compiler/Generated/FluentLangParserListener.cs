@@ -242,6 +242,18 @@ public interface IFluentLangParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitReturn_statement([NotNull] FluentLangParser.Return_statementContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>local_reference_expression</c>
+	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterLocal_reference_expression([NotNull] FluentLangParser.Local_reference_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>local_reference_expression</c>
+	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitLocal_reference_expression([NotNull] FluentLangParser.Local_reference_expressionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>binary_operator_expression</c>
 	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
 	/// </summary>
@@ -253,18 +265,6 @@ public interface IFluentLangParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitBinary_operator_expression([NotNull] FluentLangParser.Binary_operator_expressionContext context);
-	/// <summary>
-	/// Enter a parse tree produced by the <c>variable_expression</c>
-	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterVariable_expression([NotNull] FluentLangParser.Variable_expressionContext context);
-	/// <summary>
-	/// Exit a parse tree produced by the <c>variable_expression</c>
-	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitVariable_expression([NotNull] FluentLangParser.Variable_expressionContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>conditional_expression</c>
 	/// labeled alternative in <see cref="FluentLangParser.expression"/>.

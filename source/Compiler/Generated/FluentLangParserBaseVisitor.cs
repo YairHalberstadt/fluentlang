@@ -245,6 +245,17 @@ public partial class FluentLangParserBaseVisitor<Result> : AbstractParseTreeVisi
 	/// <return>The visitor result.</return>
 	public virtual Result VisitReturn_statement([NotNull] FluentLangParser.Return_statementContext context) { return VisitChildren(context); }
 	/// <summary>
+	/// Visit a parse tree produced by the <c>local_reference_expression</c>
+	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
+	/// <para>
+	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
+	/// on <paramref name="context"/>.
+	/// </para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	public virtual Result VisitLocal_reference_expression([NotNull] FluentLangParser.Local_reference_expressionContext context) { return VisitChildren(context); }
+	/// <summary>
 	/// Visit a parse tree produced by the <c>binary_operator_expression</c>
 	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
 	/// <para>
@@ -255,17 +266,6 @@ public partial class FluentLangParserBaseVisitor<Result> : AbstractParseTreeVisi
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	public virtual Result VisitBinary_operator_expression([NotNull] FluentLangParser.Binary_operator_expressionContext context) { return VisitChildren(context); }
-	/// <summary>
-	/// Visit a parse tree produced by the <c>variable_expression</c>
-	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
-	/// <para>
-	/// The default implementation returns the result of calling <see cref="AbstractParseTreeVisitor{Result}.VisitChildren(IRuleNode)"/>
-	/// on <paramref name="context"/>.
-	/// </para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	public virtual Result VisitVariable_expression([NotNull] FluentLangParser.Variable_expressionContext context) { return VisitChildren(context); }
 	/// <summary>
 	/// Visit a parse tree produced by the <c>conditional_expression</c>
 	/// labeled alternative in <see cref="FluentLangParser.expression"/>.

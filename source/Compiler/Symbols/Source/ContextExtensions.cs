@@ -1,7 +1,10 @@
 ﻿using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Helpers;
-using FluentLang.Compiler.Symbols.ErrorTypes;
+using FluentLang.Compiler.Symbols.ErrorSymbols;
 using FluentLang.Compiler.Symbols.Interfaces;
+using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
+using FluentLang.Compiler.Symbols.Source.MethodBody;
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using static FluentLang.Compiler.Generated.FluentLangParser;
@@ -67,6 +70,14 @@ namespace FluentLang.Compiler.Symbols.Source
 				.parameter()
 				.Select(x => new SourceParameter(x, sourceSymbolContext, diagnostics))
 				.ToImmutableArray<IParameter>();
+		}
+
+		public static IExpression BindExpression(
+			this ExpressionContext context,
+			MethodBodySymbolContext methodBodySymbolContext,
+			DiagnosticBag diagnostics)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

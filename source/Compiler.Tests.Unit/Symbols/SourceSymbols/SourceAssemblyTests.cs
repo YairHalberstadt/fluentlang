@@ -102,7 +102,6 @@ namespace A.B.C
 			Assert.Equal(i3!.FullyQualifiedName, QualifiedName("A.B.C.D.I3"));
 		}
 
-#if TryGetMethodDefined
 		[Fact]
 		public void CanAccessMethodInAssemblyByName()
 		{
@@ -126,7 +125,6 @@ namespace A.B.C
 			Assert.True(assembly.TryGetMethod(QualifiedName("A.B.C.D.M3"), out var m3));
 			Assert.Equal(m3!.FullyQualifiedName, QualifiedName("A.B.C.D.M3"));
 		}
-#endif
 
 		private class DummyAssembly : IAssembly
 		{
@@ -144,6 +142,12 @@ namespace A.B.C
 			{
 				@interface = Interfaces.FirstOrDefault(x => x.FullyQualifiedName == fullyQualifiedName);
 				return @interface != null;
+			}
+
+			public bool TryGetMethod(QualifiedName fullyQualifiedName, [NotNullWhen(true)] out IMethod? method)
+			{
+				method = Methods.FirstOrDefault(x => x.FullyQualifiedName == fullyQualifiedName);
+				return method != null;
 			}
 
 			public ImmutableArray<Diagnostic> AllDiagnostics { get; set; } = ImmutableArray<Diagnostic>.Empty;
