@@ -154,7 +154,7 @@ Set up CI pipeline on Azure
 
 ### In progress
 
-Creation of Semantic Model
+Creation of Symbol API
 
 Semantic checks (type checking etc.)
 
@@ -167,6 +167,10 @@ Implement Emitting of code
 Implement Emitting of metadata
 
 Create compiler.exe
+
+Look into code completion, syntax highlighting, etc.
+
+Look into more efficient incremental compilation.
 
 ## Contributing
 
