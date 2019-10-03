@@ -25,5 +25,8 @@
 		NoBestType,
 		InvalidLocalReference,
 		MemberNotFound,
+		LastStatementMustBeReturnStatement,
+		OnlyLastStatementCanBeReturnStatement,
+		ReturnTypeDoesNotMatch,
 	}
 }

@@ -5,7 +5,6 @@ using FluentLang.Compiler.Symbols.Source.MethodBody;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Reflection.Metadata;
 using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.Symbols.Source
@@ -63,7 +62,7 @@ namespace FluentLang.Compiler.Symbols.Source
 				.GroupBy(x => x.UPPERCASE_IDENTIFIER().Symbol.Text)
 				.Where(x => x.Count() > 1))
 			{
-				foreach(var duplicate in duplicateGroup)
+				foreach (var duplicate in duplicateGroup)
 				{
 					_diagnostics.Add(new Diagnostic(
 							new Location(duplicate.UPPERCASE_IDENTIFIER()),
@@ -116,17 +115,50 @@ namespace FluentLang.Compiler.Symbols.Source
 			var methodBodySymbolContext = new MethodBodySymbolContext(
 				_sourceSymbolContext,
 				Parameters.Select(x => new ParameterLocal(x)).ToImmutableList<ILocal>());
-			var statements = _context.method_body().method_statement();
-			var builder = ImmutableArray.CreateBuilder<IStatement>(statements.Length);
+			var statementContexts = _context.method_body().method_statement();
+			var builder = ImmutableArray.CreateBuilder<IStatement>(statementContexts.Length);
 
-			foreach (var statement in statements)
+			foreach (var statement in statementContexts)
 			{
 				builder.Add(statement.BindStatement(methodBodySymbolContext, _diagnostics, out var local));
 				if (local != null)
 					methodBodySymbolContext = methodBodySymbolContext.WithLocal(local);
 			}
 
-			return builder.MoveToImmutable();
+			var statements = builder.MoveToImmutable();
+
+			var lastStatement = statements.Last();
+			if (lastStatement is IReturnStatement returnStatement)
+			{
+				if (!returnStatement.Expression.Type.IsSubtypeOf(ReturnType))
+				{
+					_diagnostics.Add(new Diagnostic(
+						new Location(_context.method_body().method_statement().Last()),
+						ErrorCode.ReturnTypeDoesNotMatch,
+						ImmutableArray.Create<object?>(this, ReturnType, returnStatement.Expression.Type)));
+				}
+			}
+			else
+			{
+				_diagnostics.Add(new Diagnostic(
+					new Location(_context.method_body().method_statement().Last()),
+					ErrorCode.LastStatementMustBeReturnStatement,
+					ImmutableArray.Create<object?>(this, lastStatement)));
+			}
+
+			for (var i = 0; i < statements.Length - 1; i++)
+			{
+				var statement = statements[i];
+				if (statement is IReturnStatement)
+				{
+					_diagnostics.Add(new Diagnostic(
+						new Location(_context.method_body().method_statement(i)),
+						ErrorCode.OnlyLastStatementCanBeReturnStatement,
+						ImmutableArray.Create<object?>(this, statement)));
+				}
+			}
+
+			return statements;
 		}
 
 		public QualifiedName FullyQualifiedName { get; }
@@ -151,6 +183,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			_ = _parameters.Value;
 			_ = _localInterfaces.Value;
 			_ = _localMethods.Value;
+			_ = _statements.Value;
 		}
 	}
 }
