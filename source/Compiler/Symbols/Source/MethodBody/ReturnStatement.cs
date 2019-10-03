@@ -7,23 +7,23 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 {
 	internal sealed class ReturnStatement : SymbolBase, IReturnStatement
 	{
-		private readonly Declaration_statementContext _context;
-		private readonly SourceSymbolContext _sourceSymbolContext;
+		private readonly Return_statementContext _context;
+		private readonly MethodBodySymbolContext _methodBodySymbolContext;
 		private readonly Lazy<IExpression> _expression;
 
 		public ReturnStatement(
-			Declaration_statementContext context,
-			SourceSymbolContext sourceSymbolContext,
+			Return_statementContext context,
+			MethodBodySymbolContext methodBodySymbolContext,
 			DiagnosticBag diagnostics) : base(diagnostics)
 		{
 			_context = context;
-			_sourceSymbolContext = sourceSymbolContext;
+			_methodBodySymbolContext = methodBodySymbolContext;
 			_expression = new Lazy<IExpression>(BindExpression);
 		}
 
 		private IExpression BindExpression()
 		{
-			return _context.expression().BindExpression(_sourceSymbolContext, _diagnostics);
+			return _context.expression().BindExpression(_methodBodySymbolContext, _diagnostics);
 		}
 
 		public IExpression Expression => _expression.Value;

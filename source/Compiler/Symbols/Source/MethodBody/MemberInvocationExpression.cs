@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.Data.Common;
-using System.Linq;
-using Antlr4.Runtime.Tree.Xpath;
-using FluentLang.Compiler.Diagnostics;
+﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Symbols.ErrorSymbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
+using System;
+using System.Collections.Immutable;
+using System.Linq;
 using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.Symbols.Source.MethodBody
@@ -18,7 +17,6 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 		private readonly Lazy<IExpression> _expression;
 		private readonly Lazy<ImmutableArray<IExpression>> _arguments;
 		private readonly Lazy<IInterfaceMethod> _method;
-		private readonly Lazy<IType> _type;
 
 		public MemberInvocationExpression(
 			Member_invocation_expressionContext context,
@@ -32,7 +30,6 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 			_expression = new Lazy<IExpression>(BindExpression);
 			_arguments = new Lazy<ImmutableArray<IExpression>>(BindArguments);
 			_method = new Lazy<IInterfaceMethod>(BindMethod);
-			_type = new Lazy<IType>(BindType);
 		}
 
 		private IExpression BindExpression()
@@ -42,13 +39,10 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 
 		private ImmutableArray<IExpression> BindArguments()
 		{
-			return 
+			return
 				_context
 				.invocation()
-				.arguments()
-				.expression()
-				.Select(x => x.BindExpression(_methodBodySymbolContext, _diagnostics))
-				.ToImmutableArray();
+				.BindArguments(_methodBodySymbolContext, _diagnostics);
 		}
 
 		private IInterfaceMethod BindMethod()
@@ -61,7 +55,8 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 				x =>
 					x.Name == MemberName &&
 					x.Parameters.Length == Arguments.Length &&
-					x.Parameters.Zip(Arguments, (p, a) => a.Type.IsSubtypeOf(p.Type)).All(x => x)).ToList();
+					x.Parameters.Zip(Arguments, (p, a) => a.Type.IsSubtypeOf(p.Type)).All(x => x))
+				.ToList();
 
 			if (matching.Count == 1)
 				return matching[0];
@@ -70,21 +65,23 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 			{
 				_diagnostics.Add(new Diagnostic(
 					new Location(_context.UPPERCASE_IDENTIFIER()),
-					ErrorCode.MemberNotFound,
+					ErrorCode.MethodNotFound,
 					ImmutableArray.Create<object?>(type, MemberName, Arguments)));
 			}
-			else if(matching.Count == 2)
+			else if (matching.Count == 2)
 			{
 				_diagnostics.Add(new Diagnostic(
 					new Location(_context.UPPERCASE_IDENTIFIER()),
 					ErrorCode.AmbigiousMethodReference,
 					ImmutableArray.Create<object?>(matching)));
 			}
+
+			return new ErrorInterfaceMethod(MemberName, Arguments.Length);
 		}
 
 		private IType BindType()
 		{
-			throw new NotImplementedException();
+			return Method.ReturnType;
 		}
 
 		public string MemberName { get; }
@@ -95,11 +92,13 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 
 		public IInterfaceMethod Method => _method.Value;
 
-		public IType Type => _type.Value;
+		public IType Type => Method.ReturnType;
 
 		protected override void EnsureAllLocalDiagnosticsCollected()
 		{
-			throw new System.NotImplementedException();
+			_ = _expression.Value;
+			_ = _arguments.Value;
+			_ = _method.Value;
 		}
 	}
 }

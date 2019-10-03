@@ -3,9 +3,9 @@
 	public interface IDeclarationStatement : IStatement
 	{
 		IExpression Expression { get; }
-		string IdentifierName { get; }
+		string? IdentifierName { get; }
 		IType? DeclaredType { get; }
 		IType Type { get; }
-		IDeclaredLocal Local { get; }
+		IDeclaredLocal? Local { get; }
 	}
 }

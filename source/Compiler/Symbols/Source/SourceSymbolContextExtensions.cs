@@ -1,7 +1,7 @@
 ﻿using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.ErrorSymbols;
 using FluentLang.Compiler.Symbols.Interfaces;
+using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -111,7 +111,10 @@ namespace FluentLang.Compiler.Symbols.Source
 			}
 		}
 
-		public static IInterface GetInterfaceOrError(this SourceSymbolContext context, QualifiedName name, out Func<Location, Diagnostic>? diagnostic)
+		public static IInterface GetInterfaceOrError(
+			this SourceSymbolContext context,
+			QualifiedName name,
+			out Func<Location, Diagnostic>? diagnostic)
 		{
 			var possibleInterfaces = context.GetPossibleInterfaces(name);
 
@@ -133,7 +136,10 @@ namespace FluentLang.Compiler.Symbols.Source
 		}
 
 
-		public static IMethod GetMethodOrError(this SourceSymbolContext context, QualifiedName name, out Func<Location, Diagnostic>? diagnostic)
+		public static IMethod GetMethodOrError(
+			this SourceSymbolContext context,
+			QualifiedName name,
+			out Func<Location, Diagnostic>? diagnostic)
 		{
 			var possibleMethods = context.GetPossibleMethods(name);
 

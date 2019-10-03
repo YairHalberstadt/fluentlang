@@ -1,8 +1,11 @@
 ﻿using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Symbols.Interfaces;
+using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
+using FluentLang.Compiler.Symbols.Source.MethodBody;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection.Metadata;
 using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.Symbols.Source
@@ -17,6 +20,7 @@ namespace FluentLang.Compiler.Symbols.Source
 		private readonly Lazy<ImmutableArray<IParameter>> _parameters;
 		private readonly Lazy<ImmutableArray<IInterface>> _localInterfaces;
 		private readonly Lazy<ImmutableArray<IMethod>> _localMethods;
+		private readonly Lazy<ImmutableArray<IStatement>> _statements;
 
 		public SourceMethod(
 			Method_declarationContext context,
@@ -32,6 +36,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			_parameters = new Lazy<ImmutableArray<IParameter>>(BindParameters);
 			_localInterfaces = new Lazy<ImmutableArray<IInterface>>(BindLocalInterfaces);
 			_localMethods = new Lazy<ImmutableArray<IMethod>>(BindLocalMethods);
+			_statements = new Lazy<ImmutableArray<IStatement>>(BindStatements);
 		}
 
 		private IType BindReturnType()
@@ -106,6 +111,24 @@ namespace FluentLang.Compiler.Symbols.Source
 				.ToImmutableArray<IMethod>();
 		}
 
+		private ImmutableArray<IStatement> BindStatements()
+		{
+			var methodBodySymbolContext = new MethodBodySymbolContext(
+				_sourceSymbolContext,
+				Parameters.Select(x => new ParameterLocal(x)).ToImmutableList<ILocal>());
+			var statements = _context.method_body().method_statement();
+			var builder = ImmutableArray.CreateBuilder<IStatement>(statements.Length);
+
+			foreach (var statement in statements)
+			{
+				builder.Add(statement.BindStatement(methodBodySymbolContext, _diagnostics, out var local));
+				if (local != null)
+					methodBodySymbolContext = methodBodySymbolContext.WithLocal(local);
+			}
+
+			return builder.MoveToImmutable();
+		}
+
 		public QualifiedName FullyQualifiedName { get; }
 
 		public IType ReturnType => _returnType.Value;
@@ -117,6 +140,8 @@ namespace FluentLang.Compiler.Symbols.Source
 		public ImmutableArray<IMethod> LocalMethods => _localMethods.Value;
 
 		public IMethod? DeclaringMethod => _sourceSymbolContext.Scope;
+
+		public ImmutableArray<IStatement> Statements => _statements.Value;
 
 		protected override void EnsureAllLocalDiagnosticsCollected()
 		{

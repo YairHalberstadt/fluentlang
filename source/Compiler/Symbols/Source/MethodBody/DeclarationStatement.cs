@@ -22,11 +22,11 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 		{
 			_context = context;
 			_methodBodySymbolContext = methodBodySymbolContext;
-			IdentifierName = _context.LOWERCASE_IDENTIFIER()?.Symbol.Text ?? _context.DISCARD().Symbol.Text;
+			IdentifierName = _context.LOWERCASE_IDENTIFIER()?.Symbol.Text ?? null;
 			_declaredType = new Lazy<IType?>(BindDeclaredType);
 			_expression = new Lazy<IExpression>(BindExpression);
 			_type = new Lazy<IType>(BindType);
-			Local = new DeclaredLocal(this);
+			Local = _context.DISCARD() is null ? new DeclaredLocal(this) : null;
 		}
 
 		private IType? BindDeclaredType()
@@ -54,11 +54,11 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 			return DeclaredType;
 		}
 
-		public string IdentifierName { get; }
+		public string? IdentifierName { get; }
 		public IType? DeclaredType => _declaredType.Value;
 		public IExpression Expression => _expression.Value;
 		public IType Type => _type.Value;
-		public IDeclaredLocal Local { get; }
+		public IDeclaredLocal? Local { get; }
 
 		protected override void EnsureAllLocalDiagnosticsCollected()
 		{

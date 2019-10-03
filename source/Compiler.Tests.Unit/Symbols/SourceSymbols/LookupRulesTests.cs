@@ -229,7 +229,7 @@ namespace A.B {
 }
 
 M() : I {}").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InterfaceNotFound));
-			Assert.True(assembly.Methods.Single().ReturnType is IErrorType);
+			Assert.True(assembly.Methods.Single().ReturnType is IErrorSymbol);
 		}
 
 		[Fact]
@@ -247,9 +247,9 @@ namespace B {
 	interface I {}
 }
 
-M() : I {}").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InterfaceNotFound));
+M() : I {}").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.AmbigiousInterfaceReference));
 
-			Assert.True(assembly.Methods.Single().ReturnType is IErrorType);
+			Assert.True(assembly.Methods.Single().ReturnType is IErrorSymbol);
 		}
 	}
 }

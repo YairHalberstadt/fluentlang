@@ -77,7 +77,55 @@ namespace FluentLang.Compiler.Symbols.Source
 			MethodBodySymbolContext methodBodySymbolContext,
 			DiagnosticBag diagnostics)
 		{
-			throw new NotImplementedException();
+			return context switch
+			{
+				New_object_expressionContext _ => NewObjectExpression.Instance,
+				Object_patching_expressionContext opec
+					=> new ObjectPatchingExpression(opec, methodBodySymbolContext, diagnostics),
+				Binary_operator_expressionContext boec
+					=> new BinaryOperatorExpression(boec, methodBodySymbolContext, diagnostics),
+				Literal_expressionContext lec => new LiteralExpression(lec, diagnostics),
+				Static_invocation_expressionContext siec
+					=> new StaticInvocationExpression(siec, methodBodySymbolContext, diagnostics),
+				Member_invocation_expressionContext miec
+					=> new MemberInvocationExpression(miec, methodBodySymbolContext, diagnostics),
+				Conditional_expressionContext cec => new ConditionalExpression(cec, methodBodySymbolContext, diagnostics),
+				Parenthesized_expressionContext pec => pec.expression().BindExpression(methodBodySymbolContext, diagnostics),
+				Local_reference_expressionContext lrec => new LocalReferenceExpression(lrec, methodBodySymbolContext, diagnostics),
+				_ => throw Release.Fail($"unexpected expression: {context}")
+			};
+		}
+
+		public static ImmutableArray<IExpression> BindArguments(
+			this InvocationContext context,
+			MethodBodySymbolContext methodBodySymbolContext,
+			DiagnosticBag diagnostics)
+		{
+			return context
+				.arguments()
+				.expression()
+				.Select(x => x.BindExpression(methodBodySymbolContext, diagnostics))
+				.ToImmutableArray();
+		}
+
+		public static IStatement BindStatement(
+			this Method_statementContext context,
+			MethodBodySymbolContext methodBodySymbolContext,
+			DiagnosticBag diagnostics,
+			out ILocal? local)
+		{
+			if (context.declaration_statement() is { } declarationStatement)
+			{
+				var result = new DeclarationStatement(declarationStatement, methodBodySymbolContext, diagnostics);
+				local = result.Local;
+				return result;
+			}
+			if (context.return_statement() is { } returnStatement)
+			{
+				local = null;
+				return new ReturnStatement(returnStatement, methodBodySymbolContext, diagnostics);
+			}
+			throw Release.Fail($"unexpected statement: {context}");
 		}
 	}
 }
