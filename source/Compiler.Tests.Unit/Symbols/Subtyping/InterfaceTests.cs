@@ -60,7 +60,7 @@ interface AdditiveOneMethod3 OneMethod1 + OneMethod2
 		}
 
 		[Fact]
-		public void EmptyInterfaceIsSubtypeofInterfaceWithOneMethod_AndNotViceVersa()
+		public void InterfaceWithOneMethod_IsSubtypeOf_EmptyInterface_AndNotViceVersa()
 		{
 			var assembly = CreateAssembly(@"
 interface Empty {}
@@ -69,12 +69,12 @@ interface OneMethod { M() : int; }").VerifyDiagnostics();
 			Assert.True(assembly.TryGetInterface(QualifiedName("OneMethod"), out var oneMethod));
 			Debug.Assert(empty != null);
 			Debug.Assert(oneMethod != null);
-			Assert.True(empty.IsSubtypeOf(oneMethod));
-			Assert.False(oneMethod.IsSubtypeOf(empty));
+			Assert.True(oneMethod.IsSubtypeOf(empty));
+			Assert.False(empty.IsSubtypeOf(oneMethod));
 		}
 
 		[Fact]
-		public void InterfaceWithOneMethodIsNotSubtypeOfInterfaceWithOneDifferentMethod()
+		public void InterfaceWithOneMethod_IsNotSubtypeOf_InterfaceWithOneDifferentMethod()
 		{
 			var assembly = CreateAssembly(@"
 interface OneMethod1 { M() : int; }
@@ -105,7 +105,7 @@ interface OneMethod4 { M(param1 : int) : int; }").VerifyDiagnostics();
 		}
 
 		[Fact]
-		public void InterfacesWithOneMethod_IsSubtypeOfInterfaceWithOneExtraMethod_AndNotViceVersa()
+		public void InterfaceWithOneExtraMethod_IsSubtypeOf_InterfaceWithOneMethod_AndNotViceVersa()
 		{
 			var assembly = CreateAssembly(@"
 interface OneMethod { M() : int; }
@@ -114,12 +114,12 @@ interface TwoMethods { M() : int; M1() : int; }").VerifyDiagnostics();
 			Assert.True(assembly.TryGetInterface(QualifiedName("TwoMethods"), out var twoMethods));
 			Debug.Assert(twoMethods != null);
 			Debug.Assert(oneMethod != null);
-			Assert.True(oneMethod.IsSubtypeOf(twoMethods));
-			Assert.False(twoMethods.IsSubtypeOf(oneMethod));
+			Assert.True(twoMethods.IsSubtypeOf(oneMethod));
+			Assert.False(oneMethod.IsSubtypeOf(twoMethods));
 		}
 
 		[Fact]
-		public void InterfacesWithOneMethod_IsNotSubtypeOfInterfaceWithTwoDifferentMethods_AndViceVersa()
+		public void InterfacesWithTwoMethods_IsNotSubtypeOf_InterfaceWithOneDifferentMethod_AndViceVersa()
 		{
 			var assembly = CreateAssembly(@"
 interface OneMethod { M() : int; }
@@ -147,7 +147,7 @@ interface I2 { M(parameter1 : int) : bool; }").VerifyDiagnostics();
 		}
 
 		[Fact]
-		public void InterfaceWithOneMethodIsSubtypeRecursivelyA()
+		public void Interface_IsSubtypeRecursively_A()
 		{
 			var assembly = CreateAssembly(@"
 interface Empty {}
@@ -163,7 +163,7 @@ interface I2 { M(param1 : Empty()) : AdditiveEmpty; }").VerifyDiagnostics();
 		}
 
 		[Fact]
-		public void InterfaceWithOneMethodIsSubtypeRecursivelyB()
+		public void Interface_IsSubtypeRecursively_B()
 		{
 			var assembly = CreateAssembly(@"
 interface I1 { M(param1 : I1) : I1; }
@@ -177,7 +177,7 @@ interface I2 { M(param1 : I2) : I2; }").VerifyDiagnostics();
 		}
 
 		[Fact]
-		public void InterfaceWithOneMethodIsSubtypeRecursivelyC()
+		public void Interface_IsSubtypeRecursively_C()
 		{
 			var assembly = CreateAssembly(@"
 interface I1 { M(param1 : I2) : I2; }
@@ -191,7 +191,7 @@ interface I2 { M(param1 : I1) : I1; }").VerifyDiagnostics();
 		}
 
 		[Fact]
-		public void InterfaceWithOneMethodIsSubtypeRecursivelyD()
+		public void Interface_IsSubtypeRecursively_D()
 		{
 			var assembly = CreateAssembly(@"
 interface I1 { M(param1 : I2) : I1; }
@@ -205,7 +205,7 @@ interface I2 { M(param1 : I1) : I2; }");
 		}
 
 		[Fact]
-		public void InterfaceWithOneMethodIsSubtypeRecursivelyE()
+		public void Interface_IsSubtypeRecursively_E()
 		{
 			var assembly = CreateAssembly(@"
 interface I1 { M(param1 : I2) : int; }
@@ -221,7 +221,7 @@ interface I4 { M(param1 : I1) : int; }").VerifyDiagnostics();
 		}
 
 		[Fact]
-		public void InterfaceWithOneMethodIsNotSubtypeRecursively()
+		public void Interface_IsNotSubtypeRecursively()
 		{
 			var assembly = CreateAssembly(@"
 interface Empty {}
