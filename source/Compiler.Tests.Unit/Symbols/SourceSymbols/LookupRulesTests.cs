@@ -31,9 +31,12 @@ namespace B {
 				interface I {}
 				M() : int {
 					interface I {}
-					M() : I {}
+					M() : I { return {}; }
+					return 42;
 				}
+				return 42;
 			}
+			return 42;
 		}
 	}
 }").VerifyDiagnostics();
@@ -63,9 +66,12 @@ namespace B {
 			M() : int {
 				interface I {}
 				M() : int {
-					M() : I {}
+					M() : I { return {}; }
+					return 42;
 				}
+				return 42;
 			}
+			return 42;
 		}
 	}
 }").VerifyDiagnostics();
@@ -94,9 +100,12 @@ namespace B {
 			interface I {}
 			M() : int {
 				M() : int {
-					M() : I {}
+					M() : I { return {}; }
+					return 42;
 				}
+				return 42;
 			}
+			return 42;
 		}
 	}
 }").VerifyDiagnostics();
@@ -124,9 +133,12 @@ namespace B {
 		M() : int {
 			M() : int {
 				M() : int {
-					M() : I {}
+					M() : I { return {}; }
+					return 42;
 				}
+				return 42;
 			}
+			return 42;
 		}
 	}
 }").VerifyDiagnostics();
@@ -153,9 +165,12 @@ namespace B {
 		M() : int {
 			M() : int {
 				M() : int {
-					M() : I {}
+					M() : I { return {}; }
+					return 42;
 				}
+				return 42;
 			}
+			return 42;
 		}
 	}
 }").VerifyDiagnostics();
@@ -181,9 +196,12 @@ namespace B {
 		M() : int {
 			M() : int {
 				M() : int {
-					M() : I {}
+					M() : I { return {}; }
+					return 42;
 				}
+				return 42;
 			}
+			return 42;
 		}
 	}
 }").VerifyDiagnostics();
@@ -207,9 +225,12 @@ namespace B {
 		M() : int {
 			M() : int {
 				M() : int {
-					M() : I {}
+					M() : I { return {}; }
+					return 42;
 				}
+				return 42;
 			}
+			return 42;
 		}
 	}
 }").VerifyDiagnostics();
@@ -228,7 +249,7 @@ namespace A.B {
 	interface I {}
 }
 
-M() : I {}").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InterfaceNotFound));
+M() : I { return {}; }").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InterfaceNotFound));
 			Assert.True(assembly.Methods.Single().ReturnType is IErrorSymbol);
 		}
 
@@ -247,7 +268,7 @@ namespace B {
 	interface I {}
 }
 
-M() : I {}").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.AmbigiousInterfaceReference));
+M() : I { return {}; }").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.AmbigiousInterfaceReference));
 
 			Assert.True(assembly.Methods.Single().ReturnType is IErrorSymbol);
 		}

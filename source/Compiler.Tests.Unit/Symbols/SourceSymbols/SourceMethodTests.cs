@@ -14,8 +14,9 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols
 		{
 			CreateAssembly(@"
 M() : bool {
-    M1() : bool {}
-	M1(param :  int) : int {}
+    M1() : bool { return true; }
+	M1(param :  int) : int { return 42; }
+	return true;
 }").VerifyDiagnostics(
 					new Diagnostic(new Location(), ErrorCode.DuplicateMethodDeclaration),
 					new Diagnostic(new Location(), ErrorCode.DuplicateMethodDeclaration));
@@ -28,6 +29,7 @@ M() : bool {
 M() : bool {
     interface I {}
 	interface I { M() : bool; }
+	return true;
 }").VerifyDiagnostics(
 					new Diagnostic(new Location(), ErrorCode.DuplicateInterfaceDeclaration),
 					new Diagnostic(new Location(), ErrorCode.DuplicateInterfaceDeclaration));

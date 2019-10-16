@@ -89,7 +89,7 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 
 		protected override void EnsureAllLocalDiagnosticsCollected()
 		{
-			throw new NotImplementedException();
+			_ = _bind.Value;
 		}
 
 		public Primitive Type => _bind.Value.type;

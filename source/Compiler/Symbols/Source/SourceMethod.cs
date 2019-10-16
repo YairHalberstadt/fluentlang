@@ -118,6 +118,16 @@ namespace FluentLang.Compiler.Symbols.Source
 			var statementContexts = _context.method_body().method_statement();
 			var builder = ImmutableArray.CreateBuilder<IStatement>(statementContexts.Length);
 
+			if(statementContexts.Length == 0)
+			{
+				_diagnostics.Add(new Diagnostic(
+						new Location(_context.method_signature().UPPERCASE_IDENTIFIER()),
+						ErrorCode.MethodMustContainAtLeastOneStatement,
+						ImmutableArray.Create<object?>(this)));
+
+				return ImmutableArray<IStatement>.Empty;
+			}
+
 			foreach (var statement in statementContexts)
 			{
 				builder.Add(statement.BindStatement(methodBodySymbolContext, _diagnostics, out var local));

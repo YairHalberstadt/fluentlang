@@ -15,7 +15,7 @@
 		CanOnlyPatchInterface,
 		CannotMixInNonInterface,
 		CannotPatchInMethodWithoutParameters,
-		FirstParameterOfPatchedInMethodIsNotSubtypeOfResultantType,
+		ResultantTypeOfObjectPatchingExpressionIsNotSubtypeOfFirstParameterOfPatchedInMethod,
 		InvalidArgument,
 		InvalidIntegerLiteral,
 		IntegerLiteralOutOfRange,
@@ -28,5 +28,6 @@
 		LastStatementMustBeReturnStatement,
 		OnlyLastStatementCanBeReturnStatement,
 		ReturnTypeDoesNotMatch,
+		MethodMustContainAtLeastOneStatement,
 	}
 }

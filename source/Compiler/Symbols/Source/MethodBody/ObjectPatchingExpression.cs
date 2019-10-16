@@ -120,16 +120,16 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 					methods = patchedMethods.ToImmutableArray();
 				}
 
-				// can't use this, as that would lead to infinite recursion
-				var tempInterface = new TempInterface(methods);
+				// can't use `this`, as that would lead to infinite recursion
+				var tempInterface = (IInterface)new TempInterface(methods);
 
 				foreach (var (patchedInMethod, index) in patchedInMethods)
 				{
-					if (!patchedInMethod.Parameters[0].Type.IsSubtypeOf(tempInterface))
+					if (!tempInterface.IsSubtypeOf(patchedInMethod.Parameters[0].Type))
 					{
 						_objectPatchingExpression._diagnostics.Add(new Diagnostic(
 							new Location(_objectPatchingExpression._context.object_patch(index)),
-							ErrorCode.FirstParameterOfPatchedInMethodIsNotSubtypeOfResultantType,
+							ErrorCode.ResultantTypeOfObjectPatchingExpressionIsNotSubtypeOfFirstParameterOfPatchedInMethod,
 							ImmutableArray.Create<object?>(patchedInMethod, this)));
 					}
 				}
@@ -143,7 +143,10 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 
 			public ImmutableArray<Diagnostic> AllDiagnostics => ImmutableArray<Diagnostic>.Empty;
 
-			void ISymbol.EnsureAllLocalDiagnosticsCollected() { }
+			void ISymbol.EnsureAllLocalDiagnosticsCollected() 
+			{
+				_ = _methods.Value;
+			}
 
 			private sealed class PatchedInterfaceMethod : IInterfaceMethod
 			{

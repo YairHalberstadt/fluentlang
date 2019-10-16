@@ -1,4 +1,4 @@
-java -jar D:\Git\fluentlang\build-script\antlr-4.7.2-complete.jar `
+java -jar .\antlr-4.7.2-complete.jar `
     -lib ../grammar `
     -o ../source/Compiler/Generated `
     -listener `

@@ -99,7 +99,7 @@ return_statement
 
 expression
     : empty_interface                                                     #new_object_expression
-    | expression (PLUS object_patch)+                                     #object_patching_expression
+    | expression PLUS object_patch (COMMA object_patch)*                  #object_patching_expression
     | expression operator expression                                      #binary_operator_expression
     | literal                                                             #literal_expression
     | qualified_name invocation                                           #static_invocation_expression
