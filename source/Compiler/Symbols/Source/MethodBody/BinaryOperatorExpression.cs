@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Immutable;
-using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Generated;
-using FluentLang.Compiler.Symbols.ErrorSymbols;
+﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
+using System;
+using System.Collections.Immutable;
 using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.Symbols.Source.MethodBody
@@ -61,10 +60,47 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 			};
 		}
 
+		private static bool OperatorIsDefinedOnType(Operator op, Primitive primitive)
+		{
+			if (op.Equals(Operator.Equal)
+				|| op.Equals(Operator.GreaterThan)
+				|| op.Equals(Operator.GreaterThanOrEqualTo)
+				|| op.Equals(Operator.LessThan)
+				|| op.Equals(Operator.LessThanOrEqualTo)
+				|| op.Equals(Operator.NotEqual))
+				return true;
+
+			if (op.Equals(Operator.Plus))
+				return primitive.Equals(Primitive.String)
+					|| primitive.Equals(Primitive.Double)
+					|| primitive.Equals(Primitive.Int);
+
+			if (op.Equals(Operator.Minus)
+				|| op.Equals(Operator.Multiply)
+				|| op.Equals(Operator.Divide))
+				return primitive.Equals(Primitive.Double)
+					|| primitive.Equals(Primitive.Int);
+
+			if (op.Equals(Operator.Remainder))
+				return primitive.Equals(Primitive.Int);
+
+			throw Release.Fail($"unexpected operator: {op}");
+		}
+
+		private static bool OperatorAlwaysReturnsBoolean(Operator op)
+		{
+			return op.Equals(Operator.Equal)
+				|| op.Equals(Operator.GreaterThan)
+				|| op.Equals(Operator.GreaterThanOrEqualTo)
+				|| op.Equals(Operator.LessThan)
+				|| op.Equals(Operator.LessThanOrEqualTo)
+				|| op.Equals(Operator.NotEqual);
+		}
+
 		private IType BindType()
 		{
-			if (!(Left.Type is Primitive leftType) 
-				|| leftType.Equals(Primitive.String) && !Operator.Equals(Operator.Plus))
+			if (!(Left.Type is Primitive leftType)
+				|| !OperatorIsDefinedOnType(Operator, leftType))
 			{
 				_diagnostics.Add(new Diagnostic(
 					new Location(_context.expression(0)),
@@ -82,7 +118,7 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 				}
 			}
 
-			return Left.Type;
+			return OperatorAlwaysReturnsBoolean(Operator) ? Primitive.Bool : Left.Type;
 		}
 
 		public IExpression Left => _left.Value;
