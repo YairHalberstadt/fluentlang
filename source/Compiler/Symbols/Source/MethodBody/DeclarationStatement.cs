@@ -3,6 +3,7 @@ using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using System;
 using System.Collections.Immutable;
+using System.Linq;
 using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.Symbols.Source.MethodBody
@@ -14,6 +15,7 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 		private readonly Lazy<IType?> _declaredType;
 		private readonly Lazy<IExpression> _expression;
 		private readonly Lazy<IType> _type;
+		private readonly Lazy<IDeclaredLocal?> _local;
 
 		public DeclarationStatement(
 			Declaration_statementContext context,
@@ -26,7 +28,20 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 			_declaredType = new Lazy<IType?>(BindDeclaredType);
 			_expression = new Lazy<IExpression>(BindExpression);
 			_type = new Lazy<IType>(BindType);
-			Local = _context.DISCARD() is null ? new DeclaredLocal(this) : null;
+			_local = new Lazy<IDeclaredLocal?>(BindLocal);
+		}
+
+		private IDeclaredLocal? BindLocal()
+		{
+			if (_context.DISCARD() is { })
+				return null;
+			var local = new DeclaredLocal(this);
+			if (_methodBodySymbolContext.Locals.Any(x => x.Identifier == IdentifierName))
+				_diagnostics.Add(new Diagnostic(
+					new Location(_context.LOWERCASE_IDENTIFIER()),
+					ErrorCode.HidesLocal,
+					ImmutableArray.Create<object?>(local, _methodBodySymbolContext.Locals.First(x => x.Identifier == IdentifierName))));
+			return local;
 		}
 
 		private IType? BindDeclaredType()
@@ -58,12 +73,13 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 		public IType? DeclaredType => _declaredType.Value;
 		public IExpression Expression => _expression.Value;
 		public IType Type => _type.Value;
-		public IDeclaredLocal? Local { get; }
+		public IDeclaredLocal? Local => _local.Value;
 
 		protected override void EnsureAllLocalDiagnosticsCollected()
 		{
 			// Touch all lazy fields to force binding;
 
+			_ = _local.Value;
 			_ = _declaredType.Value;
 			_ = _expression.Value;
 			_ = _type.Value;

@@ -90,7 +90,7 @@ method_body
 
 declaration_statement
     : LET LOWERCASE_IDENTIFIER type_declaration? ASSIGNMENT expression SEMICOLON
-    | LET DISCARD ASSIGNMENT expression SEMICOLON
+    | DISCARD ASSIGNMENT expression SEMICOLON
     ;
 
 return_statement

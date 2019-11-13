@@ -29,5 +29,6 @@
 		OnlyLastStatementCanBeReturnStatement,
 		ReturnTypeDoesNotMatch,
 		MethodMustContainAtLeastOneStatement,
+		HidesLocal,
 	}
 }
