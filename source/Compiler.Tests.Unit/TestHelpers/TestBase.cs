@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using Xunit;
 
 namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 {
@@ -32,6 +33,18 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 		protected static QualifiedName QualifiedName(string qualifiedName)
 		{
 			return qualifiedName.Split('.').Aggregate((QualifiedName?)null, (l, r) => new QualifiedName(r, l))!;
+		}
+
+		protected static IMethod AssertGetMethod(IAssembly assembly, string qualifiedName)
+		{
+			Assert.True(assembly.TryGetMethod(QualifiedName(qualifiedName), out var method));
+			return method!;
+		}
+
+		protected static IInterface AssertGetInterface(IAssembly assembly, string qualifiedName)
+		{
+			Assert.True(assembly.TryGetInterface(QualifiedName(qualifiedName), out var @interface));
+			return @interface!;
 		}
 	}
 }

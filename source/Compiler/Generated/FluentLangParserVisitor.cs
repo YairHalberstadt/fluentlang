@@ -159,19 +159,19 @@ public interface IFluentLangParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitReturn_statement([NotNull] FluentLangParser.Return_statementContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>local_reference_expression</c>
+	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitLocal_reference_expression([NotNull] FluentLangParser.Local_reference_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>binary_operator_expression</c>
 	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitBinary_operator_expression([NotNull] FluentLangParser.Binary_operator_expressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>variable_expression</c>
-	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitVariable_expression([NotNull] FluentLangParser.Variable_expressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>conditional_expression</c>
 	/// labeled alternative in <see cref="FluentLangParser.expression"/>.

@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
+using System.Collections.Immutable;
 
 namespace FluentLang.Compiler.Symbols.Interfaces
 {
@@ -12,6 +13,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 		public ImmutableArray<IInterface> LocalInterfaces { get; }
 		public ImmutableArray<IMethod> LocalMethods { get; }
 		public IMethod? DeclaringMethod { get; }
+		public ImmutableArray<IStatement> Statements { get; }
 	}
 }
 

@@ -1,5 +1,5 @@
 ﻿using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Symbols.ErrorTypes;
+using FluentLang.Compiler.Symbols.ErrorSymbols;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -31,9 +31,12 @@ namespace B {
 				interface I {}
 				M() : int {
 					interface I {}
-					M() : I {}
+					M() : I { return {}; }
+					return 42;
 				}
+				return 42;
 			}
+			return 42;
 		}
 	}
 }").VerifyDiagnostics();
@@ -63,9 +66,12 @@ namespace B {
 			M() : int {
 				interface I {}
 				M() : int {
-					M() : I {}
+					M() : I { return {}; }
+					return 42;
 				}
+				return 42;
 			}
+			return 42;
 		}
 	}
 }").VerifyDiagnostics();
@@ -94,9 +100,12 @@ namespace B {
 			interface I {}
 			M() : int {
 				M() : int {
-					M() : I {}
+					M() : I { return {}; }
+					return 42;
 				}
+				return 42;
 			}
+			return 42;
 		}
 	}
 }").VerifyDiagnostics();
@@ -124,9 +133,12 @@ namespace B {
 		M() : int {
 			M() : int {
 				M() : int {
-					M() : I {}
+					M() : I { return {}; }
+					return 42;
 				}
+				return 42;
 			}
+			return 42;
 		}
 	}
 }").VerifyDiagnostics();
@@ -153,9 +165,12 @@ namespace B {
 		M() : int {
 			M() : int {
 				M() : int {
-					M() : I {}
+					M() : I { return {}; }
+					return 42;
 				}
+				return 42;
 			}
+			return 42;
 		}
 	}
 }").VerifyDiagnostics();
@@ -181,9 +196,12 @@ namespace B {
 		M() : int {
 			M() : int {
 				M() : int {
-					M() : I {}
+					M() : I { return {}; }
+					return 42;
 				}
+				return 42;
 			}
+			return 42;
 		}
 	}
 }").VerifyDiagnostics();
@@ -207,9 +225,12 @@ namespace B {
 		M() : int {
 			M() : int {
 				M() : int {
-					M() : I {}
+					M() : I { return {}; }
+					return 42;
 				}
+				return 42;
 			}
+			return 42;
 		}
 	}
 }").VerifyDiagnostics();
@@ -228,8 +249,8 @@ namespace A.B {
 	interface I {}
 }
 
-M() : I {}").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InterfaceNotFound));
-			Assert.True(assembly.Methods.Single().ReturnType is IErrorType);
+M() : I { return {}; }").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InterfaceNotFound));
+			Assert.True(assembly.Methods.Single().ReturnType is IErrorSymbol);
 		}
 
 		[Fact]
@@ -247,9 +268,9 @@ namespace B {
 	interface I {}
 }
 
-M() : I {}").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InterfaceNotFound));
+M() : I { return {}; }").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.AmbigiousInterfaceReference));
 
-			Assert.True(assembly.Methods.Single().ReturnType is IErrorType);
+			Assert.True(assembly.Methods.Single().ReturnType is IErrorSymbol);
 		}
 	}
 }

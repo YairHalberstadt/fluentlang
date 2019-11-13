@@ -1,9 +1,9 @@
 ﻿using FluentLang.Compiler.Symbols.Interfaces;
 using System.Collections.Generic;
 
-namespace FluentLang.Compiler.Symbols.ErrorTypes
+namespace FluentLang.Compiler.Symbols.ErrorSymbols
 {
-	public interface IErrorType : IType
+	public interface IErrorSymbol : ISymbol
 	{
 	}
 }

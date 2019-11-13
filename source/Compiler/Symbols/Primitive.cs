@@ -45,7 +45,7 @@ namespace FluentLang.Compiler.Symbols
 			return ReferenceEquals(this, other);
 		}
 
-		public override string? ToString()
+		public override string ToString()
 		{
 			return FullyQualifiedName.ToString();
 		}

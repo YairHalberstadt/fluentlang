@@ -1,5 +1,7 @@
 ﻿using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Symbols.Interfaces;
+using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
+using FluentLang.Compiler.Symbols.Source.MethodBody;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
@@ -17,6 +19,7 @@ namespace FluentLang.Compiler.Symbols.Source
 		private readonly Lazy<ImmutableArray<IParameter>> _parameters;
 		private readonly Lazy<ImmutableArray<IInterface>> _localInterfaces;
 		private readonly Lazy<ImmutableArray<IMethod>> _localMethods;
+		private readonly Lazy<ImmutableArray<IStatement>> _statements;
 
 		public SourceMethod(
 			Method_declarationContext context,
@@ -32,6 +35,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			_parameters = new Lazy<ImmutableArray<IParameter>>(BindParameters);
 			_localInterfaces = new Lazy<ImmutableArray<IInterface>>(BindLocalInterfaces);
 			_localMethods = new Lazy<ImmutableArray<IMethod>>(BindLocalMethods);
+			_statements = new Lazy<ImmutableArray<IStatement>>(BindStatements);
 		}
 
 		private IType BindReturnType()
@@ -58,7 +62,7 @@ namespace FluentLang.Compiler.Symbols.Source
 				.GroupBy(x => x.UPPERCASE_IDENTIFIER().Symbol.Text)
 				.Where(x => x.Count() > 1))
 			{
-				foreach(var duplicate in duplicateGroup)
+				foreach (var duplicate in duplicateGroup)
 				{
 					_diagnostics.Add(new Diagnostic(
 							new Location(duplicate.UPPERCASE_IDENTIFIER()),
@@ -106,6 +110,67 @@ namespace FluentLang.Compiler.Symbols.Source
 				.ToImmutableArray<IMethod>();
 		}
 
+		private ImmutableArray<IStatement> BindStatements()
+		{
+			var methodBodySymbolContext = new MethodBodySymbolContext(
+				_sourceSymbolContext,
+				Parameters.Select(x => new ParameterLocal(x)).ToImmutableList<ILocal>());
+			var statementContexts = _context.method_body().method_statement();
+			var builder = ImmutableArray.CreateBuilder<IStatement>(statementContexts.Length);
+
+			if(statementContexts.Length == 0)
+			{
+				_diagnostics.Add(new Diagnostic(
+						new Location(_context.method_signature().UPPERCASE_IDENTIFIER()),
+						ErrorCode.MethodMustContainAtLeastOneStatement,
+						ImmutableArray.Create<object?>(this)));
+
+				return ImmutableArray<IStatement>.Empty;
+			}
+
+			foreach (var statement in statementContexts)
+			{
+				builder.Add(statement.BindStatement(methodBodySymbolContext, _diagnostics, out var local));
+				if (local != null)
+					methodBodySymbolContext = methodBodySymbolContext.WithLocal(local);
+			}
+
+			var statements = builder.MoveToImmutable();
+
+			var lastStatement = statements.Last();
+			if (lastStatement is IReturnStatement returnStatement)
+			{
+				if (!returnStatement.Expression.Type.IsSubtypeOf(ReturnType))
+				{
+					_diagnostics.Add(new Diagnostic(
+						new Location(_context.method_body().method_statement().Last()),
+						ErrorCode.ReturnTypeDoesNotMatch,
+						ImmutableArray.Create<object?>(this, ReturnType, returnStatement.Expression.Type)));
+				}
+			}
+			else
+			{
+				_diagnostics.Add(new Diagnostic(
+					new Location(_context.method_body().method_statement().Last()),
+					ErrorCode.LastStatementMustBeReturnStatement,
+					ImmutableArray.Create<object?>(this, lastStatement)));
+			}
+
+			for (var i = 0; i < statements.Length - 1; i++)
+			{
+				var statement = statements[i];
+				if (statement is IReturnStatement)
+				{
+					_diagnostics.Add(new Diagnostic(
+						new Location(_context.method_body().method_statement(i)),
+						ErrorCode.OnlyLastStatementCanBeReturnStatement,
+						ImmutableArray.Create<object?>(this, statement)));
+				}
+			}
+
+			return statements;
+		}
+
 		public QualifiedName FullyQualifiedName { get; }
 
 		public IType ReturnType => _returnType.Value;
@@ -118,6 +183,8 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		public IMethod? DeclaringMethod => _sourceSymbolContext.Scope;
 
+		public ImmutableArray<IStatement> Statements => _statements.Value;
+
 		protected override void EnsureAllLocalDiagnosticsCollected()
 		{
 			// Touch all lazy fields to force binding;
@@ -126,6 +193,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			_ = _parameters.Value;
 			_ = _localInterfaces.Value;
 			_ = _localMethods.Value;
+			_ = _statements.Value;
 		}
 	}
 }

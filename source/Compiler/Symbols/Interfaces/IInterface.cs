@@ -69,13 +69,13 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 			}
 
 			if (!(other is IInterface otherInterface))
-				return false;
-
-			// We don't check if number of methods are equal, as we don't deduplicate methods.
-
-			foreach (var method in Methods)
 			{
-				if (!otherInterface.Methods.Any(x => x.IsEquivalentTo(method, null)))
+				return false;
+			}
+
+			foreach (var method in otherInterface.Methods)
+			{
+				if (!Methods.Any(x => x.IsEquivalentTo(method, null)))
 				{
 					return false;
 				}

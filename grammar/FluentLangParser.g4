@@ -54,7 +54,7 @@ parameters
     ;
 
 parameter
-    : (LOWERCASE_IDENTIFIER | THIS) type_declaration
+    : LOWERCASE_IDENTIFIER type_declaration
     ;
 
 type_declaration
@@ -90,7 +90,7 @@ method_body
 
 declaration_statement
     : LET LOWERCASE_IDENTIFIER type_declaration? ASSIGNMENT expression SEMICOLON
-    | LET DISCARD ASSIGNMENT expression SEMICOLON
+    | DISCARD ASSIGNMENT expression SEMICOLON
     ;
 
 return_statement
@@ -99,15 +99,14 @@ return_statement
 
 expression
     : empty_interface                                                     #new_object_expression
-    | expression (PLUS object_patch)+                                     #object_patching_expression
+    | expression PLUS object_patch (COMMA object_patch)*                  #object_patching_expression
     | expression operator expression                                      #binary_operator_expression
     | literal                                                             #literal_expression
     | qualified_name invocation                                           #static_invocation_expression
     | expression DOT UPPERCASE_IDENTIFIER invocation                      #member_invocation_expression
     | IF OPEN_PARENS expression CLOSE_PARENS expression ELSE expression   #conditional_expression
     | OPEN_PARENS expression CLOSE_PARENS                                 #parenthesized_expression
-    | LOWERCASE_IDENTIFIER                                                #variable_expression
-    | THIS                                                                #variable_expression
+    | LOWERCASE_IDENTIFIER                                                #local_reference_expression
     ;
 
 empty_interface
@@ -130,8 +129,6 @@ fully_qualified_method
 
 operator
     : PLUS
-    | MINUS
-    | PLUS
     | MINUS
     | STAR
     | DIV

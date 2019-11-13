@@ -53,10 +53,9 @@ ELSE: 'else';
 MIXIN: 'mixin';
 EXPORT: 'export';
 OPEN: 'open';
-THIS: 'this';
 LET: 'let';
 
-//identidiers
+//identifiers
 
 UPPERCASE_IDENTIFIER: [A-Z] IdentifierTail;
 LOWERCASE_IDENTIFIER: [a-z] IdentifierTail;

@@ -3,14 +3,9 @@ using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Source;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
 using Xunit;
 using Version = FluentLang.Compiler.Symbols.Interfaces.Version;
 
@@ -71,8 +66,8 @@ interface I2 { M() : int; }").VerifyDiagnostics();
 		public void ContainsAllMethodsInAssembly()
 		{
 			var assembly = CreateAssembly(@"
-M1() : int {}
-M2() : int {}").VerifyDiagnostics();
+M1() : int { return 42; }
+M2() : int { return 42; }").VerifyDiagnostics();
 
 			Assert.Equal(2, assembly.Methods.Length);
 			Assert.Equal(new[] { "M1", "M2" }, assembly.Methods.Select(x => x.FullyQualifiedName.ToString()).OrderBy(x => x));
@@ -92,17 +87,16 @@ namespace A.B.C
 	}
 }").VerifyDiagnostics();
 
-			Assert.True(assembly.TryGetInterface(QualifiedName("I1"), out var i1));
-			Assert.Equal(i1!.FullyQualifiedName, QualifiedName("I1"));
+			var i1 = AssertGetInterface(assembly, "I1");
+			Assert.Equal(i1.FullyQualifiedName, QualifiedName("I1"));
 
-			Assert.True(assembly.TryGetInterface(QualifiedName("A.B.C.I2"), out var i2));
-			Assert.Equal(i2!.FullyQualifiedName, QualifiedName("A.B.C.I2"));
+			var i2 = AssertGetInterface(assembly, "A.B.C.I2");
+			Assert.Equal(i2.FullyQualifiedName, QualifiedName("A.B.C.I2"));
 
-			Assert.True(assembly.TryGetInterface(QualifiedName("A.B.C.D.I3"), out var i3));
-			Assert.Equal(i3!.FullyQualifiedName, QualifiedName("A.B.C.D.I3"));
+			var i3 = AssertGetInterface(assembly, "A.B.C.D.I3");
+			Assert.Equal(i3.FullyQualifiedName, QualifiedName("A.B.C.D.I3"));
 		}
 
-#if TryGetMethodDefined
 		[Fact]
 		public void CanAccessMethodInAssemblyByName()
 		{
@@ -117,16 +111,15 @@ namespace A.B.C
 	}
 }");
 
-			Assert.True(assembly.TryGetMethod(QualifiedName("M1"), out var m1));
-			Assert.Equal(m1!.FullyQualifiedName, QualifiedName("M1"));
+			var m1 = AssertGetMethod(assembly, "M1");
+			Assert.Equal(m1.FullyQualifiedName, QualifiedName("M1"));
 
-			Assert.True(assembly.TryGetMethod(QualifiedName("A.B.C.M2"), out var m2));
-			Assert.Equal(m2!.FullyQualifiedName, QualifiedName("A.B.C.M2"));
+			var m2 = AssertGetMethod(assembly, "A.B.C.M2");
+			Assert.Equal(m2.FullyQualifiedName, QualifiedName("A.B.C.M2"));
 
-			Assert.True(assembly.TryGetMethod(QualifiedName("A.B.C.D.M3"), out var m3));
-			Assert.Equal(m3!.FullyQualifiedName, QualifiedName("A.B.C.D.M3"));
+			var m3 = AssertGetMethod(assembly, "A.B.C.D.M3");
+			Assert.Equal(m3.FullyQualifiedName, QualifiedName("A.B.C.D.M3"));
 		}
-#endif
 
 		private class DummyAssembly : IAssembly
 		{
@@ -144,6 +137,12 @@ namespace A.B.C
 			{
 				@interface = Interfaces.FirstOrDefault(x => x.FullyQualifiedName == fullyQualifiedName);
 				return @interface != null;
+			}
+
+			public bool TryGetMethod(QualifiedName fullyQualifiedName, [NotNullWhen(true)] out IMethod? method)
+			{
+				method = Methods.FirstOrDefault(x => x.FullyQualifiedName == fullyQualifiedName);
+				return method != null;
 			}
 
 			public ImmutableArray<Diagnostic> AllDiagnostics { get; set; } = ImmutableArray<Diagnostic>.Empty;
