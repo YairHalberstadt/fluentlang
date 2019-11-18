@@ -1,5 +1,4 @@
 ﻿using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.Compiler.Symbols.Source.MethodBody;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;

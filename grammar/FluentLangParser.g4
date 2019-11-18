@@ -101,6 +101,7 @@ expression
     : empty_interface                                                     #new_object_expression
     | expression PLUS object_patch (COMMA object_patch)*                  #object_patching_expression
     | expression operator expression                                      #binary_operator_expression
+    | prefix_unary_operator expression                                    #prefix_unary_operator_expression
     | literal                                                             #literal_expression
     | qualified_name invocation                                           #static_invocation_expression
     | expression DOT UPPERCASE_IDENTIFIER invocation                      #member_invocation_expression
@@ -139,6 +140,10 @@ operator
     | OP_NE
     | OP_LE
     | OP_GE
+    ;
+
+prefix_unary_operator
+    : MINUS
     ;
 
 literal
