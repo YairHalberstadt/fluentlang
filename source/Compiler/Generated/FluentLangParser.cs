@@ -2184,10 +2184,10 @@ public partial class FluentLangParser : Parser {
 
 	public partial class InvocationContext : ParserRuleContext {
 		public ITerminalNode OPEN_PARENS() { return GetToken(FluentLangParser.OPEN_PARENS, 0); }
-		public ITerminalNode CLOSE_PARENS() { return GetToken(FluentLangParser.CLOSE_PARENS, 0); }
 		public ArgumentsContext arguments() {
 			return GetRuleContext<ArgumentsContext>(0);
 		}
+		public ITerminalNode CLOSE_PARENS() { return GetToken(FluentLangParser.CLOSE_PARENS, 0); }
 		public InvocationContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
@@ -2212,21 +2212,12 @@ public partial class FluentLangParser : Parser {
 	public InvocationContext invocation() {
 		InvocationContext _localctx = new InvocationContext(Context, State);
 		EnterRule(_localctx, 56, RULE_invocation);
-		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
 			State = 265; Match(OPEN_PARENS);
-			State = 267;
-			ErrorHandler.Sync(this);
-			_la = TokenStream.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << MINUS) | (1L << OPEN_BRACE) | (1L << OPEN_PARENS) | (1L << LITERAL_TRUE) | (1L << LITERAL_FALSE) | (1L << INTEGER_LITERAL) | (1L << REAL_LITERAL) | (1L << CHARACTER_LITERAL) | (1L << REGULAR_STRING) | (1L << IF) | (1L << UPPERCASE_IDENTIFIER) | (1L << LOWERCASE_IDENTIFIER))) != 0)) {
-				{
-				State = 266; arguments();
-				}
-			}
-
-			State = 269; Match(CLOSE_PARENS);
+			State = 266; arguments();
+			State = 267; Match(CLOSE_PARENS);
 			}
 		}
 		catch (RecognitionException re) {
@@ -2279,21 +2270,29 @@ public partial class FluentLangParser : Parser {
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 271; expression(0);
-			State = 276;
+			State = 277;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			while (_la==COMMA) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << MINUS) | (1L << OPEN_BRACE) | (1L << OPEN_PARENS) | (1L << LITERAL_TRUE) | (1L << LITERAL_FALSE) | (1L << INTEGER_LITERAL) | (1L << REAL_LITERAL) | (1L << CHARACTER_LITERAL) | (1L << REGULAR_STRING) | (1L << IF) | (1L << UPPERCASE_IDENTIFIER) | (1L << LOWERCASE_IDENTIFIER))) != 0)) {
 				{
-				{
-				State = 272; Match(COMMA);
-				State = 273; expression(0);
-				}
-				}
-				State = 278;
+				State = 269; expression(0);
+				State = 274;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
+				while (_la==COMMA) {
+					{
+					{
+					State = 270; Match(COMMA);
+					State = 271; expression(0);
+					}
+					}
+					State = 276;
+					ErrorHandler.Sync(this);
+					_la = TokenStream.LA(1);
+				}
+				}
 			}
+
 			}
 		}
 		catch (RecognitionException re) {
@@ -2378,9 +2377,9 @@ public partial class FluentLangParser : Parser {
 		'\x3', '\x18', '\x3', '\x19', '\x3', '\x19', '\x3', '\x19', '\x5', '\x19', 
 		'\x102', '\n', '\x19', '\x3', '\x1A', '\x3', '\x1A', '\x3', '\x1B', '\x3', 
 		'\x1B', '\x3', '\x1C', '\x3', '\x1C', '\x3', '\x1D', '\x3', '\x1D', '\x3', 
-		'\x1E', '\x3', '\x1E', '\x5', '\x1E', '\x10E', '\n', '\x1E', '\x3', '\x1E', 
-		'\x3', '\x1E', '\x3', '\x1F', '\x3', '\x1F', '\x3', '\x1F', '\a', '\x1F', 
-		'\x115', '\n', '\x1F', '\f', '\x1F', '\xE', '\x1F', '\x118', '\v', '\x1F', 
+		'\x1E', '\x3', '\x1E', '\x3', '\x1E', '\x3', '\x1E', '\x3', '\x1F', '\x3', 
+		'\x1F', '\x3', '\x1F', '\a', '\x1F', '\x113', '\n', '\x1F', '\f', '\x1F', 
+		'\xE', '\x1F', '\x116', '\v', '\x1F', '\x5', '\x1F', '\x118', '\n', '\x1F', 
 		'\x3', '\x1F', '\x2', '\x3', ',', ' ', '\x2', '\x4', '\x6', '\b', '\n', 
 		'\f', '\xE', '\x10', '\x12', '\x14', '\x16', '\x18', '\x1A', '\x1C', '\x1E', 
 		' ', '\"', '$', '&', '(', '*', ',', '.', '\x30', '\x32', '\x34', '\x36', 
@@ -2402,7 +2401,7 @@ public partial class FluentLangParser : Parser {
 		'\x3', '\x2', '\x2', '\x2', '\x32', '\x103', '\x3', '\x2', '\x2', '\x2', 
 		'\x34', '\x105', '\x3', '\x2', '\x2', '\x2', '\x36', '\x107', '\x3', '\x2', 
 		'\x2', '\x2', '\x38', '\x109', '\x3', '\x2', '\x2', '\x2', ':', '\x10B', 
-		'\x3', '\x2', '\x2', '\x2', '<', '\x111', '\x3', '\x2', '\x2', '\x2', 
+		'\x3', '\x2', '\x2', '\x2', '<', '\x117', '\x3', '\x2', '\x2', '\x2', 
 		'>', '\x42', '\x5', '\x4', '\x3', '\x2', '?', '\x41', '\x5', '\n', '\x6', 
 		'\x2', '@', '?', '\x3', '\x2', '\x2', '\x2', '\x41', '\x44', '\x3', '\x2', 
 		'\x2', '\x2', '\x42', '@', '\x3', '\x2', '\x2', '\x2', '\x42', '\x43', 
@@ -2539,20 +2538,20 @@ public partial class FluentLangParser : Parser {
 		'\x2', '\x105', '\x106', '\t', '\x3', '\x2', '\x2', '\x106', '\x35', '\x3', 
 		'\x2', '\x2', '\x2', '\x107', '\x108', '\a', '\x6', '\x2', '\x2', '\x108', 
 		'\x37', '\x3', '\x2', '\x2', '\x2', '\x109', '\x10A', '\t', '\x4', '\x2', 
-		'\x2', '\x10A', '\x39', '\x3', '\x2', '\x2', '\x2', '\x10B', '\x10D', 
-		'\a', '\x13', '\x2', '\x2', '\x10C', '\x10E', '\x5', '<', '\x1F', '\x2', 
-		'\x10D', '\x10C', '\x3', '\x2', '\x2', '\x2', '\x10D', '\x10E', '\x3', 
-		'\x2', '\x2', '\x2', '\x10E', '\x10F', '\x3', '\x2', '\x2', '\x2', '\x10F', 
-		'\x110', '\a', '\x14', '\x2', '\x2', '\x110', ';', '\x3', '\x2', '\x2', 
-		'\x2', '\x111', '\x116', '\x5', ',', '\x17', '\x2', '\x112', '\x113', 
-		'\a', '\x16', '\x2', '\x2', '\x113', '\x115', '\x5', ',', '\x17', '\x2', 
-		'\x114', '\x112', '\x3', '\x2', '\x2', '\x2', '\x115', '\x118', '\x3', 
-		'\x2', '\x2', '\x2', '\x116', '\x114', '\x3', '\x2', '\x2', '\x2', '\x116', 
-		'\x117', '\x3', '\x2', '\x2', '\x2', '\x117', '=', '\x3', '\x2', '\x2', 
-		'\x2', '\x118', '\x116', '\x3', '\x2', '\x2', '\x2', '\x1B', '\x42', 'J', 
-		'V', '\\', '\x64', 'j', 'u', '|', '\x81', '\x91', '\x94', '\x9F', '\xA4', 
-		'\xAD', '\xAF', '\xB6', '\xBB', '\xC6', '\xE2', '\xEF', '\xF6', '\xF8', 
-		'\x101', '\x10D', '\x116',
+		'\x2', '\x10A', '\x39', '\x3', '\x2', '\x2', '\x2', '\x10B', '\x10C', 
+		'\a', '\x13', '\x2', '\x2', '\x10C', '\x10D', '\x5', '<', '\x1F', '\x2', 
+		'\x10D', '\x10E', '\a', '\x14', '\x2', '\x2', '\x10E', ';', '\x3', '\x2', 
+		'\x2', '\x2', '\x10F', '\x114', '\x5', ',', '\x17', '\x2', '\x110', '\x111', 
+		'\a', '\x16', '\x2', '\x2', '\x111', '\x113', '\x5', ',', '\x17', '\x2', 
+		'\x112', '\x110', '\x3', '\x2', '\x2', '\x2', '\x113', '\x116', '\x3', 
+		'\x2', '\x2', '\x2', '\x114', '\x112', '\x3', '\x2', '\x2', '\x2', '\x114', 
+		'\x115', '\x3', '\x2', '\x2', '\x2', '\x115', '\x118', '\x3', '\x2', '\x2', 
+		'\x2', '\x116', '\x114', '\x3', '\x2', '\x2', '\x2', '\x117', '\x10F', 
+		'\x3', '\x2', '\x2', '\x2', '\x117', '\x118', '\x3', '\x2', '\x2', '\x2', 
+		'\x118', '=', '\x3', '\x2', '\x2', '\x2', '\x1B', '\x42', 'J', 'V', '\\', 
+		'\x64', 'j', 'u', '|', '\x81', '\x91', '\x94', '\x9F', '\xA4', '\xAD', 
+		'\xAF', '\xB6', '\xBB', '\xC6', '\xE2', '\xEF', '\xF6', '\xF8', '\x101', 
+		'\x114', '\x117',
 	};
 
 	public static readonly ATN _ATN =

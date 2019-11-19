@@ -156,9 +156,9 @@ literal
     ;
 
 invocation
-    : OPEN_PARENS arguments? CLOSE_PARENS
+    : OPEN_PARENS arguments CLOSE_PARENS
     ;
 
 arguments
-    : expression (COMMA expression)*
+    : (expression (COMMA expression)*)?
     ;
