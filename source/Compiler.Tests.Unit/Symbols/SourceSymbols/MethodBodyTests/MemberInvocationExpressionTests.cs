@@ -79,8 +79,8 @@ M(param : { M(a : { M() : bool; }) : int; }) : int {
 	return param.M(param); 
 }")
 				.VerifyDiagnostics(
-						new Diagnostic(new Location(), ErrorCode.ReturnTypeDoesNotMatch),
-						new Diagnostic(new Location(), ErrorCode.MethodNotFound));
+					new Diagnostic(new Location(new TextToken(@"returnparam.M(param);")), ErrorCode.ReturnTypeDoesNotMatch),
+					new Diagnostic(new Location(new TextToken(@"M")), ErrorCode.MethodNotFound));
 		}
 
 		[Fact]
@@ -111,8 +111,8 @@ M(param : { M(a : { M(a : {}) : bool; }) : int; M(a : {}) : bool; }) : int {
 	return param.M(param); 
 }")
 				.VerifyDiagnostics(
-						new Diagnostic(new Location(), ErrorCode.ReturnTypeDoesNotMatch),
-						new Diagnostic(new Location(), ErrorCode.AmbigiousMethodReference));
+					new Diagnostic(new Location(new TextToken(@"returnparam.M(param);")), ErrorCode.ReturnTypeDoesNotMatch),
+					new Diagnostic(new Location(new TextToken(@"M")), ErrorCode.AmbigiousMethodReference));
 		}
 	}
 }

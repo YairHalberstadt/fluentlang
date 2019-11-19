@@ -7,6 +7,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Xunit;
+using static FluentLang.Compiler.Tests.Unit.TestHelpers.Assemblyextensions;
 using Version = FluentLang.Compiler.Symbols.Interfaces.Version;
 
 namespace FluentLang.Compiler.Tests.Unit.Symbols
@@ -17,14 +18,15 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols
 		public void IgnoresDocumentsWithIrrecoverableSyntaxErrors()
 		{
 			var assembly = CreateAssembly(@"
-interface I { M() : () bool; }").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.SyntaxError));
+interface I { M() : () bool; }").VerifyDiagnostics(new Diagnostic(new Location(new TextToken(@"(")), ErrorCode.SyntaxError));
 
 			Assert.Empty(assembly.Interfaces);
 
 			assembly = CreateAssembly(new string[] {
 				"interface I1 { M() : () bool; }",
 				"interface I2 { M() : bool; }",
-			}).VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.SyntaxError));
+			}).VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@"(")), ErrorCode.SyntaxError));
 
 			var @interface = Assert.Single(assembly.Interfaces);
 			Assert.Equal("I2", @interface.FullyQualifiedName!.ToString());

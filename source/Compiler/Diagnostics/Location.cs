@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using FluentLang.Compiler.Helpers;
 using System;
 
 namespace FluentLang.Compiler.Diagnostics
@@ -24,6 +25,15 @@ namespace FluentLang.Compiler.Diagnostics
 			Token = null;
 			TokenRange = default;
 			ParseTree = parseTree;
+		}
+
+		public ReadOnlySpan<char> GetText()
+		{
+			if (ParseTree is { } parseTree)
+				return parseTree.GetText().AsSpan();
+			if (Token is { } token)
+				return token.Text.AsSpan()[TokenRange];
+			return "";
 		}
 	}
 }

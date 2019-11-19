@@ -39,7 +39,8 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			public void IsCaseSensitive()
 			{
 				CreateAssembly(@"M() : bool { return False }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.SyntaxError));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"}")), ErrorCode.SyntaxError));
 			}
 		}
 
@@ -65,7 +66,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			{
 				CreateAssembly($"M() : int {{ return {(long)int.MaxValue + 1} }}")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(), ErrorCode.IntegerLiteralOutOfRange));
+						new Diagnostic(new Location(new TextToken(@"2147483648")), ErrorCode.IntegerLiteralOutOfRange));
 			}
 		}
 
@@ -144,7 +145,8 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			public void ErrorOnEmptyLiteral()
 			{
 				CreateAssembly(@"M() : char { return '' }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.SyntaxError));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"}")), ErrorCode.SyntaxError));
 			}
 
 			[Fact]
@@ -152,7 +154,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			{
 				CreateAssembly(@"M() : char { return '\' }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(), ErrorCode.SyntaxError));
+						new Diagnostic(new Location(new TextToken(@"}")), ErrorCode.SyntaxError));
 			}
 
 			[Fact]
@@ -160,15 +162,15 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			{
 				CreateAssembly(@"M() : char { return '\z' }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(), ErrorCode.SyntaxError),
-						new Diagnostic(new Location(), ErrorCode.SyntaxError));
+						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError),
+						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError));
 			}
 
 			[Fact]
 			public void ErrorOnInvalidUnicodeEscapeSequence1()
 			{
 				CreateAssembly(@"M() : char { return '\uaaa' }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.SyntaxError));
+					.VerifyDiagnostics(new Diagnostic(new Location(new TextToken(@"}")), ErrorCode.SyntaxError));
 			}
 
 			[Fact]
@@ -176,8 +178,8 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			{
 				CreateAssembly(@"M() : char { return '\u000g' }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(), ErrorCode.SyntaxError),
-						new Diagnostic(new Location(), ErrorCode.SyntaxError));
+						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError),
+						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError));
 			}
 
 			[Fact]
@@ -185,8 +187,8 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			{
 				CreateAssembly(@"M() : char { return '\u00000' }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(), ErrorCode.SyntaxError),
-						new Diagnostic(new Location(), ErrorCode.SyntaxError));
+						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError),
+						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError));
 			}
 
 			[Fact]
@@ -194,8 +196,8 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			{
 				CreateAssembly(@"M() : char { return 'aa' }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(), ErrorCode.SyntaxError),
-						new Diagnostic(new Location(), ErrorCode.SyntaxError));
+						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError),
+						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError));
 			}
 
 			[Fact]
@@ -203,8 +205,8 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			{
 				CreateAssembly(@"M() : char { return '\na' }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(), ErrorCode.SyntaxError),
-						new Diagnostic(new Location(), ErrorCode.SyntaxError));
+						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError),
+						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError));
 			}
 		}
 
@@ -231,8 +233,8 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			{
 				CreateAssembly(@"M() : string { return ""a\"" }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(), ErrorCode.SyntaxError),
-						new Diagnostic(new Location(), ErrorCode.SyntaxError));
+						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError),
+						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError));
 			}
 
 			[Fact]
@@ -240,8 +242,8 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			{
 				CreateAssembly(@"M() : string { return ""a\z"" }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(), ErrorCode.SyntaxError),
-						new Diagnostic(new Location(), ErrorCode.SyntaxError));
+						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError),
+						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError));
 			}
 
 			[Fact]
@@ -249,7 +251,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			{
 				CreateAssembly(@"M() : string { return ""a\u000"" }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(), ErrorCode.SyntaxError));
+						new Diagnostic(new Location(new TextToken(@"}")), ErrorCode.SyntaxError));
 			}
 
 			[Fact]
@@ -257,8 +259,8 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			{
 				CreateAssembly(@"M() : string { return ""\u000g"" }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(), ErrorCode.SyntaxError),
-						new Diagnostic(new Location(), ErrorCode.SyntaxError));
+						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError),
+						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError));
 			}
 		}
 	}
