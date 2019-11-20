@@ -25,7 +25,8 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 		public void ErrorIfConditionIsNotBoolean()
 		{
 			CreateAssembly(@"M() : int { return if (4) 0 else 1; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.NonBooleanCondition));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"4")), ErrorCode.NonBooleanCondition));
 		}
 
 		[Fact]
@@ -33,8 +34,8 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 		{
 			CreateAssembly(@"M() : int { return if (true) 0 else 1.0; }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(), ErrorCode.ReturnTypeDoesNotMatch),
-						new Diagnostic(new Location(), ErrorCode.NoBestType));
+						new Diagnostic(new Location(new TextToken(@"returnif(true)0else1.0;")), ErrorCode.ReturnTypeDoesNotMatch),
+						new Diagnostic(new Location(new TextToken(@"true")), ErrorCode.NoBestType));
 		}
 
 		[Fact]

@@ -2,7 +2,6 @@
 using FluentLang.Compiler.Symbols.ErrorSymbols;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using Xunit;
 
 namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols
@@ -249,7 +248,8 @@ namespace A.B {
 	interface I {}
 }
 
-M() : I { return {}; }").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InterfaceNotFound));
+M() : I { return {}; }").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@"I")), ErrorCode.InterfaceNotFound));
 			Assert.True(assembly.Methods.Single().ReturnType is IErrorSymbol);
 		}
 
@@ -268,7 +268,7 @@ namespace B {
 	interface I {}
 }
 
-M() : I { return {}; }").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.AmbigiousInterfaceReference));
+M() : I { return {}; }").VerifyDiagnostics(new Diagnostic(new Location(new TextToken(@"I")), ErrorCode.AmbigiousInterfaceReference));
 
 			Assert.True(assembly.Methods.Single().ReturnType is IErrorSymbol);
 		}

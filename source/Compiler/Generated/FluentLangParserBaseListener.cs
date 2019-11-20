@@ -344,6 +344,20 @@ public partial class FluentLangParserBaseListener : IFluentLangParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitParenthesized_expression([NotNull] FluentLangParser.Parenthesized_expressionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>prefix_unary_operator_expression</c>
+	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterPrefix_unary_operator_expression([NotNull] FluentLangParser.Prefix_unary_operator_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>prefix_unary_operator_expression</c>
+	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitPrefix_unary_operator_expression([NotNull] FluentLangParser.Prefix_unary_operator_expressionContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>member_invocation_expression</c>
 	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -461,6 +475,18 @@ public partial class FluentLangParserBaseListener : IFluentLangParserListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitOperator([NotNull] FluentLangParser.OperatorContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="FluentLangParser.prefix_unary_operator"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterPrefix_unary_operator([NotNull] FluentLangParser.Prefix_unary_operatorContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="FluentLangParser.prefix_unary_operator"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitPrefix_unary_operator([NotNull] FluentLangParser.Prefix_unary_operatorContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.literal"/>.
 	/// <para>The default implementation does nothing.</para>

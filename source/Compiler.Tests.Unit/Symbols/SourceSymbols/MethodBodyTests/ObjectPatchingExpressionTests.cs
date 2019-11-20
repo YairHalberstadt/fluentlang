@@ -75,7 +75,7 @@ M() : {} {
 
 interface I {
     M() : {};
-}").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.ResultantTypeOfObjectPatchingExpressionIsNotSubtypeOfFirstParameterOfPatchedInMethod));
+}").VerifyDiagnostics(new Diagnostic(new Location(new TextToken(@"Patch")), ErrorCode.ResultantTypeOfObjectPatchingExpressionIsNotSubtypeOfFirstParameterOfPatchedInMethod));
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			var patch = Assert.IsAssignableFrom<IObjectPatchingExpression>(returnStatement.Expression);

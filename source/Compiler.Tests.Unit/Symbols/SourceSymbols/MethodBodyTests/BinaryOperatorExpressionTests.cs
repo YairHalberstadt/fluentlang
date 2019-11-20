@@ -61,7 +61,8 @@ M(a : double, b : double) : double { return a + b; }")
 			{
 				CreateAssembly(@"
 M(a : char, b : char) : char { return a + b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -69,7 +70,8 @@ M(a : char, b : char) : char { return a + b; }")
 			{
 				CreateAssembly(@"
 M(a : bool, b : bool) : bool { return a + b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -77,7 +79,8 @@ M(a : bool, b : bool) : bool { return a + b; }")
 			{
 				CreateAssembly(@"
 M(a : {}, b : {}) : {} { return a + b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -85,7 +88,8 @@ M(a : {}, b : {}) : {} { return a + b; }")
 			{
 				CreateAssembly(@"
 M(a : int, b : double) : int { return a + b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 		}
 
@@ -124,7 +128,8 @@ M(a : double, b : double) : double { return a - b; }")
 			{
 				CreateAssembly(@"
 M(a : char, b : char) : char { return a - b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -132,7 +137,8 @@ M(a : char, b : char) : char { return a - b; }")
 			{
 				CreateAssembly(@"
 M(a : bool, b : bool) : bool { return a - b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -140,7 +146,8 @@ M(a : bool, b : bool) : bool { return a - b; }")
 			{
 				CreateAssembly(@"
 M(a : string, b : string) : string { return a - b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -148,7 +155,8 @@ M(a : string, b : string) : string { return a - b; }")
 			{
 				CreateAssembly(@"
 M(a : {}, b : {}) : {} { return a - b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -156,7 +164,8 @@ M(a : {}, b : {}) : {} { return a - b; }")
 			{
 				CreateAssembly(@"
 M(a : int, b : double) : int { return a - b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 		}
 
@@ -195,7 +204,8 @@ M(a : double, b : double) : double { return a * b; }")
 			{
 				CreateAssembly(@"
 M(a : char, b : char) : char { return a * b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -203,7 +213,8 @@ M(a : char, b : char) : char { return a * b; }")
 			{
 				CreateAssembly(@"
 M(a : bool, b : bool) : bool { return a * b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -211,7 +222,8 @@ M(a : bool, b : bool) : bool { return a * b; }")
 			{
 				CreateAssembly(@"
 M(a : string, b : string) : string { return a * b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -219,7 +231,8 @@ M(a : string, b : string) : string { return a * b; }")
 			{
 				CreateAssembly(@"
 M(a : {}, b : {}) : {} { return a * b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -227,7 +240,8 @@ M(a : {}, b : {}) : {} { return a * b; }")
 			{
 				CreateAssembly(@"
 M(a : int, b : double) : int { return a * b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 		}
 
@@ -266,7 +280,8 @@ M(a : double, b : double) : double { return a / b; }")
 			{
 				CreateAssembly(@"
 M(a : char, b : char) : char { return a / b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -274,7 +289,8 @@ M(a : char, b : char) : char { return a / b; }")
 			{
 				CreateAssembly(@"
 M(a : bool, b : bool) : bool { return a / b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -282,7 +298,7 @@ M(a : bool, b : bool) : bool { return a / b; }")
 			{
 				CreateAssembly(@"
 M(a : string, b : string) : string { return a / b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -290,7 +306,8 @@ M(a : string, b : string) : string { return a / b; }")
 			{
 				CreateAssembly(@"
 M(a : {}, b : {}) : {} { return a / b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -298,7 +315,8 @@ M(a : {}, b : {}) : {} { return a / b; }")
 			{
 				CreateAssembly(@"
 M(a : int, b : double) : int { return a / b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 		}
 
@@ -323,7 +341,8 @@ M(a : int, b : int) : int { return a % b; }")
 			{
 				CreateAssembly(@"
 M(a : double, b : double) : double { return a % b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -331,7 +350,8 @@ M(a : double, b : double) : double { return a % b; }")
 			{
 				CreateAssembly(@"
 M(a : char, b : char) : char { return a % b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -339,7 +359,8 @@ M(a : char, b : char) : char { return a % b; }")
 			{
 				CreateAssembly(@"
 M(a : bool, b : bool) : bool { return a % b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -347,7 +368,8 @@ M(a : bool, b : bool) : bool { return a % b; }")
 			{
 				CreateAssembly(@"
 M(a : string, b : string) : string { return a % b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -355,7 +377,8 @@ M(a : string, b : string) : string { return a % b; }")
 			{
 				CreateAssembly(@"
 M(a : {}, b : {}) : {} { return a % b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Fact]
@@ -363,7 +386,8 @@ M(a : {}, b : {}) : {} { return a % b; }")
 			{
 				CreateAssembly(@"
 M(a : int, b : double) : int { return a % b; }")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 		}
 
@@ -427,7 +451,8 @@ M(a : {primitiveString}, b : {primitiveString}) : bool {{ return a {OperatorSymb
 			{
 				CreateAssembly($@"
 M(a : {{}}, b : {{}}) : bool {{ return a {OperatorSymbol(op)} b; }}")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 
 			[Theory]
@@ -436,7 +461,8 @@ M(a : {{}}, b : {{}}) : bool {{ return a {OperatorSymbol(op)} b; }}")
 			{
 				CreateAssembly($@"
 M(a : int, b : double) : bool {{ return a {OperatorSymbol(op)} b; }}")
-					.VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.InvalidArgument));
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
 		}
 	}

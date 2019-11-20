@@ -18,8 +18,8 @@ M() : bool {
 	M1(param :  int) : int { return 42; }
 	return true;
 }").VerifyDiagnostics(
-					new Diagnostic(new Location(), ErrorCode.DuplicateMethodDeclaration),
-					new Diagnostic(new Location(), ErrorCode.DuplicateMethodDeclaration));
+					new Diagnostic(new Location(new TextToken(@"M1")), ErrorCode.DuplicateMethodDeclaration),
+					new Diagnostic(new Location(new TextToken(@"M1")), ErrorCode.DuplicateMethodDeclaration));
 		}
 
 		[Fact]
@@ -31,8 +31,8 @@ M() : bool {
 	interface I { M() : bool; }
 	return true;
 }").VerifyDiagnostics(
-					new Diagnostic(new Location(), ErrorCode.DuplicateInterfaceDeclaration),
-					new Diagnostic(new Location(), ErrorCode.DuplicateInterfaceDeclaration));
+					new Diagnostic(new Location(new TextToken(@"I")), ErrorCode.DuplicateInterfaceDeclaration),
+					new Diagnostic(new Location(new TextToken(@"I")), ErrorCode.DuplicateInterfaceDeclaration));
 		}
 	}
 }

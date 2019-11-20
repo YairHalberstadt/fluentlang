@@ -68,7 +68,7 @@ fragment InputCharacter:       ~[\r\n\u0085\u2028\u2029];
 
 fragment CommonCharacter
 	: SimpleEscapeSequence
-	| HexEscapeSequence
+//	| HexEscapeSequence
 	| UnicodeEscapeSequence
 	;
 
@@ -85,6 +85,7 @@ fragment SimpleEscapeSequence
 	| '\\t'
 	| '\\v'
 	;
+
 fragment HexEscapeSequence
 	: '\\x' HexDigit
 	| '\\x' HexDigit HexDigit
@@ -128,7 +129,7 @@ fragment UnicodeClassZS
 
 fragment UnicodeEscapeSequence
 	: '\\u' HexDigit HexDigit HexDigit HexDigit
-	| '\\U' HexDigit HexDigit HexDigit HexDigit HexDigit HexDigit HexDigit HexDigit
+//	| '\\U' HexDigit HexDigit HexDigit HexDigit HexDigit HexDigit HexDigit HexDigit
 	;
 
 fragment HexDigit : [0-9] | [A-F] | [a-f];

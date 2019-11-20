@@ -78,7 +78,8 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 
 		protected override void EnsureAllLocalDiagnosticsCollected()
 		{
-			throw new System.NotImplementedException();
+			_ = _arguments.Value;
+			_ = _method.Value;
 		}
 	}
 }

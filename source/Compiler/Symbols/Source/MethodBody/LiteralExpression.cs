@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Numerics;
+using System.Text;
 using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using static FluentLang.Compiler.Generated.FluentLangParser;
+using static FluentLang.Compiler.Symbols.Source.MethodBody.CharParser;
 
 namespace FluentLang.Compiler.Symbols.Source.MethodBody
 {
@@ -30,7 +33,7 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 				INTEGER_LITERAL => (Primitive.Int, ParseInteger(token.Text)),
 				REAL_LITERAL => (Primitive.Double, ParseDouble(token.Text)),
 				CHARACTER_LITERAL => (Primitive.Char, ParseChar(token.Text)),
-				REGULAR_STRING => (Primitive.String, token.Text),
+				REGULAR_STRING => (Primitive.String, ParseString(token.Text)),
 				var type => throw new InvalidOperationException($"Invalid Literal Token Type {type}")
 			};
 		}
@@ -75,7 +78,12 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 
 		private object? ParseChar(string text)
 		{
-			if (!char.TryParse(text, out var c))
+			Release.Assert(text[0] == '\'' && text[^1] == '\'');
+
+			if (ParseCharResult.Succeeded != TryParseNextChar(
+				text.AsSpan()[1..^1],
+				out _,
+				out var c))
 			{
 				_diagnostics.Add(new Diagnostic(
 					new Location(_context.literal()),
@@ -85,6 +93,33 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 			}
 
 			return c;
+		}
+
+		private string ParseString(string text)
+		{
+			Release.Assert(text[0] == '\"' && text[^1] == '\"');
+			var span = text.AsSpan()[1..^1];
+			var totalCharsConsumed = 0;
+			var builder = new StringBuilder(text.Length);
+			while(!span.IsEmpty)
+			{
+				var result = TryParseNextChar(span, out var charsConsumed, out var parsedChar);
+				if (result == ParseCharResult.InvalidEscapeSequence)
+				{
+					_diagnostics.Add(new Diagnostic(
+						new Location(
+							_context.literal().Start,
+							totalCharsConsumed..(totalCharsConsumed + charsConsumed)),
+						ErrorCode.InvalidEscapeSequence));
+				}
+				else
+				{
+					builder.Append(parsedChar);
+				}
+				totalCharsConsumed += charsConsumed;
+				span = span[charsConsumed..];
+			}
+			return builder.ToString();
 		}
 
 		protected override void EnsureAllLocalDiagnosticsCollected()

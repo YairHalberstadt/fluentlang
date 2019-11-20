@@ -84,6 +84,8 @@ namespace FluentLang.Compiler.Symbols.Source
 					=> new ObjectPatchingExpression(opec, methodBodySymbolContext, diagnostics),
 				Binary_operator_expressionContext boec
 					=> new BinaryOperatorExpression(boec, methodBodySymbolContext, diagnostics),
+				Prefix_unary_operator_expressionContext puoec
+					=> new PrefixUnaryOperatorExpression(puoec, methodBodySymbolContext, diagnostics),
 				Literal_expressionContext lec => new LiteralExpression(lec, diagnostics),
 				Static_invocation_expressionContext siec
 					=> new StaticInvocationExpression(siec, methodBodySymbolContext, diagnostics),

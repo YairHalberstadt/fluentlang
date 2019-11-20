@@ -1,5 +1,4 @@
 ﻿using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.Compiler.Symbols.Source.MethodBody;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
@@ -77,7 +76,7 @@ M() : {} {
 	return x; 
 }
 M1(param : {}) : {} { return param; }").VerifyDiagnostics(
-				new Diagnostic(new Location(), ErrorCode.MismatchedTypes));
+				new Diagnostic(new Location(new TextToken(@"{}+M1")), ErrorCode.MismatchedTypes));
 		}
 
 		[Fact]
@@ -101,7 +100,8 @@ M() : {} {
 M() : {} {
 	_ : {} = {};
 	return {};
-}").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.SyntaxError));
+}").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@":")), ErrorCode.SyntaxError));
 		}
 
 		[Fact]
@@ -111,7 +111,8 @@ M() : {} {
 M() : {} {
 	_ = {};
 	return _;
-}").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.SyntaxError));
+}").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@"_")), ErrorCode.SyntaxError));
 		}
 
 		[Fact]
@@ -122,7 +123,8 @@ M() : {} {
 	let x = {};
 	let x = {};
 	return x;
-}").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.HidesLocal));
+}").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@"x")), ErrorCode.HidesLocal));
 		}
 
 		[Fact]
@@ -132,7 +134,8 @@ M() : {} {
 M(x : {}) : {} {
 	let x = {};
 	return x;
-}").VerifyDiagnostics(new Diagnostic(new Location(), ErrorCode.HidesLocal));
+}").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@"x")), ErrorCode.HidesLocal));
 		}
 	}
 }

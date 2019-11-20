@@ -30,5 +30,6 @@
 		ReturnTypeDoesNotMatch,
 		MethodMustContainAtLeastOneStatement,
 		HidesLocal,
+		InvalidEscapeSequence,
 	}
 }
