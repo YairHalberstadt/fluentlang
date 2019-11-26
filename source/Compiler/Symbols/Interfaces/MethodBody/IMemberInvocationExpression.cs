@@ -1,11 +1,13 @@
-﻿namespace FluentLang.Compiler.Symbols.Interfaces.MethodBody
+﻿using FluentLang.Compiler.Symbols.Visitor;
+
+namespace FluentLang.Compiler.Symbols.Interfaces.MethodBody
 {
-	internal interface IMemberInvocationExpression : IInvocationExpression
+	public interface IMemberInvocationExpression : IInvocationExpression
 	{
+		T IVisitableSymbol.Visit<T>(ISymbolVisitor<T> visitor)
+			=> visitor.Visit(this);
 		IExpression Expression { get; }
-
 		IInterfaceMethod Method { get; }
-
 		string MemberName { get; }
 	}
 }

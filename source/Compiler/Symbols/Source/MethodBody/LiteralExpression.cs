@@ -11,7 +11,7 @@ using static FluentLang.Compiler.Symbols.Source.MethodBody.CharParser;
 
 namespace FluentLang.Compiler.Symbols.Source.MethodBody
 {
-	internal sealed class LiteralExpression : SymbolBase, IExpression, ILiteralExpression
+	internal sealed class LiteralExpression : SymbolBase, ILiteralExpression
 	{
 		private readonly Literal_expressionContext _context;
 		private readonly Lazy<(Primitive type, object? value)> _bind;

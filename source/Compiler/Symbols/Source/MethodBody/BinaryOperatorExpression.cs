@@ -8,7 +8,7 @@ using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.Symbols.Source.MethodBody
 {
-	internal sealed class BinaryOperatorExpression : SymbolBase, IExpression, IBinaryOperatorExpression
+	internal sealed class BinaryOperatorExpression : SymbolBase, IBinaryOperatorExpression
 	{
 		private readonly Lazy<IExpression> _left;
 		private readonly Lazy<IExpression> _right;

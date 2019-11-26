@@ -1,6 +1,8 @@
-﻿namespace FluentLang.Compiler.Symbols.Interfaces.MethodBody
+﻿using FluentLang.Compiler.Symbols.Visitor;
+
+namespace FluentLang.Compiler.Symbols.Interfaces.MethodBody
 {
-	public interface IExpression : ISymbol
+	public interface IExpression : IVisitableSymbol
 	{
 		public IType Type { get; }
 	}

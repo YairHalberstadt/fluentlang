@@ -1,7 +1,11 @@
-﻿namespace FluentLang.Compiler.Symbols.Interfaces.MethodBody
+﻿using FluentLang.Compiler.Symbols.Visitor;
+
+namespace FluentLang.Compiler.Symbols.Interfaces.MethodBody
 {
-	internal interface ILocalReferenceExpression : IExpression
+	public interface ILocalReferenceExpression : IExpression
 	{
+		T IVisitableSymbol.Visit<T>(ISymbolVisitor<T> visitor)
+			=> visitor.Visit(this);
 		string Identifier { get; }
 		ILocal Local { get; }
 	}
