@@ -152,19 +152,23 @@ ANTLR4 lexer and parser
 
 Set up CI pipeline on Azure
 
-### In progress
-
 Creation of Symbol API
 
 Semantic checks (type checking etc.)
 
-### ToDo
+### In progress
 
 Implement runtime
+
+### ToDo
 
 Implement Emitting of code
 
 Implement Emitting of metadata
+
+Implement Reading of Metadata
+
+Implement Linking
 
 Create compiler.exe
 
@@ -174,13 +178,9 @@ Look into more efficient incremental compilation.
 
 ## Contributing
 
-For now this is very much a one man project. Once the design is more complete I will update this.
+Projects which should be possible for someone else to do with us stepping on each others toes:
 
-However projects that can be done right now:
-
-1. Add more unit tests
-2. Create a blazor based text editor with syntax highlighting and stub methods ready to be hooked into the compiler once it is complete.
-
-
-
-
+1. Look into a more efficient method for implementing capturing
+2. Look into more efficient incremental compilation. Can we avoid recompiling everything whenever a single file in a single dependency changes?
+3. Report syntax errors when ANTLR automatically recover from them.
+4. Improve error recovery. Currently we discard the entire file if it contains an error. Thats a really bad strategy for an IDE.
