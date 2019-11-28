@@ -64,12 +64,24 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		public static ImmutableArray<IParameter> BindParameters(this Method_signatureContext context, SourceSymbolContext sourceSymbolContext, DiagnosticBag diagnostics)
 		{
-			return
+			var parameters =
 				context
 				.parameters()
 				.parameter()
 				.Select(x => new SourceParameter(x, sourceSymbolContext, diagnostics))
 				.ToImmutableArray<IParameter>();
+
+			foreach (var (param, index) in parameters.Select((x,i) => (x,i)))
+			{
+				if (parameters.Take(index).FirstOrDefault(x => x.Name == param.Name) is { } sameName)
+				{
+					diagnostics.Add(new Diagnostic(
+						new Location(context.parameters().parameter(index)),
+						ErrorCode.ParametersShareNames,
+						ImmutableArray.Create<object?>(param, sameName)));
+				}
+			}
+			return parameters;
 		}
 
 		public static IExpression BindExpression(
@@ -112,20 +124,21 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		public static IStatement BindStatement(
 			this Method_statementContext context,
+			int ordinalPositionInMethod,
 			MethodBodySymbolContext methodBodySymbolContext,
 			DiagnosticBag diagnostics,
 			out ILocal? local)
 		{
 			if (context.declaration_statement() is { } declarationStatement)
 			{
-				var result = new DeclarationStatement(declarationStatement, methodBodySymbolContext, diagnostics);
+				var result = new DeclarationStatement(declarationStatement, ordinalPositionInMethod, methodBodySymbolContext, diagnostics);
 				local = result.Local;
 				return result;
 			}
 			if (context.return_statement() is { } returnStatement)
 			{
 				local = null;
-				return new ReturnStatement(returnStatement, methodBodySymbolContext, diagnostics);
+				return new ReturnStatement(returnStatement, ordinalPositionInMethod, methodBodySymbolContext, diagnostics);
 			}
 			throw Release.Fail($"unexpected statement: {context}");
 		}

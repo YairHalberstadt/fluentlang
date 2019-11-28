@@ -5,7 +5,7 @@
     <RootNamespace>FluentLang.Compiler</RootNamespace>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NoWarn>CS3021</NoWarn>
+    <NoWarn>CS3021,CS8717</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

@@ -19,11 +19,13 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 
 		public DeclarationStatement(
 			Declaration_statementContext context,
+			int ordinalPositionInMethod,
 			MethodBodySymbolContext methodBodySymbolContext,
 			DiagnosticBag diagnostics) : base(diagnostics)
 		{
 			_context = context;
-			_methodBodySymbolContext = methodBodySymbolContext;
+			OrdinalPositionInMethod = ordinalPositionInMethod;
+			_methodBodySymbolContext = methodBodySymbolContext.WithStatement(this);
 			IdentifierName = _context.LOWERCASE_IDENTIFIER()?.Symbol.Text ?? null;
 			_declaredType = new Lazy<IType?>(BindDeclaredType);
 			_expression = new Lazy<IExpression>(BindExpression);
@@ -74,6 +76,8 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 		public IExpression Expression => _expression.Value;
 		public IType Type => _type.Value;
 		public IDeclaredLocal? Local => _local.Value;
+
+		public int OrdinalPositionInMethod { get; }
 
 		protected override void EnsureAllLocalDiagnosticsCollected()
 		{

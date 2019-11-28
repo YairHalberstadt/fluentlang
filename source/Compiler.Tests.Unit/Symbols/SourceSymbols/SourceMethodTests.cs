@@ -34,5 +34,59 @@ M() : bool {
 					new Diagnostic(new Location(new TextToken(@"I")), ErrorCode.DuplicateInterfaceDeclaration),
 					new Diagnostic(new Location(new TextToken(@"I")), ErrorCode.DuplicateInterfaceDeclaration));
 		}
+
+		[Fact]
+		public void ErrorOnMethodWithMultipleParametersSameName()
+		{
+			CreateAssembly(@"M(a : int, a : int) : int { return a; }")
+				.VerifyDiagnostics(
+					new Diagnostic(new Location(new TextToken(@"a:int")), ErrorCode.ParametersShareNames));
+		}
+
+		[Fact]
+		public void ParameterCanNotHideLocalDeclaredInSameScope()
+		{
+			CreateAssembly(@"
+M() : {} {
+	Local(x : {}) : {} { return x; }
+	let x = {};
+	return x;
+}").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@"x")), ErrorCode.HidesLocal));
+		}
+
+		[Fact]
+		public void ParameterCanNotHideParameter()
+		{
+			CreateAssembly(@"
+M(x : {}) : {} {
+	Local(x : {}) : {} { return x; }
+	return x;
+}").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@"x")), ErrorCode.HidesLocal));
+		}
+
+		[Fact]
+		public void ParameterCanNotHideLocalDeclaredInParentScope()
+		{
+			CreateAssembly(@"
+M() : {} {
+	Local() : {} { InnerLocal(x : {}) : {} { return x; } return {}; }
+	let x = {};
+	return x;
+}").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@"x")), ErrorCode.HidesLocal));
+		}
+
+		[Fact]
+		public void ParameterCanNotHideParentMethodParameter()
+		{
+			CreateAssembly(@"
+M(x : {}) : {} {
+	Local() : {} { InnerLocal(x : {}) : {} { return x; } return {}; }
+	return x;
+}").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@"x")), ErrorCode.HidesLocal));
+		}
 	}
 }

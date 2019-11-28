@@ -137,5 +137,28 @@ M(x : {}) : {} {
 }").VerifyDiagnostics(
 				new Diagnostic(new Location(new TextToken(@"x")), ErrorCode.HidesLocal));
 		}
+
+		[Fact]
+		public void CanNotHideLocalDeclaredInParentScope()
+		{
+			CreateAssembly(@"
+M() : {} {
+	Local() : {} { let x = {}; return x; }
+	let x = {};
+	return x;
+}").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@"x")), ErrorCode.HidesLocal));
+		}
+
+		[Fact]
+		public void CanNotHideParentMethodParameter()
+		{
+			CreateAssembly(@"
+M(x : {}) : {} {
+	Local() : {} { let x = {}; return x; }
+	return x;
+}").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@"x")), ErrorCode.HidesLocal));
+		}
 	}
 }

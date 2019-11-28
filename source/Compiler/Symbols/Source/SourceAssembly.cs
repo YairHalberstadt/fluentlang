@@ -7,6 +7,7 @@ using static MoreLinq.Extensions.MaxByExtension;
 using static FluentLang.Compiler.Generated.FluentLangParser;
 using System.Diagnostics.CodeAnalysis;
 using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Symbols.Source.MethodBody;
 
 namespace FluentLang.Compiler.Symbols.Source
 {
@@ -114,7 +115,7 @@ namespace FluentLang.Compiler.Symbols.Source
 				Method_declarationContext methodDeclaration,
 				SourceSymbolContext sourceSymbolContext)
 			{
-				var method = new SourceMethod(methodDeclaration, sourceSymbolContext, _diagnostics);
+				var method = new SourceMethod(methodDeclaration, new MethodBodySymbolContext(sourceSymbolContext), _diagnostics);
 				if (!dictionary.TryAdd(method.FullyQualifiedName, method))
 				{
 					_diagnostics.Add(

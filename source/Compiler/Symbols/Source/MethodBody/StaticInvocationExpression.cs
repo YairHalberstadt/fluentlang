@@ -2,6 +2,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.ErrorSymbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
@@ -48,7 +49,28 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 				.ToList();
 
 			if (matching.Count == 1)
-				return matching[0];
+			{
+				var target = matching[0];
+				var currentMethod = _methodBodySymbolContext.SourceSymbolContext.Scope;
+				Release.Assert(currentMethod != null);
+				if (target.DeclaringMethod == currentMethod)
+				{
+					if (target.InScopeAfter is { } declarationStatement)
+					{
+						var currentStatement = _methodBodySymbolContext.CurrentStatement;
+						Release.Assert(currentStatement != null);
+						if (declarationStatement.OrdinalPositionInMethod >= currentStatement.OrdinalPositionInMethod)
+						{
+							_diagnostics.Add(new Diagnostic(
+								new Location(_context),
+								ErrorCode.UseOfMethodWhichCapturesUnassignedLocals,
+								ImmutableArray.Create<object?>(target)));
+						}
+					}
+				}
+				return target;
+			}
+				
 
 			if (matching.Count == 0)
 			{

@@ -31,5 +31,7 @@
 		MethodMustContainAtLeastOneStatement,
 		HidesLocal,
 		InvalidEscapeSequence,
+		UseOfMethodWhichCapturesUnassignedLocals,
+		ParametersShareNames,
 	}
 }

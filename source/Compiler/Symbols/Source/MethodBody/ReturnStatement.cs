@@ -13,11 +13,13 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 
 		public ReturnStatement(
 			Return_statementContext context,
+			int ordinalPositionInMethod,
 			MethodBodySymbolContext methodBodySymbolContext,
 			DiagnosticBag diagnostics) : base(diagnostics)
 		{
 			_context = context;
-			_methodBodySymbolContext = methodBodySymbolContext;
+			OrdinalPositionInMethod = ordinalPositionInMethod;
+			_methodBodySymbolContext = methodBodySymbolContext.WithStatement(this);
 			_expression = new Lazy<IExpression>(BindExpression);
 		}
 
@@ -27,6 +29,8 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 		}
 
 		public IExpression Expression => _expression.Value;
+
+		public int OrdinalPositionInMethod { get; }
 
 		protected override void EnsureAllLocalDiagnosticsCollected()
 		{

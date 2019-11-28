@@ -1,4 +1,5 @@
 ﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using System.Collections.Immutable;
@@ -31,6 +32,14 @@ namespace FluentLang.Compiler.Symbols.ErrorSymbols
 		public ImmutableArray<Diagnostic> AllDiagnostics => ImmutableArray<Diagnostic>.Empty;
 
 		public ImmutableArray<IStatement> Statements => ImmutableArray<IStatement>.Empty;
+
+		public ImmutableArray<IParameterLocal> ParameterLocals => ImmutableArray<IParameterLocal>.Empty;
+
+		public IDeclarationStatement? InScopeAfter => null;
+
+		ImmutableArray<IDeclaredLocal> IMethod.DirectlyCapturedDeclaredLocals => throw Release.Fail("unreachable");
+
+		ImmutableArray<IMethod> IMethod.InvokedLocalMethods => throw Release.Fail("unreachable");
 
 		void ISymbol.EnsureAllLocalDiagnosticsCollected()
 		{

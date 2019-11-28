@@ -1,5 +1,6 @@
 ﻿using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Symbols.ErrorSymbols;
+using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using System.Linq;
 using Xunit;
@@ -271,6 +272,22 @@ namespace B {
 M() : I { return {}; }").VerifyDiagnostics(new Diagnostic(new Location(new TextToken(@"I")), ErrorCode.AmbigiousInterfaceReference));
 
 			Assert.True(assembly.Methods.Single().ReturnType is IErrorSymbol);
+		}
+
+		[Fact]
+		public void CanFindLocalMethodDeclaredInCurrentMethod()
+		{
+			var assembly = CreateAssembly(@"
+M() : int {
+	M1() : int { return 5; }
+	return M1();
+}").VerifyDiagnostics();
+			var m = AssertGetMethod(assembly, "M");
+			var localMethod = m.LocalMethods.Single();
+			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
+			var invocation = Assert.IsAssignableFrom<IStaticInvocationExpression>(returnStatement.Expression);
+			Assert.Equal(localMethod, invocation.Method);
+
 		}
 	}
 }
