@@ -172,7 +172,7 @@ Implement Linking
 
 Create compiler.exe
 
-Look into code completion, syntax highlighting, etc.
+
 
 Look into more efficient incremental compilation.
 
@@ -184,3 +184,4 @@ Projects which should be possible for someone else to do with us stepping on eac
 2. Look into more efficient incremental compilation. Can we avoid recompiling everything whenever a single file in a single dependency changes?
 3. Report syntax errors when ANTLR automatically recover from them.
 4. Improve syntax error recovery. Currently we discard the entire file if it contains a syntax error. Thats a really bad strategy for an IDE.
+5. Look into APIs for code completion, syntax highlighting, etc.
