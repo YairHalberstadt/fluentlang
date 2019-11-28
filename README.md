@@ -160,9 +160,9 @@ Semantic checks (type checking etc.)
 
 Implement runtime
 
-### ToDo
-
 Implement Emitting of code
+
+### ToDo
 
 Implement Emitting of metadata
 
@@ -172,7 +172,7 @@ Implement Linking
 
 Create compiler.exe
 
-
+Implement Standard Libraries. This will be mixed C# Libraries with FluentLang Metadata and FluentLang libraries.
 
 Look into more efficient incremental compilation.
 
