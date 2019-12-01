@@ -160,9 +160,9 @@ Semantic checks (type checking etc.)
 
 Implement runtime
 
-### ToDo
-
 Implement Emitting of code
+
+### ToDo
 
 Implement Emitting of metadata
 
@@ -172,9 +172,13 @@ Implement Linking
 
 Create compiler.exe
 
-
+Implement Standard Libraries. This will be mixed C# Libraries with FluentLang Metadata and FluentLang libraries.
 
 Look into more efficient incremental compilation.
+
+Design and implement discriminated unions.
+
+Design and implement generics.
 
 ## Contributing
 
@@ -185,3 +189,4 @@ Projects which should be possible for someone else to do with us stepping on eac
 3. Report syntax errors when ANTLR automatically recover from them.
 4. Improve syntax error recovery. Currently we discard the entire file if it contains a syntax error. Thats a really bad strategy for an IDE.
 5. Look into APIs for code completion, syntax highlighting, etc.
+6. Come up with design proposals for: Discrimated Unions, Generics, error handling (exceptions?, result types?)
