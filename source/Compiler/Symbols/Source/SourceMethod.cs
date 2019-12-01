@@ -92,6 +92,7 @@ namespace FluentLang.Compiler.Symbols.Source
 					x.anonymous_interface_declaration(),
 					_methodBodySymbolContext.Value.SourceSymbolContext,
 					fullyQualifiedName: new QualifiedName(x.UPPERCASE_IDENTIFIER().Symbol.Text),
+					isExported: false,
 					_diagnostics))
 				.ToImmutableArray<IInterface>();
 		}
@@ -232,6 +233,8 @@ namespace FluentLang.Compiler.Symbols.Source
 				.Distinct()
 				.ToImmutableArray();
 		}
+
+		public bool IsExported => _context.EXPORT() is { };
 
 		public QualifiedName FullyQualifiedName { get; }
 

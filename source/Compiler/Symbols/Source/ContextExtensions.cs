@@ -35,7 +35,12 @@ namespace FluentLang.Compiler.Symbols.Source
 			}
 			if (context.anonymous_interface_declaration() is { } interfaceContext)
 			{
-				return new SourceInterface(interfaceContext, sourceSymbolContext, fullyQualifiedName: null, diagnostics);
+				return new SourceInterface(
+					interfaceContext,
+					sourceSymbolContext,
+					fullyQualifiedName: null,
+					isExported: false,
+					diagnostics);
 			}
 
 			diagnostics.Add(new Diagnostic(new Location(context), ErrorCode.InvalidParseTree, ImmutableArray.Create<object?>(context)));

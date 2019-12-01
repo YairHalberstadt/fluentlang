@@ -11,7 +11,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 	{
 		T IVisitableSymbol.Visit<T>(ISymbolVisitor<T> visitor)
 			=> visitor.Visit(this);
-
+		public bool IsExported { get; }
 		public QualifiedName FullyQualifiedName { get; }
 		public string Name => FullyQualifiedName.Name;
 		public QualifiedName? Namespace => FullyQualifiedName.Parent;

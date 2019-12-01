@@ -21,17 +21,20 @@ namespace FluentLang.Compiler.Symbols.Source
 			Anonymous_interface_declarationContext context,
 			SourceSymbolContext sourceSymbolContext,
 			QualifiedName? fullyQualifiedName,
+			bool isExported,
 			DiagnosticBag diagnostics) : base(diagnostics)
 		{
 			_context = context;
 			_sourceSymbolContext = sourceSymbolContext;
 			FullyQualifiedName = fullyQualifiedName;
+			IsExported = isExported;
 
 			_methods = new Lazy<ImmutableArray<IInterfaceMethod>>(GenerateMethods);
 
 			Release.Assert(fullyQualifiedName?.Parent is null || fullyQualifiedName.Parent == _sourceSymbolContext.NameSpace);
 		}
 
+		public bool IsExported { get; }
 		public QualifiedName? FullyQualifiedName { get; }
 
 		public ImmutableArray<IInterfaceMethod> Methods => _methods.Value;

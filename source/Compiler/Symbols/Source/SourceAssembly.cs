@@ -91,7 +91,12 @@ namespace FluentLang.Compiler.Symbols.Source
 				SourceSymbolContext  sourceSymbolContext)
 			{
 				var name = new QualifiedName(interfaceDeclaration.UPPERCASE_IDENTIFIER().Symbol.Text, sourceSymbolContext.NameSpace);
-				var @interface = new SourceInterface(interfaceDeclaration.anonymous_interface_declaration(), sourceSymbolContext, name,  _diagnostics);
+				var @interface = new SourceInterface(
+					interfaceDeclaration.anonymous_interface_declaration(),
+					sourceSymbolContext,
+					name,
+					isExported: interfaceDeclaration.EXPORT() is { },
+					_diagnostics);
 				if (!dictionary.TryAdd(name, @interface))
 				{
 					_diagnostics.Add(
