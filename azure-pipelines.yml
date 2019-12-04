@@ -33,7 +33,7 @@ steps:
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
   inputs:
     command: 'pack'
-    packagesToPack: 'Runtime/Runtime.csproj'
+    packagesToPack: '**/Runtime.csproj'
     packDestination: '$(Build.ArtifactStagingDirectory)'
     versioningScheme: byPrereleaseNumber
     includeSymbols: true
