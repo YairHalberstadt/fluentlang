@@ -39,15 +39,6 @@ steps:
 
 - task: DotNetCoreCLI@2
   displayName: Nuget Push
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
-  inputs:
-    command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
-    nuGetFeedType: 'external'
-    externalEndpoint: 'Nuget Org'
-
-- task: DotNetCoreCLI@2
-  displayName: Nuget Push
   inputs:
     command: custom
     custom: nuget
