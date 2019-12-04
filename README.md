@@ -44,7 +44,7 @@ interface b
 
 Here a and b are equavelent.
 
-Every object has an implicit interface it implements, and and is a subtype of any interface this interface is a subtype of.
+Every object has an implicit interface it implements, and is a subtype of any interface this interface is a subtype of.
 
 #### Primitives
 
@@ -116,14 +116,14 @@ interface Counter
 
 CreateCounter() : Counter
 {
-      return {} + Increment + Value;
+      return {} + Increment, Value;
       Increment(counter : Counter) : Counter
       {
           value = counter.Value();
           return counter + Value;
           Value(counter : {}) : int
           {
-              return value;
+              return value + 1;
           }
       }
 
