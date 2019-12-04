@@ -44,6 +44,5 @@ steps:
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
   inputs:
     command: 'push'
-    feedsToUse: 'config'
     packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
-    includeNugetOrg: true
+    
