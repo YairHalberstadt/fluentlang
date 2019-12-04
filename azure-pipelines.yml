@@ -28,18 +28,18 @@ steps:
     arguments: '--configuration $(buildConfiguration)'
 
 # Package a project
-- task: NuGetCommand@2
+- task: DotNetCoreCLI@2
   displayName: Nuget Pack
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
   inputs:
     command: 'pack'
     packagesToPack: '**/Runtime.csproj'
-    packDestination: '$(Build.ArtifactStagingDirectory)'
+    outputDir: '$(Build.ArtifactStagingDirectory)'
     versioningScheme: byPrereleaseNumber
     includeSymbols: true
 
 # Push a project
-- task: NuGetCommand@2
+- task: DotNetCoreCLI@2
   displayName: Nuget Push
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
   inputs:
