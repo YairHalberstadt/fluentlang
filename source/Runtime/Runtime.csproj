@@ -6,6 +6,16 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>CS3021,CS8717</NoWarn>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>FluentLang.Runtime</PackageId>
+    <Version>1.0.0-preview-1</Version>
+    <Authors>FluentLang</Authors>
+    <Company>FluentLang</Company>
+    <Product>FluentLang</Product>
+    <Description>.Net based Runtime for the FluentLang Language.</Description>
+    <Copyright />
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/YairHalberstadt/fluentlang/</RepositoryUrl>
   </PropertyGroup>
 
 </Project>
