@@ -35,7 +35,6 @@ steps:
     packagesToPack: '**/Runtime.csproj'
     outputDir: '$(Build.ArtifactStagingDirectory)'
     versioningScheme: byPrereleaseNumber
-    includeSymbols: true
 
 - task: DotNetCoreCLI@2
   displayName: Nuget Push
@@ -43,6 +42,6 @@ steps:
     command: custom
     custom: nuget
     arguments: >
-      push $(Build.ArtifactStagingDirectory)/**/*.nupkg
+      push $(Build.ArtifactStagingDirectory)/**/*.nupkg $(Build.ArtifactStagingDirectory)/**/*.snupkg
       -s https://api.nuget.org/v3/index.json
       -k $(NuGetSourceServerApiKey)
