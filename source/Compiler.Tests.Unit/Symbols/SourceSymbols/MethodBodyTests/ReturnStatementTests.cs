@@ -3,16 +3,21 @@ using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 {
 	public class ReturnStatementTests : TestBase
 	{
+		public ReturnStatementTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+		{
+		}
+
 		[Fact]
 		public void CanReturnSameTypeAsMethod()
 		{
 			var assembly = CreateAssembly("M() : {} { return {}; }")
-				.VerifyDiagnostics();
+				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			Assert.True(returnStatement.Expression.Type.IsEquivalentTo(m.ReturnType));
@@ -22,7 +27,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 		public void CanReturnSubTypeOfMethod()
 		{
 			var assembly = CreateAssembly("M(param : { M() : bool; }) : {} { return param; }")
-				.VerifyDiagnostics();
+				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			Assert.True(returnStatement.Expression.Type.IsSubtypeOf(m.ReturnType));

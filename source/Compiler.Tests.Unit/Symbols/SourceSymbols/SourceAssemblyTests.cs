@@ -7,13 +7,18 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Xunit;
-using static FluentLang.Compiler.Tests.Unit.TestHelpers.Assemblyextensions;
+using Xunit.Abstractions;
+using static FluentLang.Compiler.Tests.Unit.TestHelpers.AssemblyExtensions;
 using Version = FluentLang.Compiler.Symbols.Interfaces.Version;
 
 namespace FluentLang.Compiler.Tests.Unit.Symbols
 {
 	public class SourceAssemblyTests : TestBase
 	{
+		public SourceAssemblyTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+		{
+		}
+
 		[Fact]
 		public void IgnoresDocumentsWithIrrecoverableSyntaxErrors()
 		{
@@ -58,7 +63,7 @@ interface I { M() : () bool; }").VerifyDiagnostics(new Diagnostic(new Location(n
 		{
 			var assembly = CreateAssembly(@"
 interface I1 { M() : bool; }
-interface I2 { M() : int; }").VerifyDiagnostics();
+interface I2 { M() : int; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 			Assert.Equal(2, assembly.Interfaces.Length);
 			Assert.Equal(new[] { "I1", "I2" }, assembly.Interfaces.Select(x => x.FullyQualifiedName!.ToString()).OrderBy(x => x));
@@ -69,7 +74,7 @@ interface I2 { M() : int; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 M1() : int { return 42; }
-M2() : int { return 42; }").VerifyDiagnostics();
+M2() : int { return 42; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 			Assert.Equal(2, assembly.Methods.Length);
 			Assert.Equal(new[] { "M1", "M2" }, assembly.Methods.Select(x => x.FullyQualifiedName.ToString()).OrderBy(x => x));
@@ -87,7 +92,7 @@ namespace A.B.C
 	{
 		interface I3 { M() : string; }
 	}
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 			var i1 = AssertGetInterface(assembly, "I1");
 			Assert.Equal(i1.FullyQualifiedName, QualifiedName("I1"));

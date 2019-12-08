@@ -5,16 +5,21 @@ using FluentLang.Compiler.Symbols.Source.MethodBody;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 {
 	public class ConditionalExpressionTests : TestBase
 	{
+		public ConditionalExpressionTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+		{
+		}
+
 		[Fact]
 		public void CanCompileConditional()
 		{
 			var assembly = CreateAssembly(@"M() : int { return if (true) 0 else 1; }")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			var exp = Assert.IsAssignableFrom<IConditionalExpression>(statement.Expression);
@@ -44,7 +49,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			var assembly = CreateAssembly(@"
 M() : {} { return if (true) {} + M1 else {}; }
 M1(param : {}) : bool { return true; }")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			var exp = Assert.IsAssignableFrom<IConditionalExpression>(statement.Expression);
@@ -57,7 +62,7 @@ M1(param : {}) : bool { return true; }")
 			var assembly = CreateAssembly(@"
 M() : {} { return if (true) {} else {} + M1; }
 M1(param : {}) : bool { return true; }")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			var exp = Assert.IsAssignableFrom<IConditionalExpression>(statement.Expression);

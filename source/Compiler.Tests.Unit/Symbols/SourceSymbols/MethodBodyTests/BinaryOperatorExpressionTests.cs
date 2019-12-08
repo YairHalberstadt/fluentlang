@@ -7,19 +7,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 {
-	public class BinaryOperatorExpressionTests : TestBase
+	public class BinaryOperatorExpressionTests
 	{
 		public class PlusTests : TestBase
 		{
+			public PlusTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+			{
+			}
+
 			[Fact]
 			public void CanPlusStrings()
 			{
 				var assembly = CreateAssembly(@"
 M(a : string, b : string) : string { return a + b; }")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -33,7 +38,7 @@ M(a : string, b : string) : string { return a + b; }")
 			{
 				var assembly = CreateAssembly(@"
 M(a : int, b : int) : int { return a + b; }")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -47,7 +52,7 @@ M(a : int, b : int) : int { return a + b; }")
 			{
 				var assembly = CreateAssembly(@"
 M(a : double, b : double) : double { return a + b; }")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -95,12 +100,16 @@ M(a : int, b : double) : int { return a + b; }")
 
 		public class MinusTests : TestBase
 		{
+			public MinusTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+			{
+			}
+
 			[Fact]
 			public void CanMinusInts()
 			{
 				var assembly = CreateAssembly(@"
 M(a : int, b : int) : int { return a - b; }")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -114,7 +123,7 @@ M(a : int, b : int) : int { return a - b; }")
 			{
 				var assembly = CreateAssembly(@"
 M(a : double, b : double) : double { return a - b; }")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -171,12 +180,16 @@ M(a : int, b : double) : int { return a - b; }")
 
 		public class MultiplyTests : TestBase
 		{
+			public MultiplyTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+			{
+			}
+
 			[Fact]
 			public void CanMultiplyInts()
 			{
 				var assembly = CreateAssembly(@"
 M(a : int, b : int) : int { return a * b; }")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -190,7 +203,7 @@ M(a : int, b : int) : int { return a * b; }")
 			{
 				var assembly = CreateAssembly(@"
 M(a : double, b : double) : double { return a * b; }")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -247,12 +260,16 @@ M(a : int, b : double) : int { return a * b; }")
 
 		public class DivideTests : TestBase
 		{
+			public DivideTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+			{
+			}
+
 			[Fact]
 			public void CanDivideInts()
 			{
 				var assembly = CreateAssembly(@"
 M(a : int, b : int) : int { return a / b; }")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -266,7 +283,7 @@ M(a : int, b : int) : int { return a / b; }")
 			{
 				var assembly = CreateAssembly(@"
 M(a : double, b : double) : double { return a / b; }")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -322,12 +339,16 @@ M(a : int, b : double) : int { return a / b; }")
 
 		public class RemainderTests : TestBase
 		{
+			public RemainderTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+			{
+			}
+
 			[Fact]
 			public void CanRemainderInts()
 			{
 				var assembly = CreateAssembly(@"
 M(a : int, b : int) : int { return a % b; }")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -393,14 +414,18 @@ M(a : int, b : double) : int { return a % b; }")
 
 		public class EqualityOperatorsTests : TestBase
 		{
-			public static Operator[][] EqualityOperators { get; } =
+			public EqualityOperatorsTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
 			{
-				new []{ Operator.Equal },
-				new []{ Operator.GreaterThan },
-				new []{ Operator.GreaterThanOrEqualTo },
-				new []{ Operator.LessThan },
-				new []{ Operator.LessThanOrEqualTo },
-				new []{ Operator.NotEqual },
+			}
+
+			public static object[][] EqualityOperators { get; } =
+			{
+				new object[]{ Operator.Equal },
+				new object[]{ Operator.GreaterThan },
+				new object[]{ Operator.GreaterThanOrEqualTo },
+				new object[]{ Operator.LessThan },
+				new object[]{ Operator.LessThanOrEqualTo },
+				new object[]{ Operator.NotEqual },
 			};
 
 			public static Primitive[] Primitives { get; } =
@@ -436,7 +461,7 @@ M(a : int, b : double) : int { return a % b; }")
 				var primitiveString = primitive.ToString().ToLower();
 				var assembly = CreateAssembly($@"
 M(a : {primitiveString}, b : {primitiveString}) : bool {{ return a {OperatorSymbol(op)} b; }}")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());

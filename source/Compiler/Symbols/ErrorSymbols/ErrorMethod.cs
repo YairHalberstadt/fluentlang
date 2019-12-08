@@ -43,6 +43,8 @@ namespace FluentLang.Compiler.Symbols.ErrorSymbols
 
 		public bool IsExported => false;
 
+		public IAssembly DeclaringAssembly => throw Release.Fail("unreachable");
+
 		void ISymbol.EnsureAllLocalDiagnosticsCollected()
 		{
 		}

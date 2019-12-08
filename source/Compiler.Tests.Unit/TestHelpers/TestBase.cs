@@ -6,11 +6,19 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 {
 	public abstract class TestBase
 	{
+		protected readonly ITestOutputHelper _testOutputHelper;
+
+		protected TestBase(ITestOutputHelper testOutputHelper)
+		{
+			_testOutputHelper = testOutputHelper;
+		}
+
 		protected IAssembly CreateAssembly(string source)
 		{
 			var document = new TestDocument(source);
@@ -32,7 +40,7 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 
 		protected static QualifiedName QualifiedName(string qualifiedName)
 		{
-			return qualifiedName.Split('.').Aggregate((QualifiedName?)null, (l, r) => new QualifiedName(r, l))!;
+			return Compiler.Symbols.QualifiedName.Parse(qualifiedName);
 		}
 
 		protected static IMethod AssertGetMethod(IAssembly assembly, string qualifiedName)

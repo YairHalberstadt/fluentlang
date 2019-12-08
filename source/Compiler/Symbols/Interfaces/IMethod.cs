@@ -21,6 +21,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 		public ImmutableArray<IInterface> LocalInterfaces { get; }
 		public ImmutableArray<IMethod> LocalMethods { get; }
 		public IMethod? DeclaringMethod { get; }
+		public IAssembly DeclaringAssembly { get; }
 		public ImmutableArray<IStatement> Statements { get; }
 		public IDeclarationStatement? InScopeAfter { get; }
 		protected ImmutableArray<IDeclaredLocal> DirectlyCapturedDeclaredLocals { get; }

@@ -3,11 +3,16 @@ using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 {
 	public class LocalReferenceExpressionTests : TestBase
 	{
+		public LocalReferenceExpressionTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+		{
+		}
+
 		[Fact]
 		public void CanReferenceDeclaredLocal()
 		{
@@ -15,7 +20,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 M() : {} {
 	let x = {};
 	return x; 
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var declarationStatement = Assert.IsAssignableFrom<IDeclarationStatement>(m.Statements.First());
 			var local = declarationStatement.Local;
@@ -32,7 +37,7 @@ M() : {} {
 			var assembly = CreateAssembly(@"
 M(x : {}) : {} {
 	return x; 
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Last());
 			var exp = Assert.IsAssignableFrom<ILocalReferenceExpression>(returnStatement.Expression);
@@ -58,7 +63,7 @@ M(x : {}) : {} {
 		return x;
 	}
 	return {}; 
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var localM = m.LocalMethods.Single();
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(localM.Statements.Last());
@@ -79,7 +84,7 @@ M(x : {}) : {} {
 		return {};
 	}
 	return {}; 
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var localM = m.LocalMethods.Single().LocalMethods.Single();
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(localM.Statements.Last());
@@ -125,7 +130,7 @@ M() : {} {
 		return x;
 	}
 	return {}; 
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var localM = m.LocalMethods.Single();
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(localM.Statements.Last());
@@ -148,7 +153,7 @@ M() : {} {
 		return {};
 	}
 	return {}; 
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var localM = m.LocalMethods.Single().LocalMethods.Single();
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(localM.Statements.Last());
@@ -236,7 +241,7 @@ M() : {} {
 	let x = {};
 	return Local(); 
 }")
-				.VerifyDiagnostics();
+				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 		}
 
 		[Fact]
@@ -276,7 +281,7 @@ M() : {} {
 	let x = Local();
 	return x; 
 }")
-				.VerifyDiagnostics();
+				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 		}
 
 		[Fact]
@@ -287,7 +292,7 @@ M() : {} {
 	Local() : {} { let x = Local(); return x; }
 	return {}; 
 }")
-				.VerifyDiagnostics();
+				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 		}
 	}
 }

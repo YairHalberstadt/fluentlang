@@ -3,6 +3,7 @@ using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using System.Diagnostics;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace FluentLang.Compiler.Tests.Unit.Subtyping
 {
@@ -17,12 +18,16 @@ namespace FluentLang.Compiler.Tests.Unit.Subtyping
 			new [] { Primitive.String },
 		};
 
+		public InterfaceTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+		{
+		}
+
 		[Fact]
 		public void InterfaceIsSubtypeOf_IdenticalInterfaceWithDifferentNames()
 		{
 			var assembly = CreateAssembly(@"
 interface I1 {}
-interface I2 {}").VerifyDiagnostics();
+interface I2 {}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			Assert.True(assembly.TryGetInterface(QualifiedName("I1"), out var i1));
 			Assert.True(assembly.TryGetInterface(QualifiedName("I2"), out var i2));
 			Debug.Assert(i1 != null);
@@ -41,7 +46,7 @@ interface OneMethod2 { M() : int; }
 interface AdditiveOneMethod1 { M() : int; } + Empty
 interface AdditiveOneMethod2 OneMethod1 + Empty
 interface AdditiveOneMethod3 OneMethod1 + OneMethod2
-").VerifyDiagnostics();
+").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			Assert.True(assembly.TryGetInterface(QualifiedName("OneMethod1"), out var i1));
 			Assert.True(assembly.TryGetInterface(QualifiedName("OneMethod2"), out var i2));
 			Assert.True(assembly.TryGetInterface(QualifiedName("AdditiveOneMethod1"), out var i3));
@@ -64,7 +69,7 @@ interface AdditiveOneMethod3 OneMethod1 + OneMethod2
 		{
 			var assembly = CreateAssembly(@"
 interface Empty {}
-interface OneMethod { M() : int; }").VerifyDiagnostics();
+interface OneMethod { M() : int; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			Assert.True(assembly.TryGetInterface(QualifiedName("Empty"), out var empty));
 			Assert.True(assembly.TryGetInterface(QualifiedName("OneMethod"), out var oneMethod));
 			Debug.Assert(empty != null);
@@ -80,7 +85,7 @@ interface OneMethod { M() : int; }").VerifyDiagnostics();
 interface OneMethod1 { M() : int; }
 interface OneMethod2 { M() : bool; }
 interface OneMethod3 { M1() : int; }
-interface OneMethod4 { M(param1 : int) : int; }").VerifyDiagnostics();
+interface OneMethod4 { M(param1 : int) : int; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			Assert.True(assembly.TryGetInterface(QualifiedName("OneMethod1"), out var i1));
 			Assert.True(assembly.TryGetInterface(QualifiedName("OneMethod1"), out var i2));
 			Assert.True(assembly.TryGetInterface(QualifiedName("OneMethod1"), out var i3));
@@ -109,7 +114,7 @@ interface OneMethod4 { M(param1 : int) : int; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 interface OneMethod { M() : int; }
-interface TwoMethods { M() : int; M1() : int; }").VerifyDiagnostics();
+interface TwoMethods { M() : int; M1() : int; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			Assert.True(assembly.TryGetInterface(QualifiedName("OneMethod"), out var oneMethod));
 			Assert.True(assembly.TryGetInterface(QualifiedName("TwoMethods"), out var twoMethods));
 			Debug.Assert(twoMethods != null);
@@ -123,7 +128,7 @@ interface TwoMethods { M() : int; M1() : int; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 interface OneMethod { M() : int; }
-interface TwoMethods { M() : bool; M1() : int; }").VerifyDiagnostics();
+interface TwoMethods { M() : bool; M1() : int; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			Assert.True(assembly.TryGetInterface(QualifiedName("OneMethod"), out var oneMethod));
 			Assert.True(assembly.TryGetInterface(QualifiedName("TwoMethods"), out var twoMethods));
 			Debug.Assert(twoMethods != null);
@@ -137,7 +142,7 @@ interface TwoMethods { M() : bool; M1() : int; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 interface I1 { M(param1 : int) : bool; }
-interface I2 { M(parameter1 : int) : bool; }").VerifyDiagnostics();
+interface I2 { M(parameter1 : int) : bool; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			Assert.True(assembly.TryGetInterface(QualifiedName("I1"), out var i1));
 			Assert.True(assembly.TryGetInterface(QualifiedName("I2"), out var i2));
 			Debug.Assert(i1 != null);
@@ -153,7 +158,7 @@ interface I2 { M(parameter1 : int) : bool; }").VerifyDiagnostics();
 interface Empty {}
 interface AdditiveEmpty Empty + {}
 interface I1 { M(param1 : AdditiveEmpty()) : Empty; }
-interface I2 { M(param1 : Empty()) : AdditiveEmpty; }").VerifyDiagnostics();
+interface I2 { M(param1 : Empty()) : AdditiveEmpty; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			Assert.True(assembly.TryGetInterface(QualifiedName("I1"), out var i1));
 			Assert.True(assembly.TryGetInterface(QualifiedName("I2"), out var i2));
 			Debug.Assert(i1 != null);
@@ -167,7 +172,7 @@ interface I2 { M(param1 : Empty()) : AdditiveEmpty; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 interface I1 { M(param1 : I1) : I1; }
-interface I2 { M(param1 : I2) : I2; }").VerifyDiagnostics();
+interface I2 { M(param1 : I2) : I2; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			Assert.True(assembly.TryGetInterface(QualifiedName("I1"), out var i1));
 			Assert.True(assembly.TryGetInterface(QualifiedName("I2"), out var i2));
 			Debug.Assert(i1 != null);
@@ -181,7 +186,7 @@ interface I2 { M(param1 : I2) : I2; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 interface I1 { M(param1 : I2) : I2; }
-interface I2 { M(param1 : I1) : I1; }").VerifyDiagnostics();
+interface I2 { M(param1 : I1) : I1; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			Assert.True(assembly.TryGetInterface(QualifiedName("I1"), out var i1));
 			Assert.True(assembly.TryGetInterface(QualifiedName("I2"), out var i2));
 			Debug.Assert(i1 != null);
@@ -211,7 +216,7 @@ interface I2 { M(param1 : I1) : I2; }");
 interface I1 { M(param1 : I2) : int; }
 interface I2 { M(param1 : I3) : int; }
 interface I3 { M(param1 : I4) : int; }
-interface I4 { M(param1 : I1) : int; }").VerifyDiagnostics();
+interface I4 { M(param1 : I1) : int; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			Assert.True(assembly.TryGetInterface(QualifiedName("I1"), out var i1));
 			Assert.True(assembly.TryGetInterface(QualifiedName("I2"), out var i2));
 			Debug.Assert(i1 != null);
@@ -228,7 +233,7 @@ interface Empty {}
 interface I1 { M(param1 : I2) : int; }
 interface I2 { M(param1 : I3) : int; }
 interface I3 { M(param1 : I4) : int; }
-interface I4 { M(param1 : Empty) : int; }").VerifyDiagnostics();
+interface I4 { M(param1 : Empty) : int; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			Assert.True(assembly.TryGetInterface(QualifiedName("I1"), out var i1));
 			Assert.True(assembly.TryGetInterface(QualifiedName("I2"), out var i2));
 			Debug.Assert(i1 != null);

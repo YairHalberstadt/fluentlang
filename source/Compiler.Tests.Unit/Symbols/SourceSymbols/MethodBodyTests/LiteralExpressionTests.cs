@@ -4,18 +4,23 @@ using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 {
-	public class LiteralExpressionTests : TestBase
+	public class LiteralExpressionTests
 	{
 		public class BooleanLiterals : TestBase
 		{
+			public BooleanLiterals(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+			{
+			}
+
 			[Fact]
 			public void LiteralTrue()
 			{
 				var assembly = CreateAssembly(@"M() : bool { return true }")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<ILiteralExpression>(statement.Expression);
@@ -27,7 +32,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			public void LiteralFalse()
 			{
 				var assembly = CreateAssembly(@"M() : bool { return false }")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<ILiteralExpression>(statement.Expression);
@@ -46,6 +51,10 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 
 		public class IntLiterals : TestBase
 		{
+			public IntLiterals(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+			{
+			}
+
 			[Theory]
 			[InlineData(0)]
 			[InlineData(42)]
@@ -53,7 +62,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			public void CorrectlyParsesIntLiterals(int val)
 			{
 				var assembly = CreateAssembly($"M() : int {{ return {val} }}")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<ILiteralExpression>(statement.Expression);
@@ -72,6 +81,10 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 
 		public class DoubleLiterals : TestBase
 		{
+			public DoubleLiterals(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+			{
+			}
+
 			[Theory]
 			[InlineData(0.0, "0.0")]
 			[InlineData(42.0, "42.0")]
@@ -81,7 +94,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			public void CorrectlyParsesDoubleLiteral(double val, string literal)
 			{
 				var assembly = CreateAssembly($"M() : double {{ return {literal} }}")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<ILiteralExpression>(statement.Expression);
@@ -92,6 +105,10 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 
 		public class CharLiterals : TestBase
 		{
+			public CharLiterals(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+			{
+			}
+
 			[Theory]
 			[InlineData('a')]
 			[InlineData('1')]
@@ -101,7 +118,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			public void CorrectlyParsesSimpleCharLiterals(char val)
 			{
 				var assembly = CreateAssembly($"M() : char {{ return '{val}' }}")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<ILiteralExpression>(statement.Expression);
@@ -117,7 +134,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			public void CorrectlyParsesEscapedCharLiterals(string escapeString, char expected)
 			{
 				var assembly = CreateAssembly($"M() : char {{ return '{escapeString}' }}")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<ILiteralExpression>(statement.Expression);
@@ -133,7 +150,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			public void CorrectlyParsesUnicodeEscapedCharLiterals(string escapeString, char expected)
 			{
 				var assembly = CreateAssembly($"M() : char {{ return '{escapeString}' }}")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<ILiteralExpression>(statement.Expression);
@@ -212,6 +229,10 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 
 		public class StringLiterals : TestBase
 		{
+			public StringLiterals(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+			{
+			}
+
 			[Theory]
 			[InlineData(@"", "")]
 			[InlineData(@"abc", "abc")]
@@ -220,7 +241,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			public void CanParseStringsCorrectly(string literal, string expected)
 			{
 				var assembly = CreateAssembly($"M() : string {{ return \"{literal}\" }}")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<ILiteralExpression>(statement.Expression);

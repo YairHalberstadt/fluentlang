@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace FluentLang.Compiler.Symbols
 {
@@ -79,6 +80,9 @@ namespace FluentLang.Compiler.Symbols
 		{
 			return !(a == b);
 		}
+
+		public static QualifiedName Parse(string name) => 
+			name.Split('.').Aggregate((QualifiedName?)null, (l, r) => new QualifiedName(r, l))!;
 	}
 }
 

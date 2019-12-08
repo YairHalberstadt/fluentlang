@@ -9,16 +9,21 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 {
 	public class MemberInvocationExpressionTests : TestBase
 	{
+		public MemberInvocationExpressionTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+		{
+		}
+
 		[Fact]
 		public void CanInvokeMemberWithNoArguments()
 		{
 			var assembly = CreateAssembly(@"M(param : { M() : int; }) : int { return param.M(); }")
-				.VerifyDiagnostics();
+				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -38,7 +43,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 M(param : { M(a : int, b : bool) : int; }) : int { 
 	return param.M(5, false); 
 }")
-				.VerifyDiagnostics();
+				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -58,7 +63,7 @@ M(param : { M(a : int, b : bool) : int; }) : int {
 M(param : { M(a : {}) : int; }) : int { 
 	return param.M(param); 
 }")
-				.VerifyDiagnostics();
+				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -90,7 +95,7 @@ M(param : { M(a : { M() : bool; }) : int; }) : int {
 M(param : { M(a : {}) : int; M(a : { M() : bool; }) : bool; }) : int { 
 	return param.M(param); 
 }")
-				.VerifyDiagnostics();
+				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());

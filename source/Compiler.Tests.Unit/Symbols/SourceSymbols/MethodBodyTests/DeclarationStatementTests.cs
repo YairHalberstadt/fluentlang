@@ -4,11 +4,16 @@ using FluentLang.Compiler.Symbols.Source.MethodBody;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 {
 	public class DeclarationStatementTests : TestBase
 	{
+		public DeclarationStatementTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+		{
+		}
+
 		[Fact]
 		public void CanUseDeclaredVariable()
 		{
@@ -16,7 +21,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 M() : {} {
 	let x = {};
 	return x; 
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var declarationStatement = Assert.IsAssignableFrom<IDeclarationStatement>(m.Statements.First());
 			var local = declarationStatement.Local;
@@ -35,7 +40,7 @@ M() : {} {
 M() : {} {
 	let x : {} = {};
 	return x; 
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var declarationStatement = Assert.IsAssignableFrom<IDeclarationStatement>(m.Statements.First());
 			var local = declarationStatement.Local;
@@ -55,7 +60,7 @@ M() : {} {
 	let x : {} = {} + M1;
 	return x; 
 }
-M1(param : {}) : {} { return param; }").VerifyDiagnostics();
+M1(param : {}) : {} { return param; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var declarationStatement = Assert.IsAssignableFrom<IDeclarationStatement>(m.Statements.First());
 			var local = declarationStatement.Local;
@@ -86,7 +91,7 @@ M1(param : {}) : {} { return param; }").VerifyDiagnostics(
 M() : {} {
 	_ = {};
 	return {};
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var declarationStatement = Assert.IsAssignableFrom<IDeclarationStatement>(m.Statements.First());
 			Assert.Null(declarationStatement.Local);

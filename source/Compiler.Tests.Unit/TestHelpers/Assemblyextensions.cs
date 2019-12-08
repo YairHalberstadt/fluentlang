@@ -1,13 +1,16 @@
-﻿using Antlr4.Runtime;
-using FluentLang.Compiler.Diagnostics;
+﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Emit;
 using FluentLang.Compiler.Symbols.Interfaces;
 using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 {
-	public static class Assemblyextensions
+	public static class AssemblyExtensions
 	{
 		public static IAssembly VerifyDiagnostics(this IAssembly assembly, params Diagnostic[] expectedDiagnostics)
 		{
@@ -43,33 +46,50 @@ Actual:
 					=> $"new Diagnostic(new Location(new TextToken(@\"{diagnostic.Location.GetText().ToString()}\")), {nameof(ErrorCode)}.{diagnostic.ErrorCode})";
 			}
 		}
-	}
 
-	internal class TextToken : IToken
-	{
-		public TextToken(string text)
+		public static IAssembly VerifyEmit(this IAssembly assembly, ITestOutputHelper testOutputHelper, string? expectedCSharp = null)
 		{
-			Text = text;
+			if (!assembly.AllDiagnostics.IsEmpty)
+				throw new InvalidOperationException("cannot emit assembly with errors");
+
+			var csharpStream = new MemoryStream();
+			var writer = new StreamWriter(csharpStream);
+			var reader = new StreamReader(csharpStream);
+
+			new CSharpEmitter(new MethodKeyGenerator()).Emit(assembly, writer);
+
+			csharpStream.Position = 0;
+
+			if (expectedCSharp is { })
+			{
+				Assert.Equal(expectedCSharp, reader.ReadToEnd());
+				csharpStream.Position = 0;
+			}
+
+			var ilStream = new MemoryStream();
+
+			var emitResult = new CSharpAssemblyCompiler(
+				new XunitLogger<CSharpAssemblyCompiler>(testOutputHelper)).Compile(reader, assembly, new CompilationOptions(), ilStream, new Assembly[] { });
+
+			if (!emitResult.Success)
+			{
+				csharpStream.Position = 0;
+
+				Assert.False(true,
+					"compiling and emitting csharp failed with diagnostics:\n"
+					+ string.Join('\n', emitResult.Diagnostics)
+					+ "\n\ncsharp code was:\n\n"
+					+ reader.ReadToEnd());
+			}
+
+			ilStream.Position = 0;
+
+			var assemblyLoadContext = new System.Runtime.Loader.AssemblyLoadContext(null, isCollectible: true);
+			// verify assembly is valid
+			assemblyLoadContext.LoadFromStream(ilStream);
+			assemblyLoadContext.Unload();
+
+			return assembly;
 		}
-
-		public string Text { get; }
-
-		public int Type => throw new System.NotImplementedException();
-
-		public int Line => throw new System.NotImplementedException();
-
-		public int Column => throw new System.NotImplementedException();
-
-		public int Channel => throw new System.NotImplementedException();
-
-		public int TokenIndex => throw new System.NotImplementedException();
-
-		public int StartIndex => throw new System.NotImplementedException();
-
-		public int StopIndex => throw new System.NotImplementedException();
-
-		public ITokenSource TokenSource => throw new System.NotImplementedException();
-
-		public ICharStream InputStream => throw new System.NotImplementedException();
 	}
 }
