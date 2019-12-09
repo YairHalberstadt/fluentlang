@@ -58,9 +58,6 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 					x.Parameters.Zip(Arguments, (p, a) => a.Type.IsSubtypeOf(p.Type)).All(x => x))
 				.ToList();
 
-			if (matching.Count == 1)
-				return matching[0];
-
 			if (matching.Count == 0)
 			{
 				_diagnostics.Add(new Diagnostic(
@@ -68,7 +65,15 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 					ErrorCode.MethodNotFound,
 					ImmutableArray.Create<object?>(type, MemberName, Arguments)));
 			}
-			else if (matching.Count == 2)
+			else if (
+				matching.Count == 1
+				|| matching.Skip(1).All(x => x.IsEquivalentTo(
+					matching[0],
+					dependantEqualities: null)))
+			{
+				return matching[0];
+			}
+			else
 			{
 				_diagnostics.Add(new Diagnostic(
 					new Location(_context.UPPERCASE_IDENTIFIER()),

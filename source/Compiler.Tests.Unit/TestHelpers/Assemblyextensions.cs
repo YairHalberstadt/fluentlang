@@ -47,7 +47,11 @@ Actual:
 			}
 		}
 
-		public static IAssembly VerifyEmit(this IAssembly assembly, ITestOutputHelper testOutputHelper, string? expectedCSharp = null)
+		public static IAssembly VerifyEmit(
+			this IAssembly assembly,
+			ITestOutputHelper testOutputHelper,
+			string? expectedCSharp = null,
+			object expectedResult = null)
 		{
 			if (!assembly.AllDiagnostics.IsEmpty)
 				throw new InvalidOperationException("cannot emit assembly with errors");
@@ -62,7 +66,10 @@ Actual:
 
 			if (expectedCSharp is { })
 			{
-				Assert.Equal(expectedCSharp, reader.ReadToEnd());
+				var actual = reader.ReadToEnd();
+				Assert.True(
+					expectedCSharp == actual,
+					"expected:\n" + expectedCSharp + "\n\nactual:\n" + actual);
 				csharpStream.Position = 0;
 			}
 
@@ -86,7 +93,14 @@ Actual:
 
 			var assemblyLoadContext = new System.Runtime.Loader.AssemblyLoadContext(null, isCollectible: true);
 			// verify assembly is valid
-			assemblyLoadContext.LoadFromStream(ilStream);
+			var emittedAssembly = assemblyLoadContext.LoadFromStream(ilStream);
+
+			if (expectedResult is { })
+			{
+				Assert.NotNull(emittedAssembly.EntryPoint);
+				Assert.Equal(expectedResult, emittedAssembly.EntryPoint!.Invoke(null, null));
+			}
+
 			assemblyLoadContext.Unload();
 
 			return assembly;

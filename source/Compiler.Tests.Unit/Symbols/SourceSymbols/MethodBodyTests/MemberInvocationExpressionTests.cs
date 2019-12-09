@@ -3,11 +3,7 @@ using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.Compiler.Symbols.Source.MethodBody;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -118,6 +114,17 @@ M(param : { M(a : { M(a : {}) : bool; }) : int; M(a : {}) : bool; }) : int {
 				.VerifyDiagnostics(
 					new Diagnostic(new Location(new TextToken(@"returnparam.M(param);")), ErrorCode.ReturnTypeDoesNotMatch),
 					new Diagnostic(new Location(new TextToken(@"M")), ErrorCode.AmbigiousMethodReference));
+		}
+
+		[Fact]
+		public void NoErrorWhenMultipleMatchingHaveSameSignature()
+		{
+			CreateAssembly(@"
+M(param : { M() : int; M() : int; }) : int { 
+	return param.M(); 
+}")
+				.VerifyDiagnostics()
+				.VerifyEmit(_testOutputHelper);
 		}
 	}
 }

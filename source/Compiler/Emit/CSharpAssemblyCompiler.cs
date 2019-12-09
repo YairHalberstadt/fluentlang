@@ -40,7 +40,7 @@ namespace FluentLang.Compiler.Emit
 				_metadataReferences
 					.Concat(referencedAssemblies.Select(x => MetadataReference.CreateFromFile(x.Location))),
 				new CSharpCompilationOptions(
-					OutputKind.DynamicallyLinkedLibrary, 
+					assembly.Methods.Any(x => x.Name == "Main") ? OutputKind.ConsoleApplication : OutputKind.DynamicallyLinkedLibrary, 
 					moduleName: assembly.Name.ToString(), 
 					optimizationLevel: OptimizationLevel.Release));
 
