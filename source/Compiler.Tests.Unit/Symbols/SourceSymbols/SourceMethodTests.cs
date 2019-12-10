@@ -4,11 +4,16 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols
 {
 	public class SourceMethodTests : TestBase
 	{
+		public SourceMethodTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+		{
+		}
+
 		[Fact]
 		public void ReportErrorOnDuplicateLocalMethod()
 		{
@@ -94,7 +99,7 @@ M(x : {}) : {} {
 		{
 			var assembly = CreateAssembly(@"
 export M1() : bool { return true; }
-M2() : bool { return true; }").VerifyDiagnostics();
+M2() : bool { return true; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m1 = AssertGetMethod(assembly, "M1");
 			Assert.True(m1.IsExported);
 			var m2 = AssertGetMethod(assembly, "M2");

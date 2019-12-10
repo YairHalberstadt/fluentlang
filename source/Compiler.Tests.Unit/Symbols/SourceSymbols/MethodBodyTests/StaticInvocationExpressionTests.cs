@@ -5,16 +5,21 @@ using FluentLang.Compiler.Symbols.Source.MethodBody;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 {
 	public class StaticInvocationExpressionTests : TestBase
 	{
+		public StaticInvocationExpressionTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+		{
+		}
+
 		[Fact]
 		public void CanInvokeMethodWithNoArguments()
 		{
 			var assembly = CreateAssembly(@"M() : int { return M(); }")
-				.VerifyDiagnostics();
+				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -31,7 +36,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 M(a : int, b : bool) : int { 
 	return M(5, false); 
 }")
-				.VerifyDiagnostics();
+				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -49,7 +54,7 @@ M(a : int, b : bool) : int {
 M(a : { M(a : {}) : int; }, b : {}) : int { 
 	return M(a, a); 
 }")
-				.VerifyDiagnostics();
+				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());

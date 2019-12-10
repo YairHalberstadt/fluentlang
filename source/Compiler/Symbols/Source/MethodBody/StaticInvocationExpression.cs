@@ -79,7 +79,7 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 					ErrorCode.MethodNotFound,
 					ImmutableArray.Create<object?>(MethodName, Arguments)));
 			}
-			else if (matching.Count == 2)
+			else
 			{
 				_diagnostics.Add(new Diagnostic(
 					new Location(_context.qualified_name()),

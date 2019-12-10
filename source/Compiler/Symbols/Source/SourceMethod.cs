@@ -248,6 +248,8 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		public IMethod? DeclaringMethod => ParentSourceSymbolContext.Scope;
 
+		public IAssembly DeclaringAssembly => ParentSourceSymbolContext.Assembly;
+
 		public ImmutableArray<IStatement> Statements => _bindStatementsResult.Value.statements;
 
 		public ImmutableArray<IParameterLocal> ParameterLocals => _parameterLocals.Value;

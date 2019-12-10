@@ -2,6 +2,7 @@
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace FluentLang.Compiler.Tests.Unit.Subtyping
 {
@@ -39,6 +40,10 @@ namespace FluentLang.Compiler.Tests.Unit.Subtyping
 			new [] { Primitive.String, Primitive.Double },
 			new [] { Primitive.String, Primitive.Char },
 		};
+
+		public PrimitiveTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+		{
+		}
 
 		[Theory]
 		[MemberData(nameof(Primitives))]

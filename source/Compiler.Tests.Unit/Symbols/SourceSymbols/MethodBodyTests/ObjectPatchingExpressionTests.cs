@@ -3,11 +3,16 @@ using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 {
 	public class ObjectPatchingExpressionTests : TestBase
 	{
+		public ObjectPatchingExpressionTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+		{
+		}
+
 		[Fact]
 		public void CanPatchMethod()
 		{
@@ -15,7 +20,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 Patch(p : {}) : {} { return {}; }
 M() : {} {
 	return {} + Patch;
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			var patch = Assert.IsAssignableFrom<IObjectPatchingExpression>(returnStatement.Expression);
@@ -33,7 +38,7 @@ M() : Patched {
 
 interface Patched {
     Patch() : {};
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			var patchedInterface = AssertGetInterface(assembly, "Patched");
@@ -54,7 +59,7 @@ M() : Patched {
 interface Patched {
     Patch1() : {};
     Patch2() : {};
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -93,7 +98,7 @@ M() : Patched {
 
 interface Patched {
     Patch() : {};
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			var patchedInterface = AssertGetInterface(assembly, "Patched");
@@ -114,7 +119,7 @@ M() : Patched {
 interface Patched {
     Patch1() : {};
     Patch2() : {};
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			var patchedInterface = AssertGetInterface(assembly, "Patched");
@@ -134,7 +139,7 @@ M() : Patched {
 
 interface Patched {
     Patch() : {};
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Last());
 			var patch = Assert.IsAssignableFrom<IObjectPatchingExpression>(returnStatement.Expression);
@@ -159,7 +164,7 @@ M() : Patched {
 interface Patched {
     Patch1() : {};
     Patch2() : {};
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Last());
 			var patch = Assert.IsAssignableFrom<IObjectPatchingExpression>(returnStatement.Expression);
@@ -185,7 +190,7 @@ M() : Patched {
 interface Patched {
     Patch1() : {};
     Patch2() : {};
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Last());
 			var patch = Assert.IsAssignableFrom<IObjectPatchingExpression>(returnStatement.Expression);
@@ -210,7 +215,7 @@ M() : Patched {
 
 interface Patched {
     Patch() : {};
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());

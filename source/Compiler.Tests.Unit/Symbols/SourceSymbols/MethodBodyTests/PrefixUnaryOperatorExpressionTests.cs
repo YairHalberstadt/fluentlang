@@ -5,6 +5,7 @@ using FluentLang.Compiler.Symbols.Source.MethodBody;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 {
@@ -12,12 +13,16 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 	{
 		public class MinusTests : TestBase
 		{
+			public MinusTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+			{
+			}
+
 			[Fact]
 			public void CanMinusInt()
 			{
 				var assembly = CreateAssembly(@"
 M(param : int) : int { return -param; }")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -31,7 +36,7 @@ M(param : int) : int { return -param; }")
 			{
 				var assembly = CreateAssembly(@"
 M(param : double) : double { return -param; }")
-					.VerifyDiagnostics();
+					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
