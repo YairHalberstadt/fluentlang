@@ -156,17 +156,17 @@ Creation of Symbol API
 
 Semantic checks (type checking etc.)
 
-### In progress
-
 Implement runtime
 
-Implement Emitting of code
-
-### ToDo
+### In progress
 
 Implement Emitting of metadata
 
 Implement Reading of Metadata
+
+Implement Emitting of code
+
+### ToDo
 
 Implement Linking
 
