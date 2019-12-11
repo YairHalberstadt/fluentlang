@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.Security.Cryptography.X509Certificates;
 using static FluentLang.Compiler.Emit.CSharpNameEscaper;
 
 namespace FluentLang.Compiler.Emit
@@ -25,6 +27,7 @@ namespace FluentLang.Compiler.Emit
 		public void Emit(IAssembly assembly, TextWriter textWriter)
 		{
 			textWriter.WriteLine("using FluentLang.Runtime;");
+			textWriter.WriteLine("using FluentLang.Runtime.Metadata;");
 			textWriter.WriteLine("using System;");
 
 			textWriter.Write("public static class ");
@@ -41,6 +44,10 @@ namespace FluentLang.Compiler.Emit
 
 		private void Emit(IMethod method, TextWriter textWriter)
 		{
+			if (method.IsExported)
+			{
+				MetadataEmitter.Emit(method, textWriter);
+			}
 			if (method.DeclaringMethod is null)
 			{
 				if (method.IsExported)
@@ -415,6 +422,87 @@ namespace FluentLang.Compiler.Emit
 				Operator.Remainder => "%",
 				_ => throw new InvalidEnumArgumentException(nameof(@operator), (int)@operator, typeof(Operator)),
 			});
+		}
+
+		private static class MetadataEmitter
+		{
+			public static void Emit(IMethod method, TextWriter textWriter)
+			{
+				textWriter.Write("[MethodSignature(\"");
+				textWriter.Write(method.FullyQualifiedName.ToString());
+				textWriter.Write("\",\"");
+				Emit(method.ReturnType, textWriter);
+				textWriter.Write("\", new string[]{");
+				for (var i = 0; i < method.Parameters.Length; i++)
+				{
+					if (i != 0)
+						textWriter.Write(",");
+					textWriter.Write("\"");
+					Emit(method.Parameters[i], textWriter);
+					textWriter.Write("\"");
+				}
+				textWriter.Write("})]");
+
+			}
+
+			private static void Emit(IParameter parameter, TextWriter textWriter)
+			{
+				textWriter.Write(parameter.Name);
+				textWriter.Write(":");
+				Emit(parameter.Type, textWriter);
+			}
+
+			private static void Emit(IType type, TextWriter textWriter)
+			{
+				if (type is Primitive primitive)
+				{
+					Emit(primitive, textWriter);
+				}
+				else if (type is IInterface @interface)
+				{
+					Emit(@interface, textWriter);
+				}
+				else
+				{
+					throw Release.Fail("This location is thought to be unreachable");
+				}
+			}
+
+			private static void Emit(IInterface @interface, TextWriter textWriter)
+			{
+				if (@interface.FullyQualifiedName is { } name)
+				{
+					textWriter.Write(name.ToString());
+				}
+				else
+				{
+					textWriter.Write("{");
+					foreach (var method in @interface.Methods)
+					{
+						Emit(method, textWriter);
+					}
+					textWriter.Write("}");
+				}
+			}
+
+			private static void Emit(IInterfaceMethod method, TextWriter textWriter)
+			{
+				textWriter.Write(method.Name);
+				textWriter.Write("(");
+				for (var i = 0; i < method.Parameters.Length; i++)
+				{
+					if (i != 0)
+						textWriter.Write(",");
+					Emit(method.Parameters[i], textWriter);
+				}
+				textWriter.Write("):");
+				Emit(method.ReturnType, textWriter);
+			}
+
+			private static void Emit(Primitive primitive, TextWriter textWriter)
+			{
+				textWriter.Write(primitive.ToString());
+			}
 		}
 	}
 }
