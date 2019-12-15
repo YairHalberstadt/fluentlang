@@ -162,3 +162,25 @@ invocation
 arguments
     : (expression (COMMA expression)*)?
     ;
+
+/*
+ ***********************************************************************************
+ *                                   METADATA RULES                                *
+ *********************************************************************************** 
+ */
+
+ parameter_metadata
+    : parameter EOF
+    ;
+
+return_type_metadata
+    : type EOF
+    ;
+
+interface_method_metadata
+    : method_signature EOF
+    ;
+
+full_qualified_name_metadata
+    : qualified_name
+    ;

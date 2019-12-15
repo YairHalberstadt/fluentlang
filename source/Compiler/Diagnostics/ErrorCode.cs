@@ -33,5 +33,6 @@
 		InvalidEscapeSequence,
 		UseOfMethodWhichCapturesUnassignedLocals,
 		ParametersShareNames,
+		InvalidMetadataAssembly,
 	}
 }

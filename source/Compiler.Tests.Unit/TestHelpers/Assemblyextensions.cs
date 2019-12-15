@@ -1,6 +1,7 @@
 ﻿using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Emit;
 using FluentLang.Compiler.Symbols.Interfaces;
+using FluentLang.Compiler.Symbols.Metadata;
 using System;
 using System.IO;
 using System.Linq;
@@ -51,7 +52,8 @@ Actual:
 			this IAssembly assembly,
 			ITestOutputHelper testOutputHelper,
 			string? expectedCSharp = null,
-			object expectedResult = null)
+			object? expectedResult = null,
+			Action<IAssembly, Assembly>? testEmittedAssembly = null)
 		{
 			if (!assembly.AllDiagnostics.IsEmpty)
 				throw new InvalidOperationException("cannot emit assembly with errors");
@@ -101,9 +103,35 @@ Actual:
 				Assert.Equal(expectedResult, emittedAssembly.EntryPoint!.Invoke(null, null));
 			}
 
+			testEmittedAssembly?.Invoke(assembly, emittedAssembly);
+
 			assemblyLoadContext.Unload();
 
 			return assembly;
+		}
+
+		public static void VerifyMetadata(IAssembly assembly, Assembly emmitedAssembly)
+		{
+			var metadataAssembly = new MetadataAssembly(emmitedAssembly);
+			metadataAssembly.VerifyDiagnostics();
+
+			var exportedMethods = assembly.Methods.Where(x => x.IsExported).ToDictionary(x => x.FullyQualifiedName);
+			var metadataMethods = metadataAssembly.Methods;
+			Assert.Equal(exportedMethods.Count, metadataAssembly.Methods.Length);
+
+			foreach(var metadataMethod in metadataMethods)
+			{
+				Assert.True(exportedMethods.TryGetValue(
+					metadataMethod.FullyQualifiedName, 
+					out var exportedMethod));
+				Assert.True(metadataMethod.ReturnType.IsEquivalentTo(exportedMethod!.ReturnType));
+				Assert.Equal(exportedMethod.Parameters.Length, metadataMethod.Parameters.Length);
+				foreach(var (exportedParam, metadataParam) in exportedMethod.Parameters.Zip(metadataMethod.Parameters))
+				{
+					Assert.Equal(exportedParam.Name, metadataParam.Name);
+					Assert.True(metadataParam.Type.IsEquivalentTo(exportedParam.Type));
+				}
+			}
 		}
 	}
 }

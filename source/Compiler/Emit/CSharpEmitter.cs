@@ -2,21 +2,16 @@
 using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
-using System.Security.Cryptography.X509Certificates;
 using static FluentLang.Compiler.Emit.CSharpNameEscaper;
 
 namespace FluentLang.Compiler.Emit
 {
 	internal class CSharpEmitter
 	{
-		private const string ASSEMBLY_LEVEL_METHODS = "_AssemblyLevelMethods";
-
 		private readonly MethodKeyGenerator _keyGenerator;
 
 		public CSharpEmitter(MethodKeyGenerator keyGenerator)
@@ -31,8 +26,8 @@ namespace FluentLang.Compiler.Emit
 			textWriter.WriteLine("using System;");
 
 			textWriter.Write("public static class ");
-			textWriter.Write(assembly.Name);
-			textWriter.Write(ASSEMBLY_LEVEL_METHODS + "{");
+			textWriter.Write(Utils.GetAssemblyLevelMethodsClassName(assembly.Name.ToString()));
+			textWriter.Write("{");
 			textWriter.WriteLine();
 			foreach (var method in assembly.Methods)
 			{
@@ -216,8 +211,8 @@ namespace FluentLang.Compiler.Emit
 		{
 			if (method.DeclaringMethod is null)
 			{
-				textWriter.Write(method.DeclaringAssembly.Name);
-				textWriter.Write(ASSEMBLY_LEVEL_METHODS + ".");
+				textWriter.Write(Utils.GetAssemblyLevelMethodsClassName(method.DeclaringAssembly.Name.ToString()));
+				textWriter.Write(".");
 				textWriter.Write(Escape(method.FullyQualifiedName));
 			}
 			else
