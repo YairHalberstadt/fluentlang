@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "g4", "g4", "{1FB5BA86-E497-499C-8F66-3D58BAD1FCC2}"
 	ProjectSection(SolutionItems) = preProject
 		..\grammar\FluentLangLexer.g4 = ..\grammar\FluentLangLexer.g4
+		..\grammar\FluentLangMetadataParser.g4 = ..\grammar\FluentLangMetadataParser.g4
 		..\grammar\FluentLangParser.g4 = ..\grammar\FluentLangParser.g4
 	EndProjectSection
 EndProject
@@ -18,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runtime", "Runtime\Runtime.csproj", "{3B0A9096-288D-44ED-BEA4-7BE34AE9EF10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Runtime", "Runtime\Runtime.csproj", "{3B0A9096-288D-44ED-BEA4-7BE34AE9EF10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
