@@ -6,6 +6,12 @@ FluentLang is an experimental programming language designed to explore the inter
 
 Currently it is very much a work in progress.
 
+## Building
+
+Command Line: Make sure dotnet core 3.1 is installed. Run `dotnet build` to build, and `dotnet test` to run tests.
+
+IDE: Open in VS 2019 > version 4. Everything should work as normal.
+
 ## Aims
 
 This language is primarily a research language. It is as far as I know completely novel in its design, and is intended as a project to research how feasible the design is in practice.
