@@ -158,19 +158,19 @@ Semantic checks (type checking etc.)
 
 Implement runtime
 
-### In progress
-
 Implement Emitting of metadata
 
 Implement Reading of Metadata
 
 Implement Emitting of code
 
-### ToDo
+### In progress
 
 Implement Linking
 
 Create compiler.exe
+
+### ToDo
 
 Implement Standard Libraries. This will be mixed C# Libraries with FluentLang Metadata and FluentLang libraries.
 
@@ -190,3 +190,4 @@ Projects which should be possible for someone else to do with us stepping on eac
 4. Improve syntax error recovery. Currently we discard the entire file if it contains a syntax error. Thats a really bad strategy for an IDE.
 5. Look into APIs for code completion, syntax highlighting, etc.
 6. Come up with design proposals for: Discrimated Unions, Generics, error handling (exceptions?, result types?)
+    - Design proposals should be created as issues on this repository with the heading "Proposal:". E.g. "Proposal: design for Discriminated Unions".
