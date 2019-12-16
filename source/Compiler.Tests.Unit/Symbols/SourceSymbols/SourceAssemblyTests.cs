@@ -41,12 +41,12 @@ interface I { M() : () bool; }").VerifyDiagnostics(new Diagnostic(new Location(n
 		public void ContainsOnlyHighestVersionsOfTreeOfReferencedAssemblies()
 		{
 			var assembly1 = new DummyAssembly { };
-			var assembly2 = new DummyAssembly { Version = new Version("0.1.1"), ReferencedAssemblies = ImmutableArray.Create<IAssembly>(assembly1) };
+			var assembly2 = new DummyAssembly { Version = new Version("0.1.1"), ReferencedAssembliesAndSelf = ImmutableArray.Create<IAssembly>(assembly1) };
 			var assembly3 = new DummyAssembly
 			{
 				Name = QualifiedName("DifferentAssembly"),
 				Version = new Version("0.2.3"),
-				ReferencedAssemblies = ImmutableArray.Create<IAssembly>(assembly1)
+				ReferencedAssembliesAndSelf = ImmutableArray.Create<IAssembly>(assembly1)
 			};
 
 			var assembly = (IAssembly)new SourceAssembly(
@@ -55,7 +55,7 @@ interface I { M() : () bool; }").VerifyDiagnostics(new Diagnostic(new Location(n
 				ImmutableArray.Create<IAssembly>(assembly2, assembly3),
 				ImmutableArray<IDocument>.Empty);
 
-			Assert.Equal(new[] { assembly1, assembly3, assembly }, assembly.ReferencedAssemblies);
+			Assert.Equal(new[] { assembly1, assembly3, assembly }, assembly.ReferencedAssembliesAndSelf);
 		}
 
 		[Fact]
@@ -134,7 +134,7 @@ namespace A.B.C
 
 			public Version Version { get; set; } = new Version("1.0.0");
 
-			public ImmutableArray<IAssembly> ReferencedAssemblies { get; set; } = ImmutableArray<IAssembly>.Empty;
+			public ImmutableArray<IAssembly> ReferencedAssembliesAndSelf { get; set; } = ImmutableArray<IAssembly>.Empty;
 
 			public ImmutableArray<IInterface> Interfaces { get; set; } = ImmutableArray<IInterface>.Empty;
 

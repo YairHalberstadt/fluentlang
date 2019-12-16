@@ -1,5 +1,6 @@
 ﻿using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Symbols.Interfaces;
+using FluentLang.Compiler.Symbols.Source;
 using FluentLang.Runtime.Metadata;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,8 @@ namespace FluentLang.Compiler.Symbols.Metadata
 		private readonly Assembly _assembly;
 		private readonly Lazy<IReadOnlyDictionary<QualifiedName, IMethod>> _methodsByName;
 		private readonly Lazy<ImmutableArray<IMethod>> _methods;
+		private readonly Lazy<IReadOnlyDictionary<QualifiedName, IInterface>> _interfacesByName;
+		private readonly Lazy<ImmutableArray<IInterface>> _interfaces;
 
 		private readonly DiagnosticBag _diagnostics;
 		private readonly Lazy<ImmutableArray<Diagnostic>> _allDiagnostics;
@@ -33,12 +36,36 @@ namespace FluentLang.Compiler.Symbols.Metadata
 			Name = QualifiedName.Parse(_assembly.GetName().Name ?? "");
 			_methodsByName = new Lazy<IReadOnlyDictionary<QualifiedName, IMethod>>(GenerateMethods);
 			_methods = new Lazy<ImmutableArray<IMethod>>(() => _methodsByName.Value.Values.ToImmutableArray());
-
+			_interfacesByName = new Lazy<IReadOnlyDictionary<QualifiedName, IInterface>>(GenerateInterfaces);
+			_interfaces = new Lazy<ImmutableArray<IInterface>>(() => _interfacesByName.Value.Values.ToImmutableArray());
 			_allDiagnostics = new Lazy<ImmutableArray<Diagnostic>>(() =>
 			{
 				_diagnostics.EnsureAllDiagnosticsCollectedForSymbol();
 				return _diagnostics.ToImmutableArray();
 			});
+		}
+
+		private IReadOnlyDictionary<QualifiedName, IInterface> GenerateInterfaces()
+		{
+			var context = new SourceSymbolContext(
+				scope: null,
+				assembly: this,
+				ImmutableArray<QualifiedName>.Empty,
+				nameSpace: null);
+
+			return
+				_assembly
+				.GetAttributes<InterfaceAttribute>()
+				.Select(x => (IInterface)new SourceInterface(
+					Utils.Parse(
+						x.AnonymousInterfaceDeclaration,
+						p => p.anonymous_interface_declaration_metadata().anonymous_interface_declaration(),
+						_diagnostics),
+					context,
+					QualifiedName.Parse(x.FullyQualifiedName),
+					isExported: true,
+					_diagnostics))
+				.ToDictionary(x => x.FullyQualifiedName!);
 		}
 
 		private IReadOnlyDictionary<QualifiedName, IMethod> GenerateMethods()
@@ -82,9 +109,9 @@ namespace FluentLang.Compiler.Symbols.Metadata
 
 		public Interfaces.Version Version => throw new NotImplementedException();
 
-		public ImmutableArray<IAssembly> ReferencedAssemblies => throw new NotImplementedException();
+		public ImmutableArray<IAssembly> ReferencedAssembliesAndSelf => ImmutableArray.Create<IAssembly>(this); //TODO: implement
 
-		public ImmutableArray<IInterface> Interfaces => throw new NotImplementedException();
+		public ImmutableArray<IInterface> Interfaces => _interfaces.Value;
 
 		public ImmutableArray<IMethod> Methods => _methods.Value;
 
@@ -92,7 +119,7 @@ namespace FluentLang.Compiler.Symbols.Metadata
 
 		public bool TryGetInterface(QualifiedName fullyQualifiedName, [NotNullWhen(true)] out IInterface? @interface)
 		{
-			throw new NotImplementedException();
+			return _interfacesByName.Value.TryGetValue(fullyQualifiedName, out @interface);
 		}
 
 		public bool TryGetMethod(QualifiedName fullyQualifiedName, [NotNullWhen(true)] out IMethod? method)
@@ -106,6 +133,8 @@ namespace FluentLang.Compiler.Symbols.Metadata
 
 			_ = _methodsByName.Value;
 			_ = _methods.Value;
+			_ = _interfacesByName.Value;
+			_ = _interfaces.Value;
 		}
 	}
 }

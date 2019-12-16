@@ -9,6 +9,8 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 	{
 		public QualifiedName? FullyQualifiedName { get; set; }
 
+		public bool IsExported => false;
+
 		public ImmutableArray<IInterfaceMethod> Methods { get; set; } = ImmutableArray<IInterfaceMethod>.Empty;
 
 		public ImmutableArray<Diagnostic> AllDiagnostics { get; set; } = ImmutableArray<Diagnostic>.Empty;

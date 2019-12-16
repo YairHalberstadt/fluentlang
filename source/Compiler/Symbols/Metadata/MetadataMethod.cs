@@ -9,12 +9,12 @@ using System.Linq;
 
 namespace FluentLang.Compiler.Symbols.Metadata
 {
-	internal class MetadataMethod : MetadataSymbolBase, IMethod
+	internal class MetadataMethod : SymbolBase, IMethod
 	{
 		private readonly MethodSignatureAttribute _attribute;
 		private readonly Lazy<IType> _returnType;
 		private readonly Lazy<ImmutableArray<IParameter>> _parameters;
-		private readonly SourceSymbolContext _childSourceSymbolContext;
+		private readonly SourceSymbolContext _sourceSymbolContext;
 
 		public MetadataMethod(
 			IAssembly metadataAssembly,
@@ -23,7 +23,7 @@ namespace FluentLang.Compiler.Symbols.Metadata
 		{
 			DeclaringAssembly = metadataAssembly;
 			_attribute = attribute;
-			_childSourceSymbolContext = new SourceSymbolContext(null, DeclaringAssembly, ImmutableArray<QualifiedName>.Empty, null);
+			_sourceSymbolContext = new SourceSymbolContext(null, DeclaringAssembly, ImmutableArray<QualifiedName>.Empty, null);
 			FullyQualifiedName = QualifiedName.Parse(attribute.FullyQualifiedName);
 			_returnType = new Lazy<IType>(GenerateReturnType);
 			_parameters = new Lazy<ImmutableArray<IParameter>>(GenerateParameters);
@@ -36,8 +36,9 @@ namespace FluentLang.Compiler.Symbols.Metadata
 				.Parameters
 				.Select(x =>
 					new SourceParameter(
-						Parse(x, p => p.parameter_metadata()).parameter(),
-						_childSourceSymbolContext,
+						Utils.Parse(x, p => p.parameter_metadata(), _diagnostics).parameter(),
+						_sourceSymbolContext,
+						isExported: true,
 						_diagnostics))
 				.ToImmutableArray<IParameter>();
 		}
@@ -45,8 +46,8 @@ namespace FluentLang.Compiler.Symbols.Metadata
 		private IType GenerateReturnType()
 		{
 			var source = _attribute.ReturnType;
-			var typeContext = Parse(source, p => p.return_type_metadata()).type();
-			return typeContext.BindType(_childSourceSymbolContext, _diagnostics);
+			var typeContext = Utils.Parse(source, p => p.return_type_metadata(), _diagnostics).type();
+			return typeContext.BindType(_sourceSymbolContext, isExported: true, _diagnostics);
 		}
 
 		public bool IsExported => true;

@@ -12,6 +12,8 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 
 		public QualifiedName? FullyQualifiedName => null;
 
+		public bool IsExported => false;
+
 		public ImmutableArray<IInterfaceMethod> Methods => ImmutableArray<IInterfaceMethod>.Empty;
 
 		public ImmutableArray<Diagnostic> AllDiagnostics => ImmutableArray<Diagnostic>.Empty;

@@ -1,6 +1,5 @@
 ﻿using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
-using System.Collections;
 using System.Collections.Immutable;
 
 namespace FluentLang.Compiler.Symbols.Source

@@ -7,7 +7,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 {
 	public interface IInterface : IType
 	{
-		public bool IsExported => false;
+		public bool IsExported { get; }
 		public QualifiedName? FullyQualifiedName { get; }
 		public ImmutableArray<IInterfaceMethod> Methods { get; }
 		bool IType.IsEquivalentTo(IType other, Stack<(IType, IType)>? dependantEqualities)

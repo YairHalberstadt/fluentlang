@@ -20,7 +20,7 @@ namespace FluentLang.Compiler.Symbols.Source
 				.Aggregate((QualifiedName?)null, (l, r) => new QualifiedName(r.Symbol.Text, l))!;
 		}
 
-		public static IType BindType(this TypeContext context, SourceSymbolContext sourceSymbolContext, DiagnosticBag diagnostics)
+		public static IType BindType(this TypeContext context, SourceSymbolContext sourceSymbolContext, bool isExported, DiagnosticBag diagnostics)
 		{
 			if (context.primitive_type() is { } primitive)
 			{
@@ -31,6 +31,8 @@ namespace FluentLang.Compiler.Symbols.Source
 				var @interface = sourceSymbolContext.GetInterfaceOrError(qualifiedName.GetQualifiedName(), out var diagnostic);
 				if (diagnostic != null)
 					diagnostics.Add(diagnostic(new Location(qualifiedName)));
+				if (diagnostic is null && isExported && !@interface.IsExported)
+					diagnostics.Add(new Diagnostic(new Location(qualifiedName), ErrorCode.CannotUseUnexportedInterfaceFromExportedMember));
 				return @interface;
 			}
 			if (context.anonymous_interface_declaration() is { } interfaceContext)
@@ -39,7 +41,7 @@ namespace FluentLang.Compiler.Symbols.Source
 					interfaceContext,
 					sourceSymbolContext,
 					fullyQualifiedName: null,
-					isExported: false,
+					isExported: isExported,
 					diagnostics);
 			}
 
@@ -62,18 +64,22 @@ namespace FluentLang.Compiler.Symbols.Source
 			throw Release.Fail($"unexpected primitive: {context}");
 		}
 
-		public static IType BindReturnType(this Method_signatureContext context, SourceSymbolContext sourceSymbolContext, DiagnosticBag diagnostics)
+		public static IType BindReturnType(this Method_signatureContext context, SourceSymbolContext sourceSymbolContext, bool isExported, DiagnosticBag diagnostics)
 		{
-			return context.type_declaration().type().BindType(sourceSymbolContext, diagnostics);
+			return context.type_declaration().type().BindType(sourceSymbolContext, isExported, diagnostics);
 		}
 
-		public static ImmutableArray<IParameter> BindParameters(this Method_signatureContext context, SourceSymbolContext sourceSymbolContext, DiagnosticBag diagnostics)
+		public static ImmutableArray<IParameter> BindParameters(
+			this Method_signatureContext context,
+			SourceSymbolContext sourceSymbolContext,
+			bool isExported,
+			DiagnosticBag diagnostics)
 		{
 			var parameters =
 				context
 				.parameters()
 				.parameter()
-				.Select(x => new SourceParameter(x, sourceSymbolContext, diagnostics))
+				.Select(x => new SourceParameter(x, sourceSymbolContext, isExported, diagnostics))
 				.ToImmutableArray<IParameter>();
 
 			foreach (var (param, index) in parameters.Select((x,i) => (x,i)))

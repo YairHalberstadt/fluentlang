@@ -548,17 +548,17 @@ public partial class FluentLangParserBaseListener : IFluentLangParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitReturn_type_metadata([NotNull] FluentLangParser.Return_type_metadataContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="FluentLangParser.interface_method_metadata"/>.
+	/// Enter a parse tree produced by <see cref="FluentLangParser.anonymous_interface_declaration_metadata"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterInterface_method_metadata([NotNull] FluentLangParser.Interface_method_metadataContext context) { }
+	public virtual void EnterAnonymous_interface_declaration_metadata([NotNull] FluentLangParser.Anonymous_interface_declaration_metadataContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="FluentLangParser.interface_method_metadata"/>.
+	/// Exit a parse tree produced by <see cref="FluentLangParser.anonymous_interface_declaration_metadata"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitInterface_method_metadata([NotNull] FluentLangParser.Interface_method_metadataContext context) { }
+	public virtual void ExitAnonymous_interface_declaration_metadata([NotNull] FluentLangParser.Anonymous_interface_declaration_metadataContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.full_qualified_name_metadata"/>.
 	/// <para>The default implementation does nothing.</para>

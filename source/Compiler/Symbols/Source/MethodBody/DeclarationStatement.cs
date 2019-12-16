@@ -48,7 +48,7 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 
 		private IType? BindDeclaredType()
 		{
-			return _context.type_declaration()?.type().BindType(_methodBodySymbolContext.SourceSymbolContext, _diagnostics);
+			return _context.type_declaration()?.type().BindType(_methodBodySymbolContext.SourceSymbolContext, isExported: false, _diagnostics);
 		}
 
 		private IExpression BindExpression()

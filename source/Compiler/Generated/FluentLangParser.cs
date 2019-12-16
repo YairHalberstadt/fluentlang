@@ -57,7 +57,8 @@ public partial class FluentLangParser : Parser {
 		RULE_empty_interface = 22, RULE_object_patch = 23, RULE_fully_qualified_method = 24, 
 		RULE_operator = 25, RULE_prefix_unary_operator = 26, RULE_literal = 27, 
 		RULE_invocation = 28, RULE_arguments = 29, RULE_parameter_metadata = 30, 
-		RULE_return_type_metadata = 31, RULE_interface_method_metadata = 32, RULE_full_qualified_name_metadata = 33;
+		RULE_return_type_metadata = 31, RULE_anonymous_interface_declaration_metadata = 32, 
+		RULE_full_qualified_name_metadata = 33;
 	public static readonly string[] ruleNames = {
 		"compilation_unit", "open_directives", "open_directive", "qualified_name", 
 		"namespace_member_declaration", "namespace_declaration", "interface_declaration", 
@@ -67,7 +68,7 @@ public partial class FluentLangParser : Parser {
 		"method_statement", "declaration_statement", "return_statement", "expression", 
 		"empty_interface", "object_patch", "fully_qualified_method", "operator", 
 		"prefix_unary_operator", "literal", "invocation", "arguments", "parameter_metadata", 
-		"return_type_metadata", "interface_method_metadata", "full_qualified_name_metadata"
+		"return_type_metadata", "anonymous_interface_declaration_metadata", "full_qualified_name_metadata"
 	};
 
 	private static readonly string[] _LiteralNames = {
@@ -2402,39 +2403,39 @@ public partial class FluentLangParser : Parser {
 		return _localctx;
 	}
 
-	public partial class Interface_method_metadataContext : ParserRuleContext {
-		public Method_signatureContext method_signature() {
-			return GetRuleContext<Method_signatureContext>(0);
+	public partial class Anonymous_interface_declaration_metadataContext : ParserRuleContext {
+		public Anonymous_interface_declarationContext anonymous_interface_declaration() {
+			return GetRuleContext<Anonymous_interface_declarationContext>(0);
 		}
 		public ITerminalNode Eof() { return GetToken(FluentLangParser.Eof, 0); }
-		public Interface_method_metadataContext(ParserRuleContext parent, int invokingState)
+		public Anonymous_interface_declaration_metadataContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
 		}
-		public override int RuleIndex { get { return RULE_interface_method_metadata; } }
+		public override int RuleIndex { get { return RULE_anonymous_interface_declaration_metadata; } }
 		public override void EnterRule(IParseTreeListener listener) {
 			IFluentLangParserListener typedListener = listener as IFluentLangParserListener;
-			if (typedListener != null) typedListener.EnterInterface_method_metadata(this);
+			if (typedListener != null) typedListener.EnterAnonymous_interface_declaration_metadata(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
 			IFluentLangParserListener typedListener = listener as IFluentLangParserListener;
-			if (typedListener != null) typedListener.ExitInterface_method_metadata(this);
+			if (typedListener != null) typedListener.ExitAnonymous_interface_declaration_metadata(this);
 		}
 		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
 			IFluentLangParserVisitor<TResult> typedVisitor = visitor as IFluentLangParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitInterface_method_metadata(this);
+			if (typedVisitor != null) return typedVisitor.VisitAnonymous_interface_declaration_metadata(this);
 			else return visitor.VisitChildren(this);
 		}
 	}
 
 	[RuleVersion(0)]
-	public Interface_method_metadataContext interface_method_metadata() {
-		Interface_method_metadataContext _localctx = new Interface_method_metadataContext(Context, State);
-		EnterRule(_localctx, 64, RULE_interface_method_metadata);
+	public Anonymous_interface_declaration_metadataContext anonymous_interface_declaration_metadata() {
+		Anonymous_interface_declaration_metadataContext _localctx = new Anonymous_interface_declaration_metadataContext(Context, State);
+		EnterRule(_localctx, 64, RULE_anonymous_interface_declaration_metadata);
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 293; method_signature();
+			State = 293; anonymous_interface_declaration();
 			State = 294; Match(Eof);
 			}
 		}
@@ -2747,7 +2748,7 @@ public partial class FluentLangParser : Parser {
 		'\x2', '\x2', '\x3', '\x123', '?', '\x3', '\x2', '\x2', '\x2', '\x124', 
 		'\x125', '\x5', '\x1E', '\x10', '\x2', '\x125', '\x126', '\a', '\x2', 
 		'\x2', '\x3', '\x126', '\x41', '\x3', '\x2', '\x2', '\x2', '\x127', '\x128', 
-		'\x5', '\x16', '\f', '\x2', '\x128', '\x129', '\a', '\x2', '\x2', '\x3', 
+		'\x5', '\x10', '\t', '\x2', '\x128', '\x129', '\a', '\x2', '\x2', '\x3', 
 		'\x129', '\x43', '\x3', '\x2', '\x2', '\x2', '\x12A', '\x12B', '\x5', 
 		'\b', '\x5', '\x2', '\x12B', '\x45', '\x3', '\x2', '\x2', '\x2', '\x1B', 
 		'J', 'R', '^', '\x64', 'l', 'r', '}', '\x84', '\x89', '\x99', '\x9C', 

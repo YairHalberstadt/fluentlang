@@ -47,7 +47,7 @@ namespace FluentLang.Compiler.Symbols.Source
 				_context
 				.simple_anonymous_interface_declaration()
 				.SelectMany(x => x.interface_member_declaration())
-				.Select(x => new SourceInterfaceMethod(x, _sourceSymbolContext, _diagnostics))
+				.Select(x => new SourceInterfaceMethod(x, _sourceSymbolContext, IsExported, _diagnostics))
 
 				// add methods defined in additive interfaces
 				.Concat(

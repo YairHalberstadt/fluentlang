@@ -5,13 +5,13 @@ namespace FluentLang.Runtime.Metadata
 	[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
 	public class InterfaceAttribute : Attribute
 	{
-		public InterfaceAttribute(string fullyQualifiedName, string[] methods)
+		public InterfaceAttribute(string fullyQualifiedName, string anonymousInterfaceDeclaration)
 		{
 			FullyQualifiedName = fullyQualifiedName;
-			Methods = methods;
+			AnonymousInterfaceDeclaration = anonymousInterfaceDeclaration;
 		}
 
 		public string FullyQualifiedName { get; }
-		public string[] Methods { get; }
+		public string AnonymousInterfaceDeclaration { get; }
 	}
 }

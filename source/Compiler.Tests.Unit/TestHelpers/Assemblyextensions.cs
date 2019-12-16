@@ -115,9 +115,13 @@ Actual:
 			var metadataAssembly = new MetadataAssembly(emmitedAssembly);
 			metadataAssembly.VerifyDiagnostics();
 
-			var exportedMethods = assembly.Methods.Where(x => x.IsExported).ToDictionary(x => x.FullyQualifiedName);
+			var exportedMethods = 
+				assembly
+				.Methods
+				.Where(x => x.IsExported)
+				.ToDictionary(x => x.FullyQualifiedName);
 			var metadataMethods = metadataAssembly.Methods;
-			Assert.Equal(exportedMethods.Count, metadataAssembly.Methods.Length);
+			Assert.Equal(exportedMethods.Count, metadataMethods.Length);
 
 			foreach(var metadataMethod in metadataMethods)
 			{
@@ -126,11 +130,28 @@ Actual:
 					out var exportedMethod));
 				Assert.True(metadataMethod.ReturnType.IsEquivalentTo(exportedMethod!.ReturnType));
 				Assert.Equal(exportedMethod.Parameters.Length, metadataMethod.Parameters.Length);
-				foreach(var (exportedParam, metadataParam) in exportedMethod.Parameters.Zip(metadataMethod.Parameters))
+				foreach(var (exportedParam, metadataParam) in 
+					exportedMethod.Parameters.Zip(metadataMethod.Parameters))
 				{
 					Assert.Equal(exportedParam.Name, metadataParam.Name);
 					Assert.True(metadataParam.Type.IsEquivalentTo(exportedParam.Type));
 				}
+			}
+
+			var exportedInterfaces = 
+				assembly
+				.Interfaces
+				.Where(x => x.IsExported)
+				.ToDictionary(x => x.FullyQualifiedName);
+			var metadataInterfaces = metadataAssembly.Interfaces;
+			Assert.Equal(exportedInterfaces.Count, metadataInterfaces.Length);
+
+			foreach (var metadataInterface in metadataInterfaces)
+			{
+				Assert.True(exportedInterfaces.TryGetValue(
+					metadataInterface.FullyQualifiedName,
+					out var exportedInterface));
+				Assert.True(metadataInterface.IsEquivalentTo(exportedInterface!));
 			}
 		}
 	}

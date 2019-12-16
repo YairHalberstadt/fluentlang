@@ -1,7 +1,4 @@
 ﻿using FluentLang.Compiler.Tests.Unit.TestHelpers;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -33,6 +30,50 @@ namespace FluentLang.Compiler.Tests.Unit.Emit
 		public void CorrectMetadataEmittedForMethodWithMultipleParameters()
 		{
 			CreateAssembly("export M(a: int, b: bool) : string  { return \"\"; }")
+				.VerifyDiagnostics()
+				.VerifyEmit(_testOutputHelper, testEmittedAssembly: AssemblyExtensions.VerifyMetadata);
+		}
+
+		[Fact]
+		public void CorrectMetadataEmittedForInterface()
+		{
+			CreateAssembly("export interface I { M() : int; }")
+				.VerifyDiagnostics()
+				.VerifyEmit(_testOutputHelper, testEmittedAssembly: AssemblyExtensions.VerifyMetadata);
+		}
+
+		[Fact]
+		public void CorrectMetadataEmittedForInterfaceReferencingExportedInterface()
+		{
+			CreateAssembly("export interface I { M() : I1; } export interface I1 {}")
+				.VerifyDiagnostics()
+				.VerifyEmit(_testOutputHelper, testEmittedAssembly: AssemblyExtensions.VerifyMetadata);
+		}
+
+		[Fact]
+		public void CorrectMetadataEmittedForInterfaceReferencingItself()
+		{
+			CreateAssembly("export interface I { M() : I; }")
+				.VerifyDiagnostics()
+				.VerifyEmit(_testOutputHelper, testEmittedAssembly: AssemblyExtensions.VerifyMetadata);
+		}
+
+		[Fact]
+		public void CorrectMetadataEmittedForMethodReferencingExportedInterfaceInParameter()
+		{
+			CreateAssembly(@"
+export interface I { }
+export M(a : I, b : { M() : I; }) : int { return 42; }")
+				.VerifyDiagnostics()
+				.VerifyEmit(_testOutputHelper, testEmittedAssembly: AssemblyExtensions.VerifyMetadata);
+		}
+
+		[Fact]
+		public void CorrectMetadataEmittedForMethodReferencingExportedInterfaceInReturnType()
+		{
+			CreateAssembly(@"
+export interface I { }
+export M() : I { return {}; }")
 				.VerifyDiagnostics()
 				.VerifyEmit(_testOutputHelper, testEmittedAssembly: AssemblyExtensions.VerifyMetadata);
 		}

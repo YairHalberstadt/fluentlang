@@ -1,8 +1,5 @@
 ﻿using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Tests.Unit.TestHelpers;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -104,6 +101,40 @@ M2() : bool { return true; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper)
 			Assert.True(m1.IsExported);
 			var m2 = AssertGetMethod(assembly, "M2");
 			Assert.False(m2.IsExported);
+		}
+
+		[Fact]
+		public void ExportedMethodCanNotReferenceNonExportedInterface()
+		{
+			CreateAssembly(@"
+interface I {}
+export M(a : I) : I { return {}; }").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@"I")), ErrorCode.CannotUseUnexportedInterfaceFromExportedMember),
+				new Diagnostic(new Location(new TextToken(@"I")), ErrorCode.CannotUseUnexportedInterfaceFromExportedMember));
+		}
+
+		[Fact]
+		public void ExportedMethodCanReferenceExportedInterface()
+		{
+			CreateAssembly(@"
+export interface I {}
+export M(a : I) : I { return {}; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+		}
+
+		[Fact]
+		public void NonExportedMethodCanReferenceExportedInterface()
+		{
+			CreateAssembly(@"
+export interface I {}
+M(a : I) : I { return {}; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+		}
+
+		[Fact]
+		public void NonExportedMethodCanReferenceNonExportedInterface()
+		{
+			CreateAssembly(@"
+interface I {}
+M(a : I) : I { return {}; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 		}
 	}
 }

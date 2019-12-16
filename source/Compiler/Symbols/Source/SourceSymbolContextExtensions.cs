@@ -63,7 +63,7 @@ namespace FluentLang.Compiler.Symbols.Source
 				}
 			}
 
-			var assemblies = context.Assembly.ReferencedAssemblies;
+			var assemblies = context.Assembly.ReferencedAssembliesAndSelf;
 
 			// types in the innermost namespace have priority over types in its parent namespace, 
 			// which have priority over types in its parent etc. 

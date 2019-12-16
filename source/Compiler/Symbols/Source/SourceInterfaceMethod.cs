@@ -11,17 +11,19 @@ namespace FluentLang.Compiler.Symbols.Source
 	{
 		private readonly Interface_member_declarationContext _context;
 		private readonly SourceSymbolContext _sourceSymbolContext;
-
+		private readonly bool _isExported;
 		private readonly Lazy<IType> _returnType;
 		private readonly Lazy<ImmutableArray<IParameter>> _parameters;
 
 		public SourceInterfaceMethod(
 			Interface_member_declarationContext context,
 			SourceSymbolContext sourceSymbolContext,
+			bool isExported,
 			DiagnosticBag diagnostics) : base(diagnostics)
 		{
 			_context = context;
 			_sourceSymbolContext = sourceSymbolContext;
+			_isExported = isExported;
 			Name = context.method_signature().UPPERCASE_IDENTIFIER().Symbol.Text;
 
 			_returnType = new Lazy<IType>(BindReturnType);
@@ -30,7 +32,7 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		private IType BindReturnType()
 		{
-			return _context.method_signature().BindReturnType(_sourceSymbolContext, _diagnostics);
+			return _context.method_signature().BindReturnType(_sourceSymbolContext, _isExported, _diagnostics);
 		}
 
 		private ImmutableArray<IParameter> BindParameters()
@@ -38,7 +40,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			return
 				_context
 				.method_signature()
-				.BindParameters(_sourceSymbolContext, _diagnostics);
+				.BindParameters(_sourceSymbolContext, _isExported, _diagnostics);
 		}
 
 		public string Name { get; }

@@ -10,18 +10,18 @@ namespace FluentLang.Compiler.Symbols.Source
 	{
 		private readonly ParameterContext _context;
 		private readonly SourceSymbolContext _sourceSymbolContext;
-
 		private readonly Lazy<IType> _type;
 
 		public SourceParameter(
 			ParameterContext context,
 			SourceSymbolContext sourceSymbolContext,
+			bool isExported,
 			DiagnosticBag diagnostics) : base(diagnostics)
 		{
 			_context = context;
 			_sourceSymbolContext = sourceSymbolContext;
 			Name = _context.LOWERCASE_IDENTIFIER().Symbol.Text;
-			_type = new Lazy<IType>(() => _context.type_declaration().type().BindType(_sourceSymbolContext, _diagnostics));
+			_type = new Lazy<IType>(() => _context.type_declaration().type().BindType(_sourceSymbolContext, isExported, _diagnostics));
 		}
 		public string Name { get; }
 

@@ -177,8 +177,8 @@ return_type_metadata
     : type EOF
     ;
 
-interface_method_metadata
-    : method_signature EOF
+anonymous_interface_declaration_metadata
+    : anonymous_interface_declaration EOF
     ;
 
 full_qualified_name_metadata

@@ -13,6 +13,8 @@ namespace FluentLang.Compiler.Symbols.ErrorSymbols
 
 		public QualifiedName? FullyQualifiedName => new QualifiedName("<Error Interface>", null);
 
+		public bool IsExported => false;
+
 		public ImmutableArray<IInterfaceMethod> Methods => ImmutableArray<IInterfaceMethod>.Empty;
 
 		public ImmutableArray<Diagnostic> AllDiagnostics => ImmutableArray<Diagnostic>.Empty;

@@ -55,7 +55,7 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		private IType BindReturnType()
 		{
-			return _context.method_signature().BindReturnType(ParentSourceSymbolContext, _diagnostics);
+			return _context.method_signature().BindReturnType(ParentSourceSymbolContext, IsExported, _diagnostics);
 		}
 
 		private ImmutableArray<IParameter> BindParameters()
@@ -63,7 +63,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			return
 				_context
 				.method_signature()
-				.BindParameters(ParentSourceSymbolContext, _diagnostics);
+				.BindParameters(ParentSourceSymbolContext, IsExported, _diagnostics);
 		}
 
 		private ImmutableArray<IInterface> BindLocalInterfaces()

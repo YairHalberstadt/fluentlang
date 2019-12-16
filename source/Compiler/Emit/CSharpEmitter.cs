@@ -7,7 +7,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using static FluentLang.Compiler.Emit.CSharpNameEscaper;
-
 namespace FluentLang.Compiler.Emit
 {
 	internal class CSharpEmitter
@@ -25,6 +24,11 @@ namespace FluentLang.Compiler.Emit
 			textWriter.WriteLine("using FluentLang.Runtime.Metadata;");
 			textWriter.WriteLine("using System;");
 
+			foreach (var @interface in assembly.Interfaces.Where(x => x.IsExported))
+			{
+				MetadataEmitter.EmitInterfaceAttribute(@interface, textWriter);
+			}
+
 			textWriter.Write("public static class ");
 			textWriter.Write(Utils.GetAssemblyLevelMethodsClassName(assembly.Name.ToString()));
 			textWriter.Write("{");
@@ -41,7 +45,7 @@ namespace FluentLang.Compiler.Emit
 		{
 			if (method.IsExported)
 			{
-				MetadataEmitter.Emit(method, textWriter);
+				MetadataEmitter.EmitMethodAttribute(method, textWriter);
 			}
 			if (method.DeclaringMethod is null)
 			{
@@ -227,7 +231,7 @@ namespace FluentLang.Compiler.Emit
 			{
 				case int i: textWriter.Write(i); break;
 				case bool b: textWriter.Write(b ? "true" : "false"); break;
-				case double d: 
+				case double d:
 					switch (d)
 					{
 						case double.PositiveInfinity:
@@ -240,19 +244,19 @@ namespace FluentLang.Compiler.Emit
 							textWriter.Write("double.NaN");
 							break;
 						default:
-							textWriter.Write(d); 
-							textWriter.Write('d'); 
+							textWriter.Write(d);
+							textWriter.Write('d');
 							break;
 					}
 					break;
-				case char c: 
+				case char c:
 					textWriter.Write('\'');
 					EmitCharLiteral(c);
 					textWriter.Write('\'');
 					break;
 				case string s:
 					textWriter.Write('\"');
-					foreach(var c in s)
+					foreach (var c in s)
 						EmitCharLiteral(c);
 					textWriter.Write('\"');
 					break;
@@ -276,7 +280,7 @@ namespace FluentLang.Compiler.Emit
 		private void Emit(IBinaryOperatorExpression boe, TextWriter textWriter)
 		{
 			Emit(boe.Left, textWriter);
-			if ((boe.Left.Type == Primitive.String || boe.Left.Type == Primitive.Bool) 
+			if ((boe.Left.Type == Primitive.String || boe.Left.Type == Primitive.Bool)
 				&& IsInequalityOperator(boe.Operator))
 			{
 				textWriter.Write(".CompareTo(");
@@ -309,13 +313,13 @@ namespace FluentLang.Compiler.Emit
 		{
 			var mixinIndex = 0;
 			textWriter.Write("(((Func<FLObject,");
-			var mixins = 
+			var mixins =
 				ope
 				.Patches
 				.Select(x => x.MixedInExpression)
 				.Where(x => x != null)
 				!.ToList<IExpression>();
-			foreach(var mie in mixins)
+			foreach (var mie in mixins)
 			{
 				Emit(mie!.Type, textWriter);
 				textWriter.Write(",");
@@ -327,7 +331,7 @@ namespace FluentLang.Compiler.Emit
 				textWriter.Write(i);
 			}
 			textWriter.Write(") => { FLObject Target = null; Target = Original");
-			foreach(var patch in ope.Patches)
+			foreach (var patch in ope.Patches)
 			{
 				EmitPatch(patch, textWriter);
 			}
@@ -421,7 +425,7 @@ namespace FluentLang.Compiler.Emit
 
 		private static class MetadataEmitter
 		{
-			public static void Emit(IMethod method, TextWriter textWriter)
+			public static void EmitMethodAttribute(IMethod method, TextWriter textWriter)
 			{
 				textWriter.Write("[MethodSignature(\"");
 				textWriter.Write(method.FullyQualifiedName.ToString());
@@ -440,6 +444,16 @@ namespace FluentLang.Compiler.Emit
 
 			}
 
+			public static void EmitInterfaceAttribute(IInterface @interface, TextWriter textWriter)
+			{
+				textWriter.Write("[assembly: Interface(\"");
+				Release.Assert(@interface.FullyQualifiedName is { });
+				textWriter.Write(@interface.FullyQualifiedName.ToString());
+				textWriter.Write("\",\"");
+				Emit(@interface, textWriter, isDeclaration: true);
+				textWriter.Write("\")]");
+			}
+
 			private static void Emit(IParameter parameter, TextWriter textWriter)
 			{
 				textWriter.Write(parameter.Name);
@@ -455,7 +469,7 @@ namespace FluentLang.Compiler.Emit
 				}
 				else if (type is IInterface @interface)
 				{
-					Emit(@interface, textWriter);
+					Emit(@interface, textWriter, isDeclaration: false);
 				}
 				else
 				{
@@ -463,9 +477,9 @@ namespace FluentLang.Compiler.Emit
 				}
 			}
 
-			private static void Emit(IInterface @interface, TextWriter textWriter)
+			private static void Emit(IInterface @interface, TextWriter textWriter, bool isDeclaration)
 			{
-				if (@interface.FullyQualifiedName is { } name)
+				if (!isDeclaration && @interface.FullyQualifiedName is { } name && @interface.IsExported)
 				{
 					textWriter.Write(name.ToString());
 				}

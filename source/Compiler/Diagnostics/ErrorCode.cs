@@ -34,5 +34,6 @@
 		UseOfMethodWhichCapturesUnassignedLocals,
 		ParametersShareNames,
 		InvalidMetadataAssembly,
+		CannotUseUnexportedInterfaceFromExportedMember,
 	}
 }

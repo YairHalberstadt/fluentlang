@@ -33,7 +33,7 @@ namespace FluentLang.Compiler.Symbols.Source
 
 			_referencedAssemblies = new Lazy<ImmutableArray<IAssembly>>(() =>
 				directlyReferencedAssemblies
-				.SelectMany(x => x.ReferencedAssemblies)
+				.SelectMany(x => x.ReferencedAssembliesAndSelf)
 				.Concat(directlyReferencedAssemblies)
 				.GroupBy(x => x.Name)
 				.Select(x => x.MaxBy(x => x.Version).First())
@@ -66,7 +66,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			});
 		}
 
-		public ImmutableArray<IAssembly> ReferencedAssemblies => _referencedAssemblies.Value;
+		public ImmutableArray<IAssembly> ReferencedAssembliesAndSelf => _referencedAssemblies.Value;
 
 		public ImmutableArray<IInterface> Interfaces => _interfaces.Value;
 
