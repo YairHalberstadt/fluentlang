@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>FluentLang.Compiler.Tests.Unit</RootNamespace>
+    <Nullable>enable</Nullable>
+    <NoWarn>xUnit1019</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DeepEqual" Version="2.0.0" />
+    <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="7.0.15" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\flc\flc.csproj" />
+  </ItemGroup>
+
+</Project>
