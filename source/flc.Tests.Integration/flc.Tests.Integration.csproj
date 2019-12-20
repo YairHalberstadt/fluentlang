@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>FluentLang.Compiler.Tests.Unit</RootNamespace>
+    <RootNamespace>FluentLang.Compiler.Tests.Integration</RootNamespace>
     <Nullable>enable</Nullable>
     <NoWarn>xUnit1019</NoWarn>
   </PropertyGroup>
