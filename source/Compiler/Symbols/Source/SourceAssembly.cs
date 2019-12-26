@@ -1,19 +1,19 @@
-﻿using FluentLang.Compiler.Symbols.Interfaces;
+﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Symbols.Interfaces;
+using FluentLang.Compiler.Symbols.Source.MethodBody;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using static MoreLinq.Extensions.MaxByExtension;
-using static FluentLang.Compiler.Generated.FluentLangParser;
 using System.Diagnostics.CodeAnalysis;
-using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Symbols.Source.MethodBody;
+using System.Linq;
+using static FluentLang.Compiler.Generated.FluentLangParser;
+using Version = FluentLang.Compiler.Symbols.Interfaces.Version;
 
 namespace FluentLang.Compiler.Symbols.Source
 {
 	internal sealed class SourceAssembly : IAssembly
 	{
-		private readonly Lazy<ImmutableArray<IAssembly>> _referencedAssemblies;
+		private readonly Lazy<ImmutableArray<IAssembly>> _referencedAssembliesAndSelf;
 		private readonly Lazy<ImmutableArray<IDocument>> _documents;
 		private readonly Lazy<IReadOnlyDictionary<QualifiedName, IInterface>> _interfacesByName;
 		private readonly Lazy<ImmutableArray<IInterface>> _interfaces;
@@ -25,20 +25,14 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		public SourceAssembly(
 			QualifiedName name,
-			Interfaces.Version version,
+			Version version,
 			ImmutableArray<IAssembly> directlyReferencedAssemblies,
 			ImmutableArray<IDocument> documents)
 		{
 			_diagnostics = new DiagnosticBag(this);
 
-			_referencedAssemblies = new Lazy<ImmutableArray<IAssembly>>(() =>
-				directlyReferencedAssemblies
-				.SelectMany(x => x.ReferencedAssembliesAndSelf)
-				.Concat(directlyReferencedAssemblies)
-				.GroupBy(x => x.Name)
-				.Select(x => x.MaxBy(x => x.Version).First())
-				.Append(this)
-				.ToImmutableArray());
+			_referencedAssembliesAndSelf = new Lazy<ImmutableArray<IAssembly>>(
+				() => ((IAssembly)this).CalculateReferencedAssembliesAndSelf(directlyReferencedAssemblies, _diagnostics));
 
 			_documents = new Lazy<ImmutableArray<IDocument>>(() =>
 				documents.Select(x =>
@@ -59,14 +53,14 @@ namespace FluentLang.Compiler.Symbols.Source
 			Name = name;
 			Version = version;
 
-			_allDiagnostics = new Lazy<ImmutableArray<Diagnostic>>(() => 
+			_allDiagnostics = new Lazy<ImmutableArray<Diagnostic>>(() =>
 			{
 				_diagnostics.EnsureAllDiagnosticsCollectedForSymbol();
 				return _diagnostics.ToImmutableArray();
 			});
 		}
 
-		public ImmutableArray<IAssembly> ReferencedAssembliesAndSelf => _referencedAssemblies.Value;
+		public ImmutableArray<IAssembly> ReferencedAssembliesAndSelf => _referencedAssembliesAndSelf.Value;
 
 		public ImmutableArray<IInterface> Interfaces => _interfaces.Value;
 
@@ -88,7 +82,7 @@ namespace FluentLang.Compiler.Symbols.Source
 
 			void BindInterface(
 				Interface_declarationContext interfaceDeclaration,
-				SourceSymbolContext  sourceSymbolContext)
+				SourceSymbolContext sourceSymbolContext)
 			{
 				var name = new QualifiedName(interfaceDeclaration.UPPERCASE_IDENTIFIER().Symbol.Text, sourceSymbolContext.NameSpace);
 				var @interface = new SourceInterface(
@@ -192,7 +186,7 @@ namespace FluentLang.Compiler.Symbols.Source
 		{
 			// Touch all lazy fields to force binding;
 
-			_ = _referencedAssemblies.Value;
+			_ = _referencedAssembliesAndSelf.Value;
 			_ = _documents.Value;
 			_ = _interfacesByName.Value;
 			_ = _interfaces.Value;

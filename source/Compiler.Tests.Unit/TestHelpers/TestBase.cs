@@ -24,7 +24,7 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 			var document = new TestDocument(source);
 			return new SourceAssembly(
 				QualifiedName("Test"),
-				new Version("1.0.0"),
+				version: new Version(1, 0, 0),
 				ImmutableArray<IAssembly>.Empty,
 				ImmutableArray.Create<IDocument>(document));
 		}
@@ -33,7 +33,7 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 		{
 			return new SourceAssembly(
 				QualifiedName("Test"),
-				new Version("1.0.0"),
+				version: new Version(1,0,0),
 				ImmutableArray<IAssembly>.Empty,
 				sources.Select(x => new TestDocument(x)).ToImmutableArray<IDocument>());
 		}

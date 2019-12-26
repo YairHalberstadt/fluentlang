@@ -7,6 +7,8 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using static FluentLang.Compiler.Emit.CSharpNameEscaper;
+using Version = FluentLang.Compiler.Symbols.Interfaces.Version;
+
 namespace FluentLang.Compiler.Emit
 {
 	internal class CSharpEmitter
@@ -23,6 +25,14 @@ namespace FluentLang.Compiler.Emit
 			textWriter.WriteLine("using FluentLang.Runtime;");
 			textWriter.WriteLine("using FluentLang.Runtime.Metadata;");
 			textWriter.WriteLine("using System;");
+			textWriter.WriteLine("using AssemblyFileVersionAttribute = System.Reflection.AssemblyFileVersionAttribute;");
+
+			MetadataEmitter.EmitAssemblyFileVersionAttribute(assembly.Version, textWriter);
+
+			foreach (var dependency in assembly.ReferencedAssembliesAndSelf.Where(x => x.Name != assembly.Name))
+			{
+				MetadataEmitter.EmitDependencyAttribute(dependency, textWriter);
+			}
 
 			foreach (var @interface in assembly.Interfaces.Where(x => x.IsExported))
 			{
@@ -251,24 +261,29 @@ namespace FluentLang.Compiler.Emit
 					break;
 				case char c:
 					textWriter.Write('\'');
-					EmitCharLiteral(c);
+					EmitCharLiteral(c, textWriter);
 					textWriter.Write('\'');
 					break;
 				case string s:
-					textWriter.Write('\"');
-					foreach (var c in s)
-						EmitCharLiteral(c);
-					textWriter.Write('\"');
+					EmitStringLiteral(s, textWriter);
 					break;
 				case null: throw Release.Fail("this location is thought to be unreachable");
 				default: throw Release.Fail($"unexpected type of literal: {le.Value.GetType()}");
 			}
+		}
 
-			void EmitCharLiteral(char c)
-			{
-				textWriter.Write(@"\u");
-				textWriter.Write(((int)c).ToString("X4"));
-			}
+		private static void EmitCharLiteral(char @char, TextWriter textWriter)
+		{
+			textWriter.Write(@"\u");
+			textWriter.Write(((int)@char).ToString("X4"));
+		}
+
+		private static void EmitStringLiteral(string str, TextWriter textWriter)
+		{
+			textWriter.Write('\"');
+			foreach (var c in str)
+				EmitCharLiteral(c, textWriter);
+			textWriter.Write('\"');
 		}
 
 		private void Emit(IPrefixUnaryOperatorExpression puoe, TextWriter textWriter)
@@ -511,6 +526,22 @@ namespace FluentLang.Compiler.Emit
 			private static void Emit(Primitive primitive, TextWriter textWriter)
 			{
 				textWriter.Write(primitive.ToString());
+			}
+
+			internal static void EmitAssemblyFileVersionAttribute(Version version, TextWriter textWriter)
+			{
+				textWriter.Write("[assembly: AssemblyFileVersion(");
+				EmitStringLiteral(version.ToString(), textWriter);
+				textWriter.WriteLine(")]");
+			}
+
+			internal static void EmitDependencyAttribute(IAssembly dependency, TextWriter textWriter)
+			{
+				textWriter.Write("[assembly: Dependency(");
+				EmitStringLiteral(dependency.Name.ToString(), textWriter);
+				textWriter.Write(",");
+				EmitStringLiteral(dependency.Version.ToString(), textWriter);
+				textWriter.WriteLine(")]");
 			}
 		}
 	}

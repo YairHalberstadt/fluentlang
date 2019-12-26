@@ -35,5 +35,6 @@
 		ParametersShareNames,
 		InvalidMetadataAssembly,
 		CannotUseUnexportedInterfaceFromExportedMember,
+		MultipleVersionsOfSameAssembly,
 	}
 }

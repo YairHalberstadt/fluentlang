@@ -3,6 +3,7 @@ using FluentLang.Compiler.Emit;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Metadata;
 using System;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -103,6 +104,7 @@ Actual:
 				Assert.Equal(expectedResult, emittedAssembly.EntryPoint!.Invoke(null, null));
 			}
 
+			VerifyMetadata(assembly, emittedAssembly);
 			testEmittedAssembly?.Invoke(assembly, emittedAssembly);
 
 			assemblyLoadContext.Unload();
@@ -110,10 +112,12 @@ Actual:
 			return assembly;
 		}
 
-		public static void VerifyMetadata(IAssembly assembly, Assembly emmitedAssembly)
+		private static void VerifyMetadata(IAssembly assembly, Assembly emittedAssembly)
 		{
-			var metadataAssembly = new MetadataAssembly(emmitedAssembly);
+			var metadataAssembly = new MetadataAssembly(emittedAssembly, ImmutableArray<IAssembly>.Empty);
 			metadataAssembly.VerifyDiagnostics();
+
+			Assert.Equal(assembly.Version, metadataAssembly.Version);
 
 			var exportedMethods = 
 				assembly

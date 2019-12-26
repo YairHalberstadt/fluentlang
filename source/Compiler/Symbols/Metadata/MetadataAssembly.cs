@@ -8,6 +8,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using Version = FluentLang.Compiler.Symbols.Interfaces.Version;
 
 namespace FluentLang.Compiler.Symbols.Metadata
 {
@@ -18,11 +19,13 @@ namespace FluentLang.Compiler.Symbols.Metadata
 		private readonly Lazy<ImmutableArray<IMethod>> _methods;
 		private readonly Lazy<IReadOnlyDictionary<QualifiedName, IInterface>> _interfacesByName;
 		private readonly Lazy<ImmutableArray<IInterface>> _interfaces;
+		private readonly Lazy<ImmutableArray<IAssembly>> _referencedAssembliesAndSelf;
 
 		private readonly DiagnosticBag _diagnostics;
 		private readonly Lazy<ImmutableArray<Diagnostic>> _allDiagnostics;
 
-		public MetadataAssembly(Assembly assembly)
+
+		public MetadataAssembly(Assembly assembly, ImmutableArray<IAssembly> dependencies)
 		{
 			_diagnostics = new DiagnosticBag(this);
 			_assembly = assembly;
@@ -33,7 +36,37 @@ namespace FluentLang.Compiler.Symbols.Metadata
 					ErrorCode.InvalidMetadataAssembly,
 					ImmutableArray.Create<object?>("Metadata Assembly has no name")));
 
+			var assemblyFileVersionAttributes = assembly.GetAttributes<AssemblyFileVersionAttribute>();
+			if (assemblyFileVersionAttributes.Length != 1)
+			{
+				_diagnostics.Add(new Diagnostic(
+					new Location(),
+					ErrorCode.InvalidMetadataAssembly,
+					ImmutableArray.Create<object?>($"Metadata Assembly must have exactly one {nameof(AssemblyFileVersionAttribute)}")));
+				Version = new Version(0, 0, 0);
+			}
+			else
+			{
+				var versionAttribute = assemblyFileVersionAttributes[0];
+				if (!Version.TryParse(versionAttribute.Version, out var version))
+				{
+					_diagnostics.Add(new Diagnostic(
+						new Location(),
+						ErrorCode.InvalidMetadataAssembly,
+						ImmutableArray.Create<object?>($"Version `{version}` is invalid")));
+					Version = new Version(0, 0, 0);
+				}
+				else
+				{
+					Version = version;
+				}
+			}
+
 			Name = QualifiedName.Parse(_assembly.GetName().Name ?? "");
+
+			_referencedAssembliesAndSelf = new Lazy<ImmutableArray<IAssembly>>(
+				() => ((IAssembly)this).CalculateReferencedAssembliesAndSelf(dependencies, _diagnostics));
+
 			_methodsByName = new Lazy<IReadOnlyDictionary<QualifiedName, IMethod>>(GenerateMethods);
 			_methods = new Lazy<ImmutableArray<IMethod>>(() => _methodsByName.Value.Values.ToImmutableArray());
 			_interfacesByName = new Lazy<IReadOnlyDictionary<QualifiedName, IInterface>>(GenerateInterfaces);
@@ -107,9 +140,9 @@ namespace FluentLang.Compiler.Symbols.Metadata
 
 		public QualifiedName Name { get; }
 
-		public Interfaces.Version Version => throw new NotImplementedException();
+		public Version Version { get; }
 
-		public ImmutableArray<IAssembly> ReferencedAssembliesAndSelf => ImmutableArray.Create<IAssembly>(this); //TODO: implement
+		public ImmutableArray<IAssembly> ReferencedAssembliesAndSelf => _referencedAssembliesAndSelf.Value;
 
 		public ImmutableArray<IInterface> Interfaces => _interfaces.Value;
 
@@ -130,7 +163,7 @@ namespace FluentLang.Compiler.Symbols.Metadata
 		void ISymbol.EnsureAllLocalDiagnosticsCollected()
 		{
 			// Touch all lazy fields to force binding;
-
+			_ = _referencedAssembliesAndSelf.Value;
 			_ = _methodsByName.Value;
 			_ = _methods.Value;
 			_ = _interfacesByName.Value;

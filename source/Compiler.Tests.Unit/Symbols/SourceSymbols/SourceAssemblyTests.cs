@@ -20,6 +20,86 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols
 		}
 
 		[Fact]
+		public void ContainsTransitiveReferencedAssemblies()
+		{
+			var assembly1 = new SourceAssembly(
+				QualifiedName("1"),
+				version: new Version(1, 0, 0),
+				ImmutableArray<IAssembly>.Empty,
+				ImmutableArray<IDocument>.Empty);
+			var assembly2 = new SourceAssembly(
+				QualifiedName("2"),
+				version: new Version(1, 0, 0),
+				ImmutableArray.Create<IAssembly>(assembly1),
+				ImmutableArray<IDocument>.Empty);
+			var assembly3 = new SourceAssembly(
+				QualifiedName("3"),
+				version: new Version(1, 0, 0),
+				ImmutableArray.Create<IAssembly>(assembly2),
+				ImmutableArray<IDocument>.Empty);
+			var assembly = (IAssembly)new SourceAssembly(
+				QualifiedName("TestAssembly"),
+				version: new Version(1, 0, 0),
+				ImmutableArray.Create<IAssembly>(assembly3),
+				ImmutableArray<IDocument>.Empty);
+
+			Assert.Equal(new[] { assembly1, assembly2, assembly3, assembly }, assembly.ReferencedAssembliesAndSelf);
+		}
+
+		[Fact]
+		public void DeduplicatesReferencedAssemblies()
+		{
+			var assembly1a = new SourceAssembly(
+				QualifiedName("1"),
+				version: new Version(1, 0, 0),
+				ImmutableArray<IAssembly>.Empty,
+				ImmutableArray<IDocument>.Empty);
+			var assembly1b = new SourceAssembly(
+				QualifiedName("1"),
+				version: new Version(1, 0, 0),
+				ImmutableArray<IAssembly>.Empty,
+				ImmutableArray<IDocument>.Empty);
+			var assembly2 = new SourceAssembly(
+				QualifiedName("2"),
+				version: new Version(1, 0, 0),
+				ImmutableArray.Create<IAssembly>(assembly1a),
+				ImmutableArray<IDocument>.Empty);
+			var assembly3 = new SourceAssembly(
+				QualifiedName("3"),
+				version: new Version(1, 0, 0),
+				ImmutableArray.Create<IAssembly>(assembly1b),
+				ImmutableArray<IDocument>.Empty);
+			var assembly = (IAssembly)new SourceAssembly(
+				QualifiedName("TestAssembly"),
+				version: new Version(1, 0, 0),
+				ImmutableArray.Create<IAssembly>(assembly2, assembly3),
+				ImmutableArray<IDocument>.Empty);
+
+			Assert.Equal(new[] { assembly1a, assembly2, assembly3, assembly }, assembly.ReferencedAssembliesAndSelf);
+		}
+
+		[Fact]
+		public void ErrorsIfReferencedAssembliesContainDifferentVersionOfSameAssembly()
+		{
+			var assembly1a = new SourceAssembly(
+				QualifiedName("1"),
+				version: new Version(1, 0, 0),
+				ImmutableArray<IAssembly>.Empty,
+				ImmutableArray<IDocument>.Empty);
+			var assembly1b = new SourceAssembly(
+				QualifiedName("1"),
+				version: new Version(1, 0, 1),
+				ImmutableArray<IAssembly>.Empty,
+				ImmutableArray<IDocument>.Empty);
+			new SourceAssembly(
+				QualifiedName("TestAssembly"),
+				version: new Version(1, 0, 0),
+				ImmutableArray.Create<IAssembly>(assembly1a, assembly1b),
+				ImmutableArray<IDocument>.Empty).VerifyDiagnostics(
+					new Diagnostic(new Location(new TextToken(@"")), ErrorCode.MultipleVersionsOfSameAssembly));
+		}
+
+		[Fact]
 		public void IgnoresDocumentsWithIrrecoverableSyntaxErrors()
 		{
 			var assembly = CreateAssembly(@"
@@ -35,27 +115,6 @@ interface I { M() : () bool; }").VerifyDiagnostics(new Diagnostic(new Location(n
 
 			var @interface = Assert.Single(assembly.Interfaces);
 			Assert.Equal("I2", @interface.FullyQualifiedName!.ToString());
-		}
-
-		[Fact]
-		public void ContainsOnlyHighestVersionsOfTreeOfReferencedAssemblies()
-		{
-			var assembly1 = new DummyAssembly { };
-			var assembly2 = new DummyAssembly { Version = new Version("0.1.1"), ReferencedAssembliesAndSelf = ImmutableArray.Create<IAssembly>(assembly1) };
-			var assembly3 = new DummyAssembly
-			{
-				Name = QualifiedName("DifferentAssembly"),
-				Version = new Version("0.2.3"),
-				ReferencedAssembliesAndSelf = ImmutableArray.Create<IAssembly>(assembly1)
-			};
-
-			var assembly = (IAssembly)new SourceAssembly(
-				QualifiedName("TestAssembly"),
-				new Version("1.0.0"),
-				ImmutableArray.Create<IAssembly>(assembly2, assembly3),
-				ImmutableArray<IDocument>.Empty);
-
-			Assert.Equal(new[] { assembly1, assembly3, assembly }, assembly.ReferencedAssembliesAndSelf);
 		}
 
 		[Fact]
@@ -126,37 +185,6 @@ namespace A.B.C
 
 			var m3 = AssertGetMethod(assembly, "A.B.C.D.M3");
 			Assert.Equal(m3.FullyQualifiedName, QualifiedName("A.B.C.D.M3"));
-		}
-
-		private class DummyAssembly : IAssembly
-		{
-			public QualifiedName Name { get; set; } = QualifiedName("Assembly");
-
-			public Version Version { get; set; } = new Version("1.0.0");
-
-			public ImmutableArray<IAssembly> ReferencedAssembliesAndSelf { get; set; } = ImmutableArray<IAssembly>.Empty;
-
-			public ImmutableArray<IInterface> Interfaces { get; set; } = ImmutableArray<IInterface>.Empty;
-
-			public ImmutableArray<IMethod> Methods { get; set; } = ImmutableArray<IMethod>.Empty;
-
-			public bool TryGetInterface(QualifiedName fullyQualifiedName, [NotNullWhen(true)] out IInterface? @interface)
-			{
-				@interface = Interfaces.FirstOrDefault(x => x.FullyQualifiedName == fullyQualifiedName);
-				return @interface != null;
-			}
-
-			public bool TryGetMethod(QualifiedName fullyQualifiedName, [NotNullWhen(true)] out IMethod? method)
-			{
-				method = Methods.FirstOrDefault(x => x.FullyQualifiedName == fullyQualifiedName);
-				return method != null;
-			}
-
-			public ImmutableArray<Diagnostic> AllDiagnostics { get; set; } = ImmutableArray<Diagnostic>.Empty;
-
-			void ISymbol.EnsureAllLocalDiagnosticsCollected()
-			{
-			}
 		}
 	}
 }
