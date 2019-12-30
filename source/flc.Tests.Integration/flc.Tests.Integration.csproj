@@ -8,6 +8,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Data\FluentLang.Runtime.dll" />
+    <None Remove="Data\Runtime.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Data\FluentLang.Runtime.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.IO.Abstractions.TestingHelpers" Version="7.0.15" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">

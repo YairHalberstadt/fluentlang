@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace flc.Tests.Unit
+namespace FluentLang.Compiler.Tests.Unit.ProjectSystem
 {
 	public class SolutionFactoryTests
 	{
@@ -31,16 +31,13 @@ namespace flc.Tests.Unit
       ],
       ""References"": [
         {
-          ""Type"": ""Url"",
-          ""AssemblyUrl"": ""https://example.com/assembly""
-		},
-        {
-          ""Type"": ""FilePath"",
-          ""AssemblyFilePath"": ""bin/assembly""
+          ""Type"": ""Assembly"",
+          ""Name"": ""assembly"",
+          ""Version"": ""1.2.3""
         },
         {
           ""Type"": ""Project"",
-          ""ProjectName"": ""Project1""
+          ""Name"": ""Project1""
         }
       ]
     }
@@ -59,9 +56,8 @@ namespace flc.Tests.Unit
 						ImmutableArray.Create("./"),
 						ImmutableArray<string>.Empty,
 						ImmutableArray.Create(
-							new Reference(Reference.ReferenceType.Url, assemblyUrl: "https://example.com/assembly"),
-							new Reference(Reference.ReferenceType.FilePath, assemblyFilePath: "bin/assembly"),
-							new Reference(Reference.ReferenceType.Project, projectName: "Project1")))));
+							new Reference(Reference.ReferenceType.Assembly, "assembly", "1.2.3"),
+							new Reference(Reference.ReferenceType.Project, "Project1")))));
 		[Fact]
 		public void CanParseValidSolutionFromString()
 		{
@@ -176,9 +172,8 @@ namespace flc.Tests.Unit
 				static void AssertEqual(Reference a, Reference b)
 				{
 					Assert.Equal(a.Type, b.Type);
-					Assert.Equal(a.AssemblyUrl, b.AssemblyUrl);
-					Assert.Equal(a.AssemblyFilePath, b.AssemblyFilePath);
-					Assert.Equal(a.ProjectName, b.ProjectName);
+					Assert.Equal(a.Name, b.Name);
+					Assert.Equal(a.Version, b.Version);
 				}
 			}
 

@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\flc\flc.csproj" />
+    <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
   </ItemGroup>
 
 </Project>

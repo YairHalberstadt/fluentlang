@@ -2,7 +2,7 @@
 using System;
 using Xunit.Abstractions;
 
-namespace FluentLang.Compiler.Tests.Unit.TestHelpers
+namespace FluentLang.TestUtils
 {
 	public class XunitLogger<T> : ILogger<T>, IDisposable
 	{

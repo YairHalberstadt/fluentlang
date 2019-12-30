@@ -27,6 +27,7 @@ namespace FluentLang.Compiler.Emit
 			textWriter.WriteLine("using System;");
 			textWriter.WriteLine("using AssemblyFileVersionAttribute = System.Reflection.AssemblyFileVersionAttribute;");
 
+			MetadataEmitter.EmitAssemblyNameAttribute(assembly.Name, textWriter);
 			MetadataEmitter.EmitAssemblyFileVersionAttribute(assembly.Version, textWriter);
 
 			foreach (var dependency in assembly.ReferencedAssembliesAndSelf.Where(x => x.Name != assembly.Name))
@@ -541,6 +542,13 @@ namespace FluentLang.Compiler.Emit
 				EmitStringLiteral(dependency.Name.ToString(), textWriter);
 				textWriter.Write(",");
 				EmitStringLiteral(dependency.Version.ToString(), textWriter);
+				textWriter.WriteLine(")]");
+			}
+
+			internal static void EmitAssemblyNameAttribute(QualifiedName name, TextWriter textWriter)
+			{
+				textWriter.Write("[assembly: AssemblyName(");
+				EmitStringLiteral(name.ToString(), textWriter);
 				textWriter.WriteLine(")]");
 			}
 		}

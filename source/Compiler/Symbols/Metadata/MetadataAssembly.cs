@@ -36,6 +36,20 @@ namespace FluentLang.Compiler.Symbols.Metadata
 					ErrorCode.InvalidMetadataAssembly,
 					ImmutableArray.Create<object?>("Metadata Assembly has no name")));
 
+			var assemblyNameAttributes = assembly.GetAttributes<AssemblyNameAttribute>();
+			if (assemblyNameAttributes.Length != 1)
+			{
+				_diagnostics.Add(new Diagnostic(
+					new Location(),
+					ErrorCode.InvalidMetadataAssembly,
+					ImmutableArray.Create<object?>($"Metadata Assembly must have exactly one {nameof(AssemblyNameAttribute)}")));
+				Name = new QualifiedName("");
+			}
+			else
+			{
+				Name = QualifiedName.Parse(assemblyNameAttributes[0].Name);
+			}
+
 			var assemblyFileVersionAttributes = assembly.GetAttributes<AssemblyFileVersionAttribute>();
 			if (assemblyFileVersionAttributes.Length != 1)
 			{
@@ -61,8 +75,6 @@ namespace FluentLang.Compiler.Symbols.Metadata
 					Version = version;
 				}
 			}
-
-			Name = QualifiedName.Parse(_assembly.GetName().Name ?? "");
 
 			_referencedAssembliesAndSelf = new Lazy<ImmutableArray<IAssembly>>(
 				() => ((IAssembly)this).CalculateReferencedAssembliesAndSelf(dependencies, _diagnostics));

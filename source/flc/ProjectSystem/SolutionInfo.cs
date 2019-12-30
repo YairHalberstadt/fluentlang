@@ -15,5 +15,9 @@ namespace FluentLang.flc.ProjectSystem
 		}
 
 		public ImmutableArray<ProjectInfo> Projects { get; }
+
+		public ImmutableArray<string> LibDirectories { get; }
+
+		public ImmutableArray<string> NugetFeeds { get; }
 	}
 }

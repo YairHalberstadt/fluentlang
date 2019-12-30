@@ -1,6 +1,6 @@
 ﻿using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
-using FluentLang.Compiler.Tests.Unit.TestHelpers;
+using FluentLang.TestUtils;
 using Xunit;
 using Xunit.Abstractions;
 

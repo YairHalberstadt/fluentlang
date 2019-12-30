@@ -3,7 +3,7 @@ using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using System.Collections.Immutable;
 
-namespace FluentLang.Compiler.Tests.Unit.TestHelpers
+namespace FluentLang.TestUtils
 {
 	public class TestInterface : IInterface
 	{

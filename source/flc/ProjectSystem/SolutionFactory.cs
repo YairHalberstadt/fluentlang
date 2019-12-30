@@ -52,7 +52,7 @@ namespace FluentLang.flc.ProjectSystem
 					project
 					.References
 					.Where(x => x.Type == Reference.ReferenceType.Project)
-					.Select(x => x.ProjectName);
+					.Select(x => x.Name);
 
 				foreach (var reference in references)
 				{

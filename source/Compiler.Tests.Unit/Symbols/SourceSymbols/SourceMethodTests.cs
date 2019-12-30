@@ -1,5 +1,5 @@
 ﻿using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Tests.Unit.TestHelpers;
+using FluentLang.TestUtils;
 using Xunit;
 using Xunit.Abstractions;
 

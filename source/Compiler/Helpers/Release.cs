@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace FluentLang.Compiler.Helpers
 {
-	internal static class Release
+	public static class Release
 	{
 		public static void Assert([DoesNotReturnIf(false)] bool condition)
 		{
@@ -17,7 +17,7 @@ namespace FluentLang.Compiler.Helpers
 		}
 
 		/// <summary>
-		/// Kills the process via <see cref="Environment.FailFast(string)"/>
+		/// Throws an <see cref="InvalidOperationException"/>
 		/// 
 		/// Returns an exception so that for flow control analysis you can write `throw Release.Fail()`
 		/// However this will never actually occur.
@@ -27,8 +27,7 @@ namespace FluentLang.Compiler.Helpers
 		[DoesNotReturn]
 		public static Exception Fail(string? message)
 		{
-			Environment.FailFast(message);
-			return new Exception(); // Unreachable
+			throw new InvalidOperationException(message);
 		}
 	}
 }

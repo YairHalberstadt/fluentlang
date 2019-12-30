@@ -35,7 +35,7 @@ namespace FluentLang.Compiler.Emit
 			var syntaxTree = SyntaxFactory.ParseSyntaxTree(sourceText, new CSharpParseOptions(LanguageVersion.CSharp8), cancellationToken: cancellationToken);
 
 			var compilation = CSharpCompilation.Create(
-				assembly.Name.ToString(),
+				$"{assembly.Name}${assembly.Version}",
 				new[] { syntaxTree },
 				_metadataReferences
 					.Concat(referencedAssemblies.Select(x => MetadataReference.CreateFromFile(x.Location))),

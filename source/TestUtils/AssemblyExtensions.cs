@@ -10,7 +10,7 @@ using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace FluentLang.Compiler.Tests.Unit.TestHelpers
+namespace FluentLang.TestUtils
 {
 	public static class AssemblyExtensions
 	{
@@ -114,10 +114,19 @@ Actual:
 
 		private static void VerifyMetadata(IAssembly assembly, Assembly emittedAssembly)
 		{
-			var metadataAssembly = new MetadataAssembly(emittedAssembly, ImmutableArray<IAssembly>.Empty);
+			var metadataAssembly = new MetadataAssembly(
+				emittedAssembly, 
+				assembly
+					.ReferencedAssembliesAndSelf
+					.Where(x => x.Name != assembly.Name && x.Version != assembly.Version)
+					.ToImmutableArray());
 			metadataAssembly.VerifyDiagnostics();
 
+			Assert.Equal(assembly.Name, metadataAssembly.Name);
 			Assert.Equal(assembly.Version, metadataAssembly.Version);
+			Assert.Equal(
+				assembly.ReferencedAssembliesAndSelf.Where(x => x.Name != assembly.Name),
+				metadataAssembly.ReferencedAssembliesAndSelf.Where(x => x.Name != metadataAssembly.Name));
 
 			var exportedMethods = 
 				assembly

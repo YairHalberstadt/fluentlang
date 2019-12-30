@@ -50,7 +50,7 @@ namespace FluentLang.flc.ProjectSystem
 					projectInfo
 					.References
 					.Where(x => x.Type == ReferenceType.Project)
-					.Select(x => x.ProjectName!)
+					.Select(x => x.Name!)
 					.ToList();
 			}
 

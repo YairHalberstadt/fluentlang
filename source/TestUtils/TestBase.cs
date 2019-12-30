@@ -1,14 +1,14 @@
 ﻿using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Source;
-using System.Collections;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace FluentLang.Compiler.Tests.Unit.TestHelpers
+namespace FluentLang.TestUtils
 {
 	public abstract class TestBase
 	{
@@ -19,13 +19,13 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 			_testOutputHelper = testOutputHelper;
 		}
 
-		protected IAssembly CreateAssembly(string source)
+		protected IAssembly CreateAssembly(string source, string? name = null, Version? version = null, params IAssembly[] references)
 		{
 			var document = new TestDocument(source);
 			return new SourceAssembly(
-				QualifiedName("Test"),
-				version: new Version(1, 0, 0),
-				ImmutableArray<IAssembly>.Empty,
+				QualifiedName(name ?? "Test"),
+				version: version ?? new Version(1, 0, 0),
+				references.ToImmutableArray(),
 				ImmutableArray.Create<IDocument>(document));
 		}
 
@@ -33,7 +33,7 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 		{
 			return new SourceAssembly(
 				QualifiedName("Test"),
-				version: new Version(1,0,0),
+				version: new Version(1, 0, 0),
 				ImmutableArray<IAssembly>.Empty,
 				sources.Select(x => new TestDocument(x)).ToImmutableArray<IDocument>());
 		}
@@ -54,5 +54,7 @@ namespace FluentLang.Compiler.Tests.Unit.TestHelpers
 			Assert.True(assembly.TryGetInterface(QualifiedName(qualifiedName), out var @interface));
 			return @interface!;
 		}
+
+		public ILogger<T> GetLogger<T>() => new XunitLogger<T>(_testOutputHelper);
 	}
 }

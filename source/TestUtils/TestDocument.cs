@@ -4,13 +4,11 @@ using FluentLang.Compiler.Generated;
 using FluentLang.Compiler.Parsing;
 using FluentLang.Compiler.Symbols.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using System.Text;
 using static FluentLang.Compiler.Generated.FluentLangParser;
 
-namespace FluentLang.Compiler.Tests.Unit.TestHelpers
+namespace FluentLang.TestUtils
 {
 	public class TestDocument : IDocument
 	{

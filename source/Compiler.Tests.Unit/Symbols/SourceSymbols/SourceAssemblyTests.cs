@@ -1,14 +1,11 @@
 ﻿using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Source;
-using FluentLang.Compiler.Tests.Unit.TestHelpers;
+using FluentLang.TestUtils;
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
-using static FluentLang.Compiler.Tests.Unit.TestHelpers.AssemblyExtensions;
 using Version = FluentLang.Compiler.Symbols.Interfaces.Version;
 
 namespace FluentLang.Compiler.Tests.Unit.Symbols

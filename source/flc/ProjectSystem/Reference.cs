@@ -9,62 +9,30 @@ namespace FluentLang.flc.ProjectSystem
 		[JsonConstructor]
 		public Reference(
 			ReferenceType type,
-			string? assemblyUrl = null,
-			string? assemblyFilePath = null,
-			string? projectName = null)
+			string name,
+			string? version = null)
 		{
-			switch (type)
-			{
-				case ReferenceType.Url:
-					if (assemblyUrl is null)
-						throw new ArgumentNullException(assemblyUrl);
-					if (assemblyFilePath != null)
-						throw new ArgumentException(
-							$"parameter cannot be set when reference type is {type}", nameof(assemblyFilePath));
-					if (projectName != null)
-						throw new ArgumentException(
-							$"parameter cannot be set when reference type is {type}", nameof(ProjectName));
-					break;
-				case ReferenceType.FilePath:
-					if (assemblyFilePath is null)
-						throw new ArgumentNullException(assemblyFilePath);
-					if (assemblyUrl != null)
-						throw new ArgumentException(
-							$"parameter cannot be set when reference type is {type}", nameof(assemblyUrl));
-					if (projectName != null)
-						throw new ArgumentException(
-							$"parameter cannot be set when reference type is {type}", nameof(ProjectName));
-					break;
-				case ReferenceType.Project:
-					if (projectName is null)
-						throw new ArgumentNullException(projectName);
-					if (assemblyUrl != null)
-						throw new ArgumentException(
-							$"parameter cannot be set when reference type is {type}", nameof(assemblyUrl));
-					if (assemblyFilePath != null)
-						throw new ArgumentException(
-							$"parameter cannot be set when reference type is {type}", nameof(assemblyFilePath));
-					break;
-				default: throw new InvalidEnumArgumentException(nameof(type), (int)type, typeof(ReferenceType));
-			}
-			AssemblyUrl = assemblyUrl;
-			AssemblyFilePath = assemblyFilePath;
-			ProjectName = projectName;
+			if (type == ReferenceType.Project && version is { })
+				throw new ArgumentException("Project reference cannot specify a version", nameof(version));
+
+			if (type == ReferenceType.Assembly && version is null)
+				throw new ArgumentException("Assembly reference must specify a version", nameof(version));
+
+			if (type != ReferenceType.Assembly && type != ReferenceType.Project)
+				throw new InvalidEnumArgumentException(nameof(type), (int)type, typeof(ReferenceType));
+
 			Type = type;
+			Name = name;
+			Version = version;
 		}
 
-		public string? AssemblyUrl { get; }
-
-		public string? AssemblyFilePath { get; }
-
-		public string? ProjectName { get; }
-
 		public ReferenceType Type { get; }
+		public string Name { get; }
+		public string? Version { get; }
 
 		public enum ReferenceType
 		{
-			Url,
-			FilePath,
+			Assembly,
 			Project,
 		}
 	}

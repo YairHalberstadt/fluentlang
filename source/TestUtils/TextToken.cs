@@ -1,8 +1,8 @@
 ﻿using Antlr4.Runtime;
 
-namespace FluentLang.Compiler.Tests.Unit.TestHelpers
+namespace FluentLang.TestUtils
 {
-	internal class TextToken : IToken
+	public class TextToken : IToken
 	{
 		public TextToken(string text)
 		{

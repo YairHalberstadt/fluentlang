@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Xunit;
 
-namespace FluentLang.Compiler.Tests.Unit
+namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 {
 	public class ProjectDependencyOrganizerTests
 	{
@@ -14,7 +14,7 @@ namespace FluentLang.Compiler.Tests.Unit
 				name,
 				ImmutableArray.Create(""),
 				references: references
-					.Select(x => new Reference(Reference.ReferenceType.Project, projectName: x))
+					.Select(x => new Reference(Reference.ReferenceType.Project, name: x))
 					.ToImmutableArray());
 		}
 
@@ -82,7 +82,7 @@ namespace FluentLang.Compiler.Tests.Unit
 				new ProjectInfo(
 					"p1",
 					ImmutableArray.Create(""),
-					references: ImmutableArray.Create(new Reference(Reference.ReferenceType.Url, ""))),
+					references: ImmutableArray.Create(new Reference(Reference.ReferenceType.Assembly, "", ""))),
 			};
 
 			Assert.Equal(
