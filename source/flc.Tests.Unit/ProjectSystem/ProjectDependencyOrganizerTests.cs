@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Xunit;
 
-namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
+namespace FluentLang.Compiler.Tests.Unit.ProjectSystem
 {
 	public class ProjectDependencyOrganizerTests
 	{

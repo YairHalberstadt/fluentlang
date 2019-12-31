@@ -14,7 +14,7 @@ namespace FluentLang.TestUtils
 		}
 		public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) where TState : notnull
 		{
-			_output.WriteLine(state.ToString());
+			_output.WriteLine($"{logLevel.ToString().ToUpper()}: {formatter(state, exception)}");
 		}
 
 		public bool IsEnabled(LogLevel logLevel)
