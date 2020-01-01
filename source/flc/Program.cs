@@ -1,5 +1,4 @@
-﻿using FluentLang.flc;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.CommandLine;
 using System.CommandLine.Builder;
@@ -7,7 +6,7 @@ using System.CommandLine.Invocation;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace flc
+namespace FluentLang.flc
 {
 	internal class Program
 	{

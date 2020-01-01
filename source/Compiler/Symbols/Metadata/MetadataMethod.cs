@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace FluentLang.Compiler.Symbols.Metadata
 {
-	internal class MetadataMethod : SymbolBase, IMethod
+	internal sealed class MetadataMethod : SymbolBase, IMethod
 	{
 		private readonly MethodSignatureAttribute _attribute;
 		private readonly Lazy<IType> _returnType;

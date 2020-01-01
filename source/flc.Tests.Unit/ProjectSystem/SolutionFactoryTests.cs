@@ -17,6 +17,7 @@ namespace FluentLang.Compiler.Tests.Unit.ProjectSystem
   ""Projects"": [
     {
       ""Name"": ""Project1"",
+      ""Version"": { ""Major"": 0, ""Minor"": 0 },
       ""IncludedFilesAndFolders"": [
         ""./""
       ],
@@ -26,6 +27,7 @@ namespace FluentLang.Compiler.Tests.Unit.ProjectSystem
 	},
     {
       ""Name"": ""Project2"",
+      ""Version"": { ""Major"": 1, ""Minor"": 2, ""VersionSuffix"": ""alpha"" },
       ""IncludedFilesAndFolders"": [
         ""./""
       ],
@@ -48,11 +50,13 @@ namespace FluentLang.Compiler.Tests.Unit.ProjectSystem
 				ImmutableArray.Create(
 					new ProjectInfo(
 						"Project1",
+						new Version(0, 0),
 						ImmutableArray.Create("./"),
 						ImmutableArray.Create("bin/"),
 						ImmutableArray<Reference>.Empty),
 					new ProjectInfo(
 						"Project2",
+						new Version(1, 2, "alpha"),
 						ImmutableArray.Create("./"),
 						ImmutableArray<string>.Empty,
 						ImmutableArray.Create(

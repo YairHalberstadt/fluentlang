@@ -21,7 +21,7 @@ namespace FluentLang.TestUtils
 
 		protected IAssembly CreateAssembly(string source, string? name = null, Version? version = null, params IAssembly[] references)
 		{
-			var document = new TestDocument(source);
+			var document = DocumentFactory.FromString(source);
 			return new SourceAssembly(
 				QualifiedName(name ?? "Test"),
 				version: version ?? new Version(1, 0, 0),
@@ -35,7 +35,7 @@ namespace FluentLang.TestUtils
 				QualifiedName("Test"),
 				version: new Version(1, 0, 0),
 				ImmutableArray<IAssembly>.Empty,
-				sources.Select(x => new TestDocument(x)).ToImmutableArray<IDocument>());
+				sources.Select(x => DocumentFactory.FromString(x)).ToImmutableArray<IDocument>());
 		}
 
 		protected static QualifiedName QualifiedName(string qualifiedName)

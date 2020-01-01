@@ -1,10 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using System.IO.Abstractions;
-using FluentLang.flc.ProjectSystem;
+﻿using FluentLang.flc.ProjectSystem;
+using Microsoft.Extensions.Logging;
 using System.Linq;
+using System.Threading.Tasks;
 
-namespace flc
+namespace FluentLang.flc
 {
 	public class FluentLangCompiler
 	{

@@ -12,7 +12,7 @@ using Version = FluentLang.Compiler.Symbols.Interfaces.Version;
 
 namespace FluentLang.Compiler.Symbols.Metadata
 {
-	public class MetadataAssembly : IAssembly
+	internal sealed class MetadataAssembly : IAssembly
 	{
 		private readonly Assembly _assembly;
 		private readonly Lazy<IReadOnlyDictionary<QualifiedName, IMethod>> _methodsByName;

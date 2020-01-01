@@ -1,7 +1,6 @@
 ﻿using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
-using FluentLang.Compiler.Symbols.Metadata;
 using FluentLang.flc.ProjectSystem;
 using FluentLang.flc.Utils;
 using Microsoft.Extensions.Logging;
@@ -16,7 +15,7 @@ using static FluentLang.flc.ProjectSystem.Reference.ReferenceType;
 
 namespace FluentLang.flc.DependencyLoading
 {
-	public class DependencyLoader
+	public class DependencyLoader : IDependencyLoader
 	{
 		private readonly ImmutableArray<IAssemblyLoader> _assemblyLoaders;
 		private readonly DependencyAttributeReader _dependencyAttributeReader;
@@ -79,12 +78,12 @@ namespace FluentLang.flc.DependencyLoading
 			Dependency dependency,
 			CancellationToken cancellationToken)
 		{
-			var assembly = 
+			var assembly =
 				assemblyLoadContext
 				.Assemblies
 				.FirstOrDefault(x => x.GetName().Name == $"{dependency.Name}${dependency.Version}");
 
-			assembly ??= 
+			assembly ??=
 				(await
 					_assemblyLoaders
 					.ToAsyncEnumerable()
@@ -97,7 +96,7 @@ namespace FluentLang.flc.DependencyLoading
 				?? throw new FlcException(
 						$"Could not find assembly {dependency.Name} {dependency.Version} in any location");
 
-			var subDependencies = 
+			var subDependencies =
 				await
 					_dependencyAttributeReader
 					.ReadDependencies(assembly)
@@ -106,7 +105,7 @@ namespace FluentLang.flc.DependencyLoading
 					.ToImmutableArrayAsync()
 					.ConfigureAwait(false);
 
-			return new MetadataAssembly(assembly, subDependencies);
+			return AssemblyFactory.FromMetadata(assembly, subDependencies);
 		}
 	}
 }

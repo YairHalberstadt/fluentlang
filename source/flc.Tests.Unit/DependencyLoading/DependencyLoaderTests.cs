@@ -1,12 +1,10 @@
 ﻿using FluentLang.Compiler.Symbols.Interfaces;
-using FluentLang.Compiler.Symbols.Source;
 using FluentLang.flc;
 using FluentLang.flc.DependencyLoading;
 using FluentLang.flc.ProjectSystem;
 using FluentLang.TestUtils;
 using System;
 using System.Collections.Immutable;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
@@ -45,6 +43,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 				  var dependencies = dependencyLoader.LoadDependenciesAsync(
 					  new ProjectInfo(
 						  "p",
+						  new flc.ProjectSystem.Version(0, 0),
 						  ImmutableArray.Create(""),
 						  references: ImmutableArray.Create(new Reference(
 							  Reference.ReferenceType.Assembly,
@@ -80,6 +79,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 					var dependencies = dependencyLoader.LoadDependenciesAsync(
 						new ProjectInfo(
 							"p",
+							new flc.ProjectSystem.Version(0, 0),
 							ImmutableArray.Create(""),
 							references: ImmutableArray.Create(new Reference(
 								Reference.ReferenceType.Assembly,
@@ -114,6 +114,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 					Assert.Throws<FlcException>(() => dependencyLoader.LoadDependenciesAsync(
 						new ProjectInfo(
 							"p",
+							new flc.ProjectSystem.Version(0, 0),
 							ImmutableArray.Create(""),
 							references: ImmutableArray.Create(new Reference(
 								Reference.ReferenceType.Assembly,
@@ -152,6 +153,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 							var dependencies = dependencyLoader.LoadDependenciesAsync(
 								new ProjectInfo(
 									"p",
+									new flc.ProjectSystem.Version(0, 0),
 									ImmutableArray.Create(""),
 									references: ImmutableArray.Create(new Reference(
 										Reference.ReferenceType.Assembly,
@@ -189,6 +191,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 					Assert.Throws<FlcException>(() => dependencyLoader.LoadDependenciesAsync(
 						new ProjectInfo(
 							"p",
+							new flc.ProjectSystem.Version(0, 0),
 							ImmutableArray.Create(""),
 							references: ImmutableArray.Create(new Reference(
 								Reference.ReferenceType.Assembly,

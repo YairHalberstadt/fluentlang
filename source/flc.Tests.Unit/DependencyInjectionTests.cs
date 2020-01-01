@@ -1,5 +1,4 @@
-﻿using flc;
-using FluentLang.flc;
+﻿using FluentLang.flc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit;

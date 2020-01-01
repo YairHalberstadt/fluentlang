@@ -8,15 +8,15 @@ using System.Collections.Immutable;
 using System.IO;
 using static FluentLang.Compiler.Generated.FluentLangParser;
 
-namespace FluentLang.TestUtils
+namespace FluentLang.Compiler.Symbols.Source
 {
-	public class TestDocument : IDocument
+	internal sealed class SourceDocument : IDocument
 	{
 		private readonly string _source;
 		private readonly Lazy<Compilation_unitContext> _syntaxTree;
 		private ImmutableArray<Diagnostic> _diagnostics;
 
-		public TestDocument(string source)
+		public SourceDocument(string source)
 		{
 			_source = source;
 			_syntaxTree = new Lazy<Compilation_unitContext>(GetSyntaxTree);

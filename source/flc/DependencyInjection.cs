@@ -1,11 +1,7 @@
-﻿using flc;
-using FluentLang.flc.ProjectSystem;
+﻿using FluentLang.flc.ProjectSystem;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.Text;
 
 namespace FluentLang.flc
 {

@@ -12,6 +12,7 @@ namespace FluentLang.Compiler.Tests.Unit.ProjectSystem
 		{
 			return new ProjectInfo(
 				name,
+				new Version(0, 0),
 				ImmutableArray.Create(""),
 				references: references
 					.Select(x => new Reference(Reference.ReferenceType.Project, name: x))
@@ -81,6 +82,7 @@ namespace FluentLang.Compiler.Tests.Unit.ProjectSystem
 			{
 				new ProjectInfo(
 					"p1",
+					new Version(0, 0),
 					ImmutableArray.Create(""),
 					references: ImmutableArray.Create(new Reference(Reference.ReferenceType.Assembly, "", ""))),
 			};
