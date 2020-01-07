@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace FluentLang.Compiler.Emit
 {
-	internal class MethodKeyGenerator
+	public class MethodKeyGenerator
 	{
 		private readonly ConcurrentDictionary<IInterfaceMethod, string> _interfaceMethodCache = new ConcurrentDictionary<IInterfaceMethod, string>();
 		private readonly ConcurrentDictionary<IMethod, string> _methodExcludingFirstParameterCache = new ConcurrentDictionary<IMethod, string>();

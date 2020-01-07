@@ -11,11 +11,11 @@ using Version = FluentLang.Compiler.Symbols.Interfaces.Version;
 
 namespace FluentLang.Compiler.Emit
 {
-	internal class CSharpEmitter
+	public class FluentlangToCSharpEmitter
 	{
 		private readonly MethodKeyGenerator _keyGenerator;
 
-		public CSharpEmitter(MethodKeyGenerator keyGenerator)
+		public FluentlangToCSharpEmitter(MethodKeyGenerator keyGenerator)
 		{
 			_keyGenerator = keyGenerator;
 		}

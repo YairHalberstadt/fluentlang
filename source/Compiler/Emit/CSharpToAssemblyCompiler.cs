@@ -14,11 +14,11 @@ using System.Threading;
 
 namespace FluentLang.Compiler.Emit
 {
-	public class CSharpAssemblyCompiler
+	public class CSharpToAssemblyCompiler
 	{
 		private readonly ILogger _logger;
 
-		public CSharpAssemblyCompiler(ILogger logger)
+		public CSharpToAssemblyCompiler(ILogger logger)
 		{
 			_logger = logger;
 		}

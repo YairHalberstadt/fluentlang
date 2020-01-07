@@ -63,7 +63,7 @@ Actual:
 			var writer = new StreamWriter(csharpStream);
 			var reader = new StreamReader(csharpStream);
 
-			new CSharpEmitter(new MethodKeyGenerator()).Emit(assembly, writer);
+			new FluentlangToCSharpEmitter(new MethodKeyGenerator()).Emit(assembly, writer);
 
 			csharpStream.Position = 0;
 
@@ -78,8 +78,8 @@ Actual:
 
 			var ilStream = new MemoryStream();
 
-			var emitResult = new CSharpAssemblyCompiler(
-				new XunitLogger<CSharpAssemblyCompiler>(testOutputHelper)).Compile(reader, assembly, new CompilationOptions(), ilStream, new Assembly[] { });
+			var emitResult = new CSharpToAssemblyCompiler(
+				new XunitLogger<CSharpToAssemblyCompiler>(testOutputHelper)).Compile(reader, assembly, new CompilationOptions(), ilStream, new Assembly[] { });
 
 			if (!emitResult.Success)
 			{
