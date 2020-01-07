@@ -22,13 +22,13 @@ namespace FluentLang.flc.DependencyLoading
 		private readonly ILogger<DependencyLoader> _logger;
 
 		public DependencyLoader(
-			ImmutableArray<IAssemblyLoader> assemblyLoaders,
+			IEnumerable<IAssemblyLoader> assemblyLoaders,
 			DependencyAttributeReader dependencyAttributeReader,
 			ILogger<DependencyLoader> logger)
 		{
-			_assemblyLoaders = assemblyLoaders;
-			_dependencyAttributeReader = dependencyAttributeReader;
-			_logger = logger;
+			_assemblyLoaders = assemblyLoaders?.ToImmutableArray() ?? throw new ArgumentNullException(nameof(assemblyLoaders));
+			_dependencyAttributeReader = dependencyAttributeReader ?? throw new ArgumentNullException(nameof(dependencyAttributeReader));
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		public ValueTask<ImmutableArray<IAssembly>> LoadDependenciesAsync(

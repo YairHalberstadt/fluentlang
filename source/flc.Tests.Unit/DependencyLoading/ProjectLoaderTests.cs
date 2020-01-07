@@ -129,8 +129,12 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 			Assert.Equal("I", result.Interfaces.SingleOrDefault().FullyQualifiedName!.ToString());
 		}
 
-		[Fact]
-		public async Task ThrowsIfFileOrDirectoryNotFound()
+		[Theory]
+		[InlineData("sourceFile")]
+		[InlineData("directory/sourceFile")]
+		[InlineData("../sourceFile")]
+		[InlineData("sourceFile/")]
+		public async Task ThrowsIfFileOrDirectoryNotFound(string path)
 		{
 			var projectLoader = new ProjectLoader(
 				GetLogger<ProjectLoader>(),
@@ -138,7 +142,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 				new MockFileSystem());
 			var assemblyLoadContext = new AssemblyLoadContext(name: null);
 			await Assert.ThrowsAsync<FlcException>(() => projectLoader.LoadProjectAsync(
-				new ProjectInfo("p", new Version(0, 0), ImmutableArray.Create("sourceFile")),
+				new ProjectInfo("p", new Version(0, 0), ImmutableArray.Create(path)),
 				assemblyLoadContext,
 				ImmutableArray<IAssembly>.Empty).AsTask());
 		}

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -16,10 +17,12 @@ namespace FluentLang.flc.DependencyLoading
 		private readonly ILogger<FileAssemblyLoader> _logger;
 		private readonly ImmutableArray<string> _directoriesToCheck;
 
-		public FileAssemblyLoader(ILogger<FileAssemblyLoader> logger, ImmutableArray<string> directoriesToCheck)
+		public FileAssemblyLoader(
+			ILogger<FileAssemblyLoader> logger,
+			IEnumerable<string> directoriesToCheck)
 		{
-			_logger = logger;
-			_directoriesToCheck = directoriesToCheck;
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+			_directoriesToCheck = directoriesToCheck?.ToImmutableArray() ?? throw new ArgumentNullException(nameof(directoriesToCheck));
 		}
 		public ValueTask<Assembly?> TryLoadAssemblyAsync(AssemblyLoadContext assemblyLoadContext, Dependency dependency, CancellationToken cancellationToken = default)
 		{

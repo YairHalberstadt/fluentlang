@@ -61,7 +61,9 @@ namespace FluentLang.Compiler.Tests.Unit.ProjectSystem
 						ImmutableArray<string>.Empty,
 						ImmutableArray.Create(
 							new Reference(Reference.ReferenceType.Assembly, "assembly", "1.2.3"),
-							new Reference(Reference.ReferenceType.Project, "Project1")))));
+							new Reference(Reference.ReferenceType.Project, "Project1")))),
+				default,
+				default);
 		[Fact]
 		public void CanParseValidSolutionFromString()
 		{
@@ -140,6 +142,40 @@ namespace FluentLang.Compiler.Tests.Unit.ProjectSystem
 				new MockFileSystem());
 
 			Assert.Throws<FlcException>(() => solutionFactory.Parse(solutionFile));
+		}
+
+		[Fact]
+		public void CanParseLibDirectories()
+		{
+			var solutionInfo = @"
+{
+	""LibDirectories"": [ ""a.dll"", ""b.dll"" ]
+}
+";
+			var solutionFactory = new SolutionFactory(
+				NullLogger<SolutionFactory>.Instance,
+				new MockFileSystem());
+
+			var solution = solutionFactory.Parse(solutionInfo);
+
+			AssertEqual(solution, new SolutionInfo(default, ImmutableArray.Create("a.dll", "b.dll"), default));
+		}
+
+		[Fact]
+		public void CanParseNugetFeeds()
+		{
+			var solutionInfo = @"
+{
+	""NugetFeeds"": [ ""http://nuget.org"", ""http://myget.org"" ]
+}
+";
+			var solutionFactory = new SolutionFactory(
+				NullLogger<SolutionFactory>.Instance,
+				new MockFileSystem());
+
+			var solution = solutionFactory.Parse(solutionInfo);
+
+			AssertEqual(solution, new SolutionInfo(default, default, ImmutableArray.Create("http://nuget.org", "http://myget.org")));
 		}
 
 		private static void AssertEqual(SolutionInfo a, SolutionInfo b)

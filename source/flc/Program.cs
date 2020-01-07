@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Autofac;
+using FluentLang.flc.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.CommandLine;
 using System.CommandLine.Builder;
@@ -29,9 +30,10 @@ namespace FluentLang.flc
 			buildCommand.Handler = CommandHandler.Create(
 				(FileInfo solutionFile, LogLevel verbosity) =>
 				{
-					var services = new ServiceCollection();
-					DependencyInjection.ConfigureServices(services, verbosity);
-					var compiler = services.BuildServiceProvider().GetRequiredService<FluentLangCompiler>();
+					var builder = new ContainerBuilder();
+					builder.RegisterModule(new FlcModule(verbosity));
+					using var container = builder.Build();
+					var compiler = container.Resolve<FluentLangCompiler>();
 					return compiler.Build(solutionFile.FullName).AsTask();
 				});
 

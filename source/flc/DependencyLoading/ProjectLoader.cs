@@ -25,9 +25,9 @@ namespace FluentLang.flc.DependencyLoading
 			IDependencyLoader dependencyLoader,
 			IFileSystem fileSystem)
 		{
-			_logger = logger;
-			_dependencyLoader = dependencyLoader;
-			_fileSystem = fileSystem;
+			_logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
+			_dependencyLoader = dependencyLoader ?? throw new System.ArgumentNullException(nameof(dependencyLoader));
+			_fileSystem = fileSystem ?? throw new System.ArgumentNullException(nameof(fileSystem));
 		}
 
 		public async ValueTask<IAssembly> LoadProjectAsync(
@@ -93,12 +93,12 @@ namespace FluentLang.flc.DependencyLoading
 
 		private string NormalizePath(string path)
 		{
-			path = _fileSystem.Path.GetFullPath(path);
+			var fullPath = _fileSystem.Path.GetFullPath(path);
 
-			return NormalizeInternal(path);
+			return NormalizeInternal(fullPath);
 			string NormalizeInternal(string path)
 			{
-				path = path.TrimEnd(_fileSystem.Path.DirectorySeparatorChar); // if you type c:\foo\ instead of c:\foo
+				path = path.TrimEnd(_fileSystem.Path.DirectorySeparatorChar, _fileSystem.Path.AltDirectorySeparatorChar); // if you type c:\foo\ instead of c:\foo
 
 				var name = _fileSystem.Path.GetFileName(path);
 				if (name == "")
@@ -108,10 +108,14 @@ namespace FluentLang.flc.DependencyLoading
 
 				parent = NormalizeInternal(parent);
 
-				var diParent = _fileSystem.DirectoryInfo.FromDirectoryName(parent);
-				var fsiChildren = diParent.GetFileSystemInfos(name);
-				var fsiChild = fsiChildren.First();
-				return fsiChild.FullName; // coming from GetFileSystemImfos() this has the correct case
+				var parentDirectoryInfo = _fileSystem.DirectoryInfo.FromDirectoryName(parent);
+				var pathFileSystemInfo = 
+					parentDirectoryInfo
+					.GetFileSystemInfos(name)
+					.FirstOrDefault()
+						?? throw new FlcException($"File {fullPath} does not exist.");
+
+				return pathFileSystemInfo.FullName; // coming from GetFileSystemImfos() this has the correct case
 			}
 		}
 

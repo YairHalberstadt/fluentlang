@@ -36,17 +36,19 @@ namespace FluentLang.flc.DependencyLoading
 
 		private readonly ImmutableArray<string> _nugetFeedUrls;
 
-		public NugetAssemblyLoader(ILogger<NugetAssemblyLoader> logger, string globalPackagesFolder, ImmutableArray<string> nugetFeedUrls)
+		public NugetAssemblyLoader(
+			ILogger<NugetAssemblyLoader> logger,
+			string globalPackagesFolder,
+			ImmutableArray<string> nugetFeedUrls)
 		{
-			_logger = logger;
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			_nugetLogger = new NugetLoggerAdapter(logger);
-			_globalPackagesFolder = globalPackagesFolder;
+			_globalPackagesFolder = globalPackagesFolder ?? throw new ArgumentNullException(nameof(globalPackagesFolder));
 			if (nugetFeedUrls.IsDefaultOrEmpty)
 			{
 				nugetFeedUrls = _defaultFeeds;
 			}
 			_nugetFeedUrls = nugetFeedUrls;
-
 		}
 
 		public async ValueTask<Assembly?> TryLoadAssemblyAsync(
