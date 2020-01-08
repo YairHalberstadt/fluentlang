@@ -16,9 +16,9 @@ namespace FluentLang.Compiler.Emit
 {
 	public class CSharpToAssemblyCompiler
 	{
-		private readonly ILogger _logger;
+		private readonly ILogger<CSharpToAssemblyCompiler> _logger;
 
-		public CSharpToAssemblyCompiler(ILogger logger)
+		public CSharpToAssemblyCompiler(ILogger<CSharpToAssemblyCompiler> logger)
 		{
 			_logger = logger;
 		}
@@ -26,9 +26,9 @@ namespace FluentLang.Compiler.Emit
 		public EmitResult Compile(
 			TextReader file,
 			IAssembly assembly,
-			CompilationOptions compilationOptions,
-			Stream outputStream,
 			IEnumerable<Assembly> referencedAssemblies,
+			Stream outputStream,
+			Stream? pdbStream = null,
 			CancellationToken cancellationToken = default)
 		{
 			var sourceText = SourceText.From(file, int.MaxValue);
@@ -44,7 +44,7 @@ namespace FluentLang.Compiler.Emit
 					moduleName: assembly.Name.ToString(), 
 					optimizationLevel: OptimizationLevel.Release));
 
-			var emitResult = compilation.Emit(outputStream, cancellationToken: cancellationToken);
+			var emitResult = compilation.Emit(outputStream, pdbStream, cancellationToken: cancellationToken);
 
 			_logger.LogInformation(
 				$"compilation {(emitResult.Success ? "succeeded" : "failed")} with following diagnostics:"

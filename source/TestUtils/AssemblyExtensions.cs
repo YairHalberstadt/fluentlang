@@ -1,4 +1,5 @@
-﻿using FluentLang.Compiler.Diagnostics;
+﻿using FluentLang.Compiler.Compilation;
+using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Emit;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Metadata;
@@ -56,19 +57,21 @@ Actual:
 			object? expectedResult = null,
 			Action<IAssembly, Assembly>? testEmittedAssembly = null)
 		{
-			if (!assembly.AllDiagnostics.IsEmpty)
-				throw new InvalidOperationException("cannot emit assembly with errors");
+			var assemblyCompiler = new AssemblyCompiler(
+				new FluentlangToCSharpEmitter(new MethodKeyGenerator()),
+				new CSharpToAssemblyCompiler(new XunitLogger<CSharpToAssemblyCompiler>(testOutputHelper)));
 
+			var assemblyStream = new MemoryStream();
 			var csharpStream = new MemoryStream();
-			var writer = new StreamWriter(csharpStream);
-			var reader = new StreamReader(csharpStream);
+			var compilationResult = assemblyCompiler.CompileAssembly(assembly, Array.Empty<Assembly>(), assemblyStream, csharpStream);
 
-			new FluentlangToCSharpEmitter(new MethodKeyGenerator()).Emit(assembly, writer);
-
-			csharpStream.Position = 0;
+			if (!compilationResult.AssemblyDiagnostics.IsEmpty)
+				throw new InvalidOperationException("cannot emit assembly with errors");
 
 			if (expectedCSharp is { })
 			{
+				csharpStream.Position = 0;
+				var reader = new StreamReader(csharpStream);
 				var actual = reader.ReadToEnd();
 				Assert.True(
 					expectedCSharp == actual,
@@ -76,27 +79,21 @@ Actual:
 				csharpStream.Position = 0;
 			}
 
-			var ilStream = new MemoryStream();
-
-			var emitResult = new CSharpToAssemblyCompiler(
-				new XunitLogger<CSharpToAssemblyCompiler>(testOutputHelper)).Compile(reader, assembly, new CompilationOptions(), ilStream, new Assembly[] { });
-
-			if (!emitResult.Success)
+			if (!compilationResult.RoslynDiagnostics.IsEmpty)
 			{
 				csharpStream.Position = 0;
-
+				var reader = new StreamReader(csharpStream);
 				Assert.False(true,
 					"compiling and emitting csharp failed with diagnostics:\n"
-					+ string.Join('\n', emitResult.Diagnostics)
+					+ string.Join('\n', compilationResult.RoslynDiagnostics)
 					+ "\n\ncsharp code was:\n\n"
 					+ reader.ReadToEnd());
 			}
 
-			ilStream.Position = 0;
-
+			assemblyStream.Position = 0;
 			var assemblyLoadContext = new System.Runtime.Loader.AssemblyLoadContext(null, isCollectible: true);
 			// verify assembly is valid
-			var emittedAssembly = assemblyLoadContext.LoadFromStream(ilStream);
+			var emittedAssembly = assemblyLoadContext.LoadFromStream(assemblyStream);
 
 			if (expectedResult is { })
 			{
