@@ -61,7 +61,7 @@ namespace FluentLang.Compiler.Compilation
 			return new CompilationResult(
 				CompilationResultStatus.Succeeded,
 				ImmutableArray<Diagnostic>.Empty,
-				ImmutableArray<Microsoft.CodeAnalysis.Diagnostic>.Empty);
+				emitResult.Diagnostics);
 		}
 	}
 }

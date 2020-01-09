@@ -79,7 +79,7 @@ Actual:
 				csharpStream.Position = 0;
 			}
 
-			if (!compilationResult.RoslynDiagnostics.IsEmpty)
+			if (compilationResult.Status != CompilationResultStatus.Succeeded)
 			{
 				csharpStream.Position = 0;
 				var reader = new StreamReader(csharpStream);
