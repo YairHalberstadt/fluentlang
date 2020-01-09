@@ -34,7 +34,7 @@ namespace FluentLang.flc
 					builder.RegisterModule(new FlcModule(verbosity));
 					using var container = builder.Build();
 					var compiler = container.Resolve<FluentLangCompiler>();
-					return compiler.Build(solutionFile.FullName).AsTask();
+					return compiler.Build(solutionFile.FullName, "", default).AsTask();
 				});
 
 			await rootCommand.InvokeAsync(args);

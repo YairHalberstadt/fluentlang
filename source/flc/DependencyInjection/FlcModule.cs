@@ -1,6 +1,9 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Dependable.Implementations.Autofac;
+using FluentLang.Compiler.Compilation;
+using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Emit;
 using FluentLang.flc.DependencyLoading;
 using FluentLang.flc.ProjectSystem;
 using Microsoft.Extensions.DependencyInjection;
@@ -65,6 +68,26 @@ namespace FluentLang.flc.DependencyInjection
 			builder.RegisterType<ProjectLoader>()
 				.As<IProjectLoader>()
 				.InstancePerMatchingLifetimeScope(Tag.Create<SolutionInfo>());
+
+			builder.RegisterType<MethodKeyGenerator>()
+				.AsSelf()
+				.SingleInstance();
+
+			builder.RegisterType<FluentlangToCSharpEmitter>()
+				.AsSelf()
+				.SingleInstance();
+
+			builder.RegisterType<CSharpToAssemblyCompiler>()
+				.AsSelf()
+				.SingleInstance();
+
+			builder.RegisterType<AssemblyCompiler>()
+				.As<IAssemblyCompiler>()
+				.SingleInstance();
+
+			builder.RegisterType<DiagnosticFormatter>()
+				.As<IDiagnosticFormatter>()
+				.SingleInstance();
 		}
 
 		private static void ConfigureServices(IServiceCollection services, LogLevel logLevel)
