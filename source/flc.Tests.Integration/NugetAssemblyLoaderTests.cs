@@ -24,7 +24,7 @@ namespace FluentLang.Compiler.Tests.Integration
 				var assembly = await loader.TryLoadAssemblyAsync(
 					assemblyLoadContext,
 					new Dependency("FluentLang.Runtime", "1.0.0-CI-20191218-193719"));
-				Assert.NotNull(assembly?.GetType(typeof(FLObject).FullName!));
+				Assert.NotNull(assembly?.Assembly.GetType(typeof(FLObject).FullName!));
 				assemblyLoadContext.Unload();
 			}
 			finally
@@ -114,7 +114,7 @@ namespace FluentLang.Compiler.Tests.Integration
 				var assembly = await loader.TryLoadAssemblyAsync(
 					assemblyLoadContext,
 					new Dependency("FluentLang.Runtime", "1.0.0-CI-20191218-193719"));
-				Assert.NotNull(assembly?.GetType(typeof(FLObject).FullName!));
+				Assert.NotNull(assembly?.Assembly.GetType(typeof(FLObject).FullName!));
 				assemblyLoadContext.Unload();
 			}
 			finally

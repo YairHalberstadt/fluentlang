@@ -43,6 +43,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 			var projectLoader = new ProjectLoader(
 				GetLogger<ProjectLoader>(),
 				new MockDependencyLoader(),
+				_assemblyFactory,
 				new MockFileSystem(new Dictionary<string, MockFileData>
 				{
 					{"sourceFile", "interface I {}"}
@@ -52,7 +53,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 				new ProjectInfo("p", new Version(0, 0), ImmutableArray.Create("sourceFile")),
 				assemblyLoadContext,
 				ImmutableArray<IAssembly>.Empty);
-			result.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+			result.VerifyDiagnostics().VerifyEmit();
 			Assert.Equal("I", result.Interfaces.SingleOrDefault().FullyQualifiedName!.ToString());
 		}
 
@@ -62,6 +63,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 			var projectLoader = new ProjectLoader(
 				GetLogger<ProjectLoader>(),
 				new MockDependencyLoader(),
+				_assemblyFactory,
 				new MockFileSystem(new Dictionary<string, MockFileData>
 				{
 					{"dir/sourceFile1.fl", "interface I1 {}"},
@@ -72,7 +74,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 				new ProjectInfo("p", new Version(0, 0), ImmutableArray.Create("dir")),
 				assemblyLoadContext,
 				ImmutableArray<IAssembly>.Empty);
-			result.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+			result.VerifyDiagnostics().VerifyEmit();
 			Assert.Equal(
 				new[] { "I1", "I2" }, 
 				result.Interfaces.Select(x => x.FullyQualifiedName!.ToString()));
@@ -84,6 +86,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 			var projectLoader = new ProjectLoader(
 				GetLogger<ProjectLoader>(),
 				new MockDependencyLoader(),
+				_assemblyFactory,
 				new MockFileSystem(new Dictionary<string, MockFileData>
 				{
 					{"dir/sourceFile1.fl", "interface I1 {}"},
@@ -94,7 +97,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 				new ProjectInfo("p", new Version(0, 0), ImmutableArray.Create("dir")),
 				assemblyLoadContext,
 				ImmutableArray<IAssembly>.Empty);
-			result.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+			result.VerifyDiagnostics().VerifyEmit();
 			Assert.Equal(
 				new[] { "I1", "I2" },
 				result.Interfaces.Select(x => x.FullyQualifiedName!.ToString()));
@@ -106,6 +109,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 			var projectLoader = new ProjectLoader(
 				GetLogger<ProjectLoader>(),
 				new MockDependencyLoader(),
+				_assemblyFactory,
 				new MockFileSystem(new Dictionary<string, MockFileData>
 				{
 					{"c:/dir/sourceFile.fl", "interface I {}"}
@@ -125,7 +129,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 					"dir")),
 				assemblyLoadContext,
 				ImmutableArray<IAssembly>.Empty);
-			result.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+			result.VerifyDiagnostics().VerifyEmit();
 			Assert.Equal("I", result.Interfaces.SingleOrDefault().FullyQualifiedName!.ToString());
 		}
 
@@ -139,6 +143,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 			var projectLoader = new ProjectLoader(
 				GetLogger<ProjectLoader>(),
 				new MockDependencyLoader(),
+				_assemblyFactory,
 				new MockFileSystem());
 			var assemblyLoadContext = new AssemblyLoadContext(name: null);
 			await Assert.ThrowsAsync<FlcException>(() => projectLoader.LoadProjectAsync(
@@ -153,6 +158,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 			var projectLoader = new ProjectLoader(
 				GetLogger<ProjectLoader>(),
 				new MockDependencyLoader(),
+				_assemblyFactory,
 				new MockFileSystem(new Dictionary<string, MockFileData>
 				{
 					{"dir/sourceFile1.fl", "interface I1 {}"},
@@ -167,7 +173,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 					ImmutableArray.Create("dir/sourceFile2.fl")),
 				assemblyLoadContext,
 				ImmutableArray<IAssembly>.Empty);
-			result.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+			result.VerifyDiagnostics().VerifyEmit();
 			Assert.Equal(
 				new[] { "I1" },
 				result.Interfaces.Select(x => x.FullyQualifiedName!.ToString()));
@@ -179,6 +185,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 			var projectLoader = new ProjectLoader(
 				GetLogger<ProjectLoader>(),
 				new MockDependencyLoader(),
+				_assemblyFactory,
 				new MockFileSystem(new Dictionary<string, MockFileData>
 				{
 					{"dir/sourceFile1.fl", "interface I1 {}"},
@@ -193,7 +200,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 					ImmutableArray.Create("dir/subDir")),
 				assemblyLoadContext,
 				ImmutableArray<IAssembly>.Empty);
-			result.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+			result.VerifyDiagnostics().VerifyEmit();
 			Assert.Equal(
 				new[] { "I1" },
 				result.Interfaces.Select(x => x.FullyQualifiedName!.ToString()));
@@ -205,6 +212,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 			var projectLoader = new ProjectLoader(
 				GetLogger<ProjectLoader>(),
 				new MockDependencyLoader(),
+				_assemblyFactory,
 				new MockFileSystem(new Dictionary<string, MockFileData>
 				{
 					{"dir/sourceFile1.fl", "interface I1 {}"},
@@ -218,7 +226,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 					ImmutableArray.Create("dir")),
 				assemblyLoadContext,
 				ImmutableArray<IAssembly>.Empty);
-			result.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+			result.VerifyDiagnostics().VerifyEmit();
 			Assert.Equal(
 				new[] { "I1" },
 				result.Interfaces.Select(x => x.FullyQualifiedName!.ToString()));
@@ -234,25 +242,26 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 				name,
 				version)
 				.VerifyDiagnostics()
-				.VerifyEmit(_testOutputHelper, testEmittedAssembly: (original, _) =>
-				{
-					var projectLoader = new ProjectLoader(
-					GetLogger<ProjectLoader>(),
-					new MockDependencyLoader(original),
-					new MockFileSystem(new Dictionary<string, MockFileData>
-					{
-						{"sourceFile", "interface I {}"}
-					}));
-					var assemblyLoadContext = new AssemblyLoadContext(name: null);
-					var result = projectLoader.LoadProjectAsync(
-						new ProjectInfo("p", new Version(0, 0), ImmutableArray.Create("sourceFile")),
-						assemblyLoadContext,
-						ImmutableArray<IAssembly>.Empty).Result;
-					result.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
-					var dependency = result.ReferencedAssembliesAndSelf.First();
-					Assert.Equal(original.Name, dependency.Name);
-					Assert.Equal(original.Version, dependency.Version);
-				});
+				.VerifyEmit(testEmittedAssembly: (original, _, _1) =>
+                {
+                    var projectLoader = new ProjectLoader(
+						GetLogger<ProjectLoader>(),
+                        new MockDependencyLoader(original),
+						_assemblyFactory,
+                        new MockFileSystem(new Dictionary<string, MockFileData>
+                    {
+                        {"sourceFile", "interface I {}"}
+                    }));
+                    var assemblyLoadContext = new AssemblyLoadContext(name: null);
+                    var result = projectLoader.LoadProjectAsync(
+                        new ProjectInfo("p", new Version(0, 0), ImmutableArray.Create("sourceFile")),
+                        assemblyLoadContext,
+                        ImmutableArray<IAssembly>.Empty).Result;
+                    result.VerifyDiagnostics().VerifyEmit();
+                    var dependency = result.ReferencedAssembliesAndSelf.First();
+                    Assert.Equal(original.Name, dependency.Name);
+                    Assert.Equal(original.Version, dependency.Version);
+                });
 		}
 	}
 }

@@ -4,6 +4,7 @@ using Dependable.Implementations.Autofac;
 using FluentLang.Compiler.Compilation;
 using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Emit;
+using FluentLang.Compiler.Symbols;
 using FluentLang.flc.DependencyLoading;
 using FluentLang.flc.ProjectSystem;
 using Microsoft.Extensions.DependencyInjection;
@@ -87,6 +88,10 @@ namespace FluentLang.flc.DependencyInjection
 
 			builder.RegisterType<DiagnosticFormatter>()
 				.As<IDiagnosticFormatter>()
+				.SingleInstance();
+
+			builder.RegisterType<AssemblyFactory>()
+				.AsSelf()
 				.SingleInstance();
 		}
 

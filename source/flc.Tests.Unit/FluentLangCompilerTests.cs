@@ -4,10 +4,8 @@ using FluentLang.flc.DependencyInjection;
 using FluentLang.TestUtils;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-using System.IO;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Xunit;
@@ -26,7 +24,7 @@ namespace FluentLang.Compiler.Tests.Unit
 		{
 			var fileSystem = new MockFileSystem(
 				new Dictionary<string, MockFileData>
-				{ 
+				{
 					{
 						"solutionFile",
 						@"
@@ -48,9 +46,7 @@ namespace FluentLang.Compiler.Tests.Unit
 					}
 				});
 
-			var builder = new ContainerBuilder();
-			builder.RegisterModule(new FlcModule(LogLevel.Trace));
-			builder.RegisterInstance(fileSystem).As<IFileSystem>();
+			var builder = CreateBuilder(fileSystem);
 			using var container = builder.Build();
 			var compiler = container.Resolve<FluentLangCompiler>();
 			await compiler.Build("solutionFile", outputDirectory, outputCSharp: false);
@@ -88,9 +84,7 @@ namespace FluentLang.Compiler.Tests.Unit
 					}
 				});
 
-			var builder = new ContainerBuilder();
-			builder.RegisterModule(new FlcModule(LogLevel.Trace));
-			builder.RegisterInstance(fileSystem).As<IFileSystem>();
+			var builder = CreateBuilder(fileSystem);
 			using var container = builder.Build();
 			var compiler = container.Resolve<FluentLangCompiler>();
 			await compiler.Build("solutionFile", outputDirectory, outputCSharp: true);
@@ -110,7 +104,7 @@ public static class Project_AssemblyLevelMethods
 		return (42);
 	}
 }";
-			var actual = 
+			var actual =
 				fileSystem.File.ReadAllText(fileSystem.Path.Combine(outputDirectory, "Project.cs"));
 			Assert.Equal(
 				Normalise(expectedCSharp),
@@ -125,6 +119,148 @@ public static class Project_AssemblyLevelMethods
 				csharp = Regex.Replace(csharp, "\\s+", "");
 				return csharp;
 			}
+		}
+
+		[Fact]
+		public async Task FluentLangCompilerWritesAllProjectsToOutputDirectory()
+		{
+			var fileSystem = new MockFileSystem(
+				new Dictionary<string, MockFileData>
+				{
+					{
+						"solutionFile",
+						@"
+{
+  ""Projects"": [
+    {
+      ""Name"": ""Project1"",
+      ""Version"": { ""Major"": 0, ""Minor"": 0 },
+      ""IncludedFilesAndFolders"": [
+        ""./""
+      ]
+	},
+    {
+      ""Name"": ""Project2"",
+      ""Version"": { ""Major"": 0, ""Minor"": 0 },
+      ""IncludedFilesAndFolders"": [
+        ""./""
+      ]
+	}
+	]
+}"
+					},
+					{
+						"file.fl",
+						@"M() : int { return 42; }"
+					}
+				});
+
+			var builder = CreateBuilder(fileSystem);
+			using var container = builder.Build();
+			var compiler = container.Resolve<FluentLangCompiler>();
+			await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false);
+			Assert.Equal(2560, fileSystem.File.ReadAllBytes("Project1.dll").Length);
+			Assert.Equal(2560, fileSystem.File.ReadAllBytes("Project2.dll").Length);
+		}
+
+		[Fact]
+		public async Task FluentLangCompilerStopsIfFirstProjectFailsToCompile()
+		{
+			var fileSystem = new MockFileSystem(
+				new Dictionary<string, MockFileData>
+				{
+					{
+						"solutionFile",
+						@"
+{
+  ""Projects"": [
+    {
+      ""Name"": ""Project1"",
+      ""Version"": { ""Major"": 0, ""Minor"": 0 },
+      ""IncludedFilesAndFolders"": [
+        ""a.fl""
+      ]
+	},
+    {
+      ""Name"": ""Project2"",
+      ""Version"": { ""Major"": 0, ""Minor"": 0 },
+      ""IncludedFilesAndFolders"": [
+        ""b.fl""
+      ]
+	}
+	]
+}"
+					},
+					{
+						"a.fl",
+						@"M(}{};"
+					},
+					{
+						"b.fl",
+						@"M() : int { return 42; }"
+					}
+				});
+
+			var builder = CreateBuilder(fileSystem);
+			using var container = builder.Build();
+			var compiler = container.Resolve<FluentLangCompiler>();
+			await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false);
+			Assert.False(fileSystem.File.Exists("Project1.dll"));
+			Assert.False(fileSystem.File.Exists("Project2.dll"));
+		}
+
+		[Fact]
+		public async Task FluentLangCompilerWritesDependenciesToOutputFile()
+		{
+			var fileSystem = new MockFileSystem(
+				new Dictionary<string, MockFileData>
+				{
+					{
+						"solutionFile",
+						@"
+{
+  ""Projects"": [
+    {
+      ""Name"": ""Project"",
+      ""Version"": { ""Major"": 0, ""Minor"": 0 },
+      ""IncludedFilesAndFolders"": [
+        ""a.fl""
+      ]
+	},
+    {
+      ""Name"": ""Project2"",
+      ""Version"": { ""Major"": 0, ""Minor"": 0 },
+      ""IncludedFilesAndFolders"": [
+        ""b.fl""
+      ]
+	}
+	]
+}"
+					},
+					{
+						"a.fl",
+						@"M(}{};"
+					},
+					{
+						"b.fl",
+						@"M() : int { return 42; }"
+					}
+				});
+
+			var builder = CreateBuilder(fileSystem);
+			using var container = builder.Build();
+			var compiler = container.Resolve<FluentLangCompiler>();
+			await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false);
+			Assert.False(fileSystem.File.Exists("Project1.dll"));
+			Assert.False(fileSystem.File.Exists("Project2.dll"));
+		}
+
+		private static ContainerBuilder CreateBuilder(MockFileSystem fileSystem)
+		{
+			var builder = new ContainerBuilder();
+			builder.RegisterModule(new FlcModule(LogLevel.Trace));
+			builder.RegisterInstance(fileSystem).As<IFileSystem>();
+			return builder;
 		}
 
 		public FluentLangCompilerTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)

@@ -6,7 +6,6 @@ using FluentLang.TestUtils;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,13 +31,15 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 				name,
 				version)
 				.VerifyDiagnostics()
-				.VerifyEmit(_testOutputHelper, testEmittedAssembly: (original, assembly) =>
+				.VerifyEmit(testEmittedAssembly: (original, assembly, assemblyBytes) =>
 			  {
 				  var assemblyLoadContext = new AssemblyLoadContext(null, true);
-				  var assemblyLoader = new MockAssemblyLoader(assembly);
+				  var assemblyLoader = new MockAssemblyLoader(
+					  new AssemblyLoadResult(assembly, assemblyBytes));
 				  var dependencyLoader = new DependencyLoader(
 					  ImmutableArray.Create<IAssemblyLoader>(assemblyLoader),
 					  new DependencyAttributeReader(),
+					  _assemblyFactory,
 					  GetLogger<DependencyLoader>());
 				  var dependencies = dependencyLoader.LoadDependenciesAsync(
 					  new ProjectInfo(
@@ -67,14 +68,16 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 				name,
 				version)
 				.VerifyDiagnostics()
-				.VerifyEmit(_testOutputHelper, testEmittedAssembly: (original, assembly) =>
+				.VerifyEmit(testEmittedAssembly: (original, assembly, assemblyBytes) =>
 				{
 					var assemblyLoadContext = new AssemblyLoadContext(null, true);
 					var assemblyLoader1 = new MockAssemblyLoader();
-					var assemblyLoader2 = new MockAssemblyLoader(assembly);
+					var assemblyLoader2 = new MockAssemblyLoader(
+						new AssemblyLoadResult(assembly, assemblyBytes));
 					var dependencyLoader = new DependencyLoader(
 						ImmutableArray.Create<IAssemblyLoader>(assemblyLoader1, assemblyLoader2),
 						new DependencyAttributeReader(),
+						_assemblyFactory,
 						GetLogger<DependencyLoader>());
 					var dependencies = dependencyLoader.LoadDependenciesAsync(
 						new ProjectInfo(
@@ -103,13 +106,14 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 				name,
 				version)
 				.VerifyDiagnostics()
-				.VerifyEmit(_testOutputHelper, testEmittedAssembly: (original, assembly) =>
+				.VerifyEmit(testEmittedAssembly: (original, assembly, assemblyBytes) =>
 				{
 					var assemblyLoadContext = new AssemblyLoadContext(null, true);
 					var assemblyLoader = new MockAssemblyLoader();
 					var dependencyLoader = new DependencyLoader(
 						ImmutableArray.Create<IAssemblyLoader>(assemblyLoader),
 						new DependencyAttributeReader(),
+						_assemblyFactory,
 						GetLogger<DependencyLoader>());
 					Assert.Throws<FlcException>(() => dependencyLoader.LoadDependenciesAsync(
 						new ProjectInfo(
@@ -133,7 +137,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 				"sub",
 				new Version(1, 2, 3))
 				.VerifyDiagnostics()
-				.VerifyEmit(_testOutputHelper, testEmittedAssembly: (_, subDependency) =>
+				.VerifyEmit(testEmittedAssembly: (_, subDependency, subDependencyBytes) =>
 				{
 					var name = "a";
 					var version = new Version(1, 2, 3);
@@ -142,13 +146,16 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 						name,
 						version)
 						.VerifyDiagnostics()
-						.VerifyEmit(_testOutputHelper, testEmittedAssembly: (original, assembly) =>
+						.VerifyEmit(testEmittedAssembly: (original, assembly, assemblyBytes) =>
 						{
 							var assemblyLoadContext = new AssemblyLoadContext(null, true);
-							var assemblyLoader = new MockAssemblyLoader(subDependency, assembly);
+							var assemblyLoader = new MockAssemblyLoader(
+								new AssemblyLoadResult(subDependency, subDependencyBytes),
+								new AssemblyLoadResult(assembly, assemblyBytes));
 							var dependencyLoader = new DependencyLoader(
 								ImmutableArray.Create<IAssemblyLoader>(assemblyLoader),
 								new DependencyAttributeReader(),
+								_assemblyFactory,
 								GetLogger<DependencyLoader>());
 							var dependencies = dependencyLoader.LoadDependenciesAsync(
 								new ProjectInfo(
@@ -180,13 +187,15 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 				version,
 				subDependency)
 				.VerifyDiagnostics()
-				.VerifyEmit(_testOutputHelper, testEmittedAssembly: (original, assembly) =>
+				.VerifyEmit(testEmittedAssembly: (original, assembly, assemblyBytes) =>
 				{
 					var assemblyLoadContext = new AssemblyLoadContext(null, true);
-					var assemblyLoader = new MockAssemblyLoader(assembly);
+					var assemblyLoader = new MockAssemblyLoader(
+						new AssemblyLoadResult(assembly, assemblyBytes));
 					var dependencyLoader = new DependencyLoader(
 						ImmutableArray.Create<IAssemblyLoader>(assemblyLoader),
 						new DependencyAttributeReader(),
+						_assemblyFactory,
 						GetLogger<DependencyLoader>());
 					Assert.Throws<FlcException>(() => dependencyLoader.LoadDependenciesAsync(
 						new ProjectInfo(
@@ -204,16 +213,79 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 
 		public class MockAssemblyLoader : IAssemblyLoader
 		{
-			private readonly ImmutableArray<Assembly> _assemblies;
+			private readonly ImmutableArray<AssemblyLoadResult> _assemblies;
 
-			public MockAssemblyLoader(params Assembly[] assemblies)
+			public MockAssemblyLoader(params AssemblyLoadResult[] assemblies)
 			{
 				_assemblies = assemblies.ToImmutableArray();
 			}
-			public ValueTask<Assembly?> TryLoadAssemblyAsync(AssemblyLoadContext assemblyLoadContext, Dependency dependency, CancellationToken cancellationToken = default)
+			public ValueTask<AssemblyLoadResult?> TryLoadAssemblyAsync(AssemblyLoadContext assemblyLoadContext, Dependency dependency, CancellationToken cancellationToken = default)
 			{
-				return new ValueTask<Assembly?>(_assemblies.FirstOrDefault(
-					x => x.GetName().Name == $"{dependency.Name}${dependency.Version}"));
+				return new ValueTask<AssemblyLoadResult?>(_assemblies.FirstOrDefault(
+					x => x.Assembly.GetName().Name == $"{dependency.Name}${dependency.Version}"));
+			}
+		}
+
+		[Fact]
+		public void LoadsAssemblyAtMostOnceEvenWhenCalledInParallel()
+		{
+			var name = "a";
+			var version = new Version(1, 2, 3);
+			CreateAssembly(
+				"",
+				name,
+				version)
+				.VerifyDiagnostics()
+				.VerifyEmit(testEmittedAssembly: (original, assembly, assemblyBytes) =>
+				{
+					var assemblyLoadContext = new AssemblyLoadContext(null, true);
+					var assemblyLoader = new MockAssemblyLoader(
+						new AssemblyLoadResult(assembly, assemblyBytes));
+					var dependencyLoader = new DependencyLoader(
+						ImmutableArray.Create<IAssemblyLoader>(assemblyLoader),
+						new DependencyAttributeReader(),
+						_assemblyFactory,
+						GetLogger<DependencyLoader>());
+					var projectInfo = new ProjectInfo(
+							"p",
+							new flc.ProjectSystem.Version(0, 0),
+							ImmutableArray.Create(""),
+							references: ImmutableArray.Create(new Reference(
+								Reference.ReferenceType.Assembly,
+								name,
+								version.ToString())));
+					_ = dependencyLoader.LoadDependenciesAsync(
+						projectInfo,
+						assemblyLoadContext,
+						Array.Empty<IAssembly>());
+					var dependencies = dependencyLoader.LoadDependenciesAsync(
+						projectInfo,
+						assemblyLoadContext,
+						Array.Empty<IAssembly>()).Result;
+					var dependency = dependencies.Single();
+					Assert.Equal(original.Name, dependency.Name);
+					Assert.Equal(original.Version, dependency.Version);
+				});
+		}
+
+		public class OnlyOneEntryAssemblyLoader : IAssemblyLoader
+		{
+			private readonly ImmutableArray<AssemblyLoadResult> _assemblies;
+
+			public OnlyOneEntryAssemblyLoader(params AssemblyLoadResult[] assemblies)
+			{
+				_assemblies = assemblies.ToImmutableArray();
+			}
+			private int _enterCount;
+			public async ValueTask<AssemblyLoadResult?> TryLoadAssemblyAsync(AssemblyLoadContext assemblyLoadContext, Dependency dependency, CancellationToken cancellationToken = default)
+			{
+				Interlocked.Increment(ref _enterCount);
+				if (_enterCount > 1)
+					throw new Exception("AssemblyLoader called more than once");
+
+				await Task.Delay(100);
+				return _assemblies.FirstOrDefault(
+					x => x.Assembly.GetName().Name == $"{dependency.Name}${dependency.Version}");
 			}
 		}
 	}

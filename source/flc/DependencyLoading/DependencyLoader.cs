@@ -5,6 +5,7 @@ using FluentLang.flc.ProjectSystem;
 using FluentLang.flc.Utils;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -19,15 +20,23 @@ namespace FluentLang.flc.DependencyLoading
 	{
 		private readonly ImmutableArray<IAssemblyLoader> _assemblyLoaders;
 		private readonly DependencyAttributeReader _dependencyAttributeReader;
+		private readonly AssemblyFactory _assemblyFactory;
 		private readonly ILogger<DependencyLoader> _logger;
+		/// <summary>
+		/// https://andrewlock.net/making-getoradd-on-concurrentdictionary-thread-safe-using-lazy/
+		/// </summary>
+		private readonly ConcurrentDictionary<Dependency, Lazy<Task<IAssembly>>> _assemblies
+			= new ConcurrentDictionary<Dependency, Lazy<Task<IAssembly>>>();
 
 		public DependencyLoader(
 			IEnumerable<IAssemblyLoader> assemblyLoaders,
 			DependencyAttributeReader dependencyAttributeReader,
+			AssemblyFactory assemblyFactory,
 			ILogger<DependencyLoader> logger)
 		{
 			_assemblyLoaders = assemblyLoaders?.ToImmutableArray() ?? throw new ArgumentNullException(nameof(assemblyLoaders));
 			_dependencyAttributeReader = dependencyAttributeReader ?? throw new ArgumentNullException(nameof(dependencyAttributeReader));
+			_assemblyFactory = assemblyFactory ?? throw new ArgumentNullException(nameof(assemblyFactory));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
@@ -67,45 +76,54 @@ namespace FluentLang.flc.DependencyLoading
 
 			Release.Assert(reference.Version != null);
 
-			return LoadDependencyAsync(
+			return new ValueTask<IAssembly>(LoadDependencyAsync(
 				assemblyLoadContext,
 				new Dependency(reference.Name, reference.Version),
-				cancellationToken);
+				cancellationToken));
 		}
 
-		private async ValueTask<IAssembly> LoadDependencyAsync(
+		private Task<IAssembly> LoadDependencyAsync(
 			AssemblyLoadContext assemblyLoadContext,
 			Dependency dependency,
 			CancellationToken cancellationToken)
 		{
-			var assembly =
-				assemblyLoadContext
-				.Assemblies
-				.FirstOrDefault(x => x.GetName().Name == $"{dependency.Name}${dependency.Version}");
+			return
+				_assemblies.GetOrAdd(
+					dependency,
+					_ => new Lazy<Task<IAssembly>>(LoadDependencyAsyncInternal))
+				.Value;
 
-			assembly ??=
-				(await
-					_assemblyLoaders
-					.ToAsyncEnumerable()
-					.SelectAwait(x => x.TryLoadAssemblyAsync(
-						assemblyLoadContext,
-						dependency,
-						cancellationToken))
-					.FirstOrDefaultAsync(x => x != null)
-					.ConfigureAwait(false))
-				?? throw new FlcException(
-						$"Could not find assembly {dependency.Name} {dependency.Version} in any location");
+			// Cannot return ValueTask since possible to await multiple times.
+			async Task<IAssembly> LoadDependencyAsyncInternal()
+			{
+				var assemblyLoadResult =
+					(await
+						_assemblyLoaders
+						.ToAsyncEnumerable()
+						.SelectAwait(x => x.TryLoadAssemblyAsync(
+							assemblyLoadContext,
+							dependency,
+							cancellationToken))
+						.FirstOrDefaultAsync(x => x != null)
+						.ConfigureAwait(false))
+					?? throw new FlcException(
+							$"Could not find assembly {dependency.Name} {dependency.Version} in any location");
 
-			var subDependencies =
-				await
-					_dependencyAttributeReader
-					.ReadDependencies(assembly)
-					.ToAsyncEnumerable()
-					.SelectAwait(x => LoadDependencyAsync(assemblyLoadContext, x, cancellationToken))
-					.ToImmutableArrayAsync()
-					.ConfigureAwait(false);
+				var subDependencies =
+					await
+						_dependencyAttributeReader
+						.ReadDependencies(assemblyLoadResult.Assembly)
+						.ToAsyncEnumerable()
+						.SelectAwait(x => new ValueTask<IAssembly>(
+							LoadDependencyAsync(assemblyLoadContext, x, cancellationToken)))
+						.ToImmutableArrayAsync()
+						.ConfigureAwait(false);
 
-			return AssemblyFactory.FromMetadata(assembly, subDependencies);
+				return _assemblyFactory.FromMetadata(
+					assemblyLoadResult.Assembly,
+					assemblyLoadResult.Bytes,
+					subDependencies);
+			}
 		}
 	}
 }

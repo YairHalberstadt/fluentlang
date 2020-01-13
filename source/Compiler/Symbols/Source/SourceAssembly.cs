@@ -1,10 +1,13 @@
-﻿using FluentLang.Compiler.Diagnostics;
+﻿using FluentLang.Compiler.Compilation;
+using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Source.MethodBody;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using static FluentLang.Compiler.Generated.FluentLangParser;
 using Version = FluentLang.Compiler.Symbols.Interfaces.Version;
@@ -21,18 +24,27 @@ namespace FluentLang.Compiler.Symbols.Source
 		private readonly Lazy<ImmutableArray<IMethod>> _methods;
 
 		private readonly DiagnosticBag _diagnostics;
+		private readonly Lazy<ImmutableArray<IAssembly>> _referencedAssemblies;
 		private readonly Lazy<ImmutableArray<Diagnostic>> _allDiagnostics;
+		private readonly Lazy<
+			(CompilationResult compilationResult, 
+			ImmutableArray<byte> assemblyBytes, 
+			ImmutableArray<byte> csharpBytes, 
+			ImmutableArray<byte> pdbBytes)> _compilationResult;
+		private readonly IAssemblyCompiler _assemblyCompiler;
 
 		public SourceAssembly(
 			QualifiedName name,
 			Version version,
 			ImmutableArray<IAssembly> directlyReferencedAssemblies,
-			ImmutableArray<IDocument> documents)
+			ImmutableArray<IDocument> documents,
+			IAssemblyCompiler assemblyCompiler)
 		{
 			_diagnostics = new DiagnosticBag(this);
-
+			_referencedAssemblies = new Lazy<ImmutableArray<IAssembly>>(
+				() => ((IAssembly)this).CalculateReferencedAssemblies(directlyReferencedAssemblies, _diagnostics).ToImmutableArray());
 			_referencedAssembliesAndSelf = new Lazy<ImmutableArray<IAssembly>>(
-				() => ((IAssembly)this).CalculateReferencedAssembliesAndSelf(directlyReferencedAssemblies, _diagnostics));
+				() => ReferencedAssemblies.Add(this));
 
 			_documents = new Lazy<ImmutableArray<IDocument>>(() =>
 				documents.Select(x =>
@@ -52,7 +64,12 @@ namespace FluentLang.Compiler.Symbols.Source
 			_methods = new Lazy<ImmutableArray<IMethod>>(() => _methodsByName.Value.Values.ToImmutableArray());
 			Name = name;
 			Version = version;
-
+			_assemblyCompiler = assemblyCompiler;
+			_compilationResult = new Lazy<(
+				CompilationResult compilationResult,
+				ImmutableArray<byte> assemblyBytes,
+				ImmutableArray<byte> csharpBytes,
+				ImmutableArray<byte> pdbBytes)>(GetCompilationResult);
 			_allDiagnostics = new Lazy<ImmutableArray<Diagnostic>>(() =>
 			{
 				_diagnostics.EnsureAllDiagnosticsCollectedForSymbol();
@@ -60,6 +77,25 @@ namespace FluentLang.Compiler.Symbols.Source
 			});
 		}
 
+		private (
+			CompilationResult compilationResult, 
+			ImmutableArray<byte> assemblyBytes, 
+			ImmutableArray<byte> csharpBytes, 
+			ImmutableArray<byte> pdbBytes) GetCompilationResult()
+		{
+			using var assemblyStream = new MemoryStream();
+			using var csharpStream = new MemoryStream();
+			using var pdbStream = new MemoryStream();
+			var compilationResult = _assemblyCompiler.CompileAssembly(this, assemblyStream, csharpStream, pdbStream);
+			return (
+				compilationResult, 
+				assemblyStream.ToImmutableArray(), 
+				csharpStream.ToImmutableArray(), 
+				pdbStream.ToImmutableArray());
+		}
+
+		public ImmutableArray<IAssembly> ReferencedAssemblies => _referencedAssemblies.Value;
+		
 		public ImmutableArray<IAssembly> ReferencedAssembliesAndSelf => _referencedAssembliesAndSelf.Value;
 
 		public ImmutableArray<IInterface> Interfaces => _interfaces.Value;
@@ -180,6 +216,24 @@ namespace FluentLang.Compiler.Symbols.Source
 		public bool TryGetMethod(QualifiedName fullyQualifiedName, [NotNullWhen(true)] out IMethod? method)
 		{
 			return _methodsByName.Value.TryGetValue(fullyQualifiedName, out method);
+		}
+
+		public CompilationResult CompileAssembly(
+			out ImmutableArray<byte> assemblyBytes,
+			out ImmutableArray<byte> csharpBytes,
+			out ImmutableArray<byte> pdbBytes)
+		{
+			var result = _compilationResult.Value;
+			assemblyBytes = result.assemblyBytes;
+			csharpBytes = result.csharpBytes;
+			pdbBytes = result.pdbBytes;
+			return result.compilationResult;
+		}
+
+		public bool TryGetAssemblyBytes(out ImmutableArray<byte> bytes)
+		{
+			var result = CompileAssembly(out bytes, out _, out _);
+			return result.Status == CompilationResultStatus.Succeeded;
 		}
 
 		void ISymbol.EnsureAllLocalDiagnosticsCollected()

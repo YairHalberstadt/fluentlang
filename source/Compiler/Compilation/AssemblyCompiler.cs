@@ -1,10 +1,8 @@
-﻿using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Emit;
+﻿using FluentLang.Compiler.Emit;
 using FluentLang.Compiler.Symbols.Interfaces;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using System.Reflection;
+using Diagnostic = FluentLang.Compiler.Diagnostics.Diagnostic;
 
 namespace FluentLang.Compiler.Compilation
 {
@@ -23,7 +21,6 @@ namespace FluentLang.Compiler.Compilation
 
 		public CompilationResult CompileAssembly(
 			IAssembly assembly,
-			IEnumerable<Assembly> referencedAssemblies,
 			Stream outputStream,
 			Stream? csharpOutputStream = null,
 			Stream? pdbStream = null)
@@ -46,7 +43,6 @@ namespace FluentLang.Compiler.Compilation
 			var emitResult = _cSharpToAssemblyCompiler.Compile(
 				reader,
 				assembly,
-				referencedAssemblies,
 				outputStream,
 				pdbStream);
 

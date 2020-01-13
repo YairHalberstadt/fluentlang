@@ -24,7 +24,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			{
 				var assembly = CreateAssembly(@"
 M(a : string, b : string) : string { return a + b; }")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -38,7 +38,7 @@ M(a : string, b : string) : string { return a + b; }")
 			{
 				var assembly = CreateAssembly(@"
 M(a : int, b : int) : int { return a + b; }")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -52,7 +52,7 @@ M(a : int, b : int) : int { return a + b; }")
 			{
 				var assembly = CreateAssembly(@"
 M(a : double, b : double) : double { return a + b; }")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -109,7 +109,7 @@ M(a : int, b : double) : int { return a + b; }")
 			{
 				var assembly = CreateAssembly(@"
 M(a : int, b : int) : int { return a - b; }")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -123,7 +123,7 @@ M(a : int, b : int) : int { return a - b; }")
 			{
 				var assembly = CreateAssembly(@"
 M(a : double, b : double) : double { return a - b; }")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -189,7 +189,7 @@ M(a : int, b : double) : int { return a - b; }")
 			{
 				var assembly = CreateAssembly(@"
 M(a : int, b : int) : int { return a * b; }")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -203,7 +203,7 @@ M(a : int, b : int) : int { return a * b; }")
 			{
 				var assembly = CreateAssembly(@"
 M(a : double, b : double) : double { return a * b; }")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -269,7 +269,7 @@ M(a : int, b : double) : int { return a * b; }")
 			{
 				var assembly = CreateAssembly(@"
 M(a : int, b : int) : int { return a / b; }")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -283,7 +283,7 @@ M(a : int, b : int) : int { return a / b; }")
 			{
 				var assembly = CreateAssembly(@"
 M(a : double, b : double) : double { return a / b; }")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -348,7 +348,7 @@ M(a : int, b : double) : int { return a / b; }")
 			{
 				var assembly = CreateAssembly(@"
 M(a : int, b : int) : int { return a % b; }")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -461,7 +461,7 @@ M(a : int, b : double) : int { return a % b; }")
 				var primitiveString = primitive.ToString().ToLower();
 				var assembly = CreateAssembly($@"
 M(a : {primitiveString}, b : {primitiveString}) : bool {{ return a {OperatorSymbol(op)} b; }}")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());

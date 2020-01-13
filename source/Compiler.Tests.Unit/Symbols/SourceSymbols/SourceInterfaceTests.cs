@@ -16,7 +16,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols
 		{
 			var assembly = CreateAssembly(@"
 export interface I1 {}
-interface I2 {}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+interface I2 {}").VerifyDiagnostics().VerifyEmit();
 			var i1 = AssertGetInterface(assembly, "I1");
 			Assert.True(i1.IsExported);
 			var i2 = AssertGetInterface(assembly, "I2");
@@ -37,7 +37,7 @@ interface I2 {}").VerifyDiagnostics(
 		{
 			CreateAssembly(@"
 export interface I1 { M() : I2 }
-export interface I2 {}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+export interface I2 {}").VerifyDiagnostics().VerifyEmit();
 		}
 
 		[Fact]
@@ -45,7 +45,7 @@ export interface I2 {}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 		{
 			CreateAssembly(@"
 interface I1 { M() : I2 }
-export interface I2 {}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+export interface I2 {}").VerifyDiagnostics().VerifyEmit();
 		}
 
 		[Fact]
@@ -53,7 +53,7 @@ export interface I2 {}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 		{
 			CreateAssembly(@"
 interface I1 { M() : I2 }
-interface I2 {}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+interface I2 {}").VerifyDiagnostics().VerifyEmit();
 		}
 	}
 }

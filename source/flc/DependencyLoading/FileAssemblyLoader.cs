@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using FluentLang.Compiler.Helpers;
+using FluentLang.flc.Utils;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -24,13 +26,13 @@ namespace FluentLang.flc.DependencyLoading
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			_directoriesToCheck = directoriesToCheck?.ToImmutableArray() ?? throw new ArgumentNullException(nameof(directoriesToCheck));
 		}
-		public ValueTask<Assembly?> TryLoadAssemblyAsync(AssemblyLoadContext assemblyLoadContext, Dependency dependency, CancellationToken cancellationToken = default)
+		public async ValueTask<AssemblyLoadResult?> TryLoadAssemblyAsync(AssemblyLoadContext assemblyLoadContext, Dependency dependency, CancellationToken cancellationToken = default)
 		{
 			var possiblePaths =
 				_directoriesToCheck
 				.Select(x => Path.Combine(x, dependency.Name + ".dll"));
 
-			var assembly = possiblePaths.Select(x =>
+			var assemblyLoadResult = await possiblePaths.ToAsyncEnumerable().SelectAwait(async x =>
 			{
 				// Check if file exists to reduce nr of exceptions
 				// no point injecting IFileSystem since it doesn't have 
@@ -41,7 +43,9 @@ namespace FluentLang.flc.DependencyLoading
 					{
 						if (FileVersionInfo.GetVersionInfo(x).FileVersion == dependency.Version)
 						{
-							return assemblyLoadContext.LoadFromAssemblyPath(Path.GetFullPath(x));
+							var bytes = (await File.ReadAllBytesAsync(x)).UnsafeAsImmutableArray();
+							var assembly = assemblyLoadContext.LoadFromStream(bytes.ToStream());
+							return new AssemblyLoadResult(assembly, bytes);
 						}
 					}
 					catch (FileNotFoundException)
@@ -49,14 +53,14 @@ namespace FluentLang.flc.DependencyLoading
 					}
 				}
 				return null;
-			}).FirstOrDefault(x => x != null);
+			}).FirstOrDefaultAsync(x => x != null);
 
-			if (assembly is null)
+			if (assemblyLoadResult is null)
 			{
 				_logger.LogInformation("Could not find assembly {0} {1} in any library directory", dependency.Name, dependency.Version);
 			}
 
-			return new ValueTask<Assembly?>(assembly);
+			return assemblyLoadResult;
 		}
 	}
 }

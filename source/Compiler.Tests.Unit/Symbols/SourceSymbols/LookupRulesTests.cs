@@ -44,7 +44,7 @@ namespace B {
 			return 42;
 		}
 	}
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			var expected = assembly.Methods.Single().LocalMethods.Single().LocalMethods.Single().LocalInterfaces.Single();
 			var actual = assembly.Methods.Single().LocalMethods.Single().LocalMethods.Single().LocalMethods.Single().ReturnType;
 			Assert.Equal(expected, actual);
@@ -79,7 +79,7 @@ namespace B {
 			return 42;
 		}
 	}
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			var expected = assembly.Methods.Single().LocalMethods.Single().LocalInterfaces.Single();
 			var actual = assembly.Methods.Single().LocalMethods.Single().LocalMethods.Single().LocalMethods.Single().ReturnType;
 			Assert.Equal(expected, actual);
@@ -113,7 +113,7 @@ namespace B {
 			return 42;
 		}
 	}
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			var expected = assembly.Methods.Single().LocalInterfaces.Single();
 			var actual = assembly.Methods.Single().LocalMethods.Single().LocalMethods.Single().LocalMethods.Single().ReturnType;
 			Assert.Equal(expected, actual);
@@ -146,7 +146,7 @@ namespace B {
 			return 42;
 		}
 	}
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			Assert.True(assembly.TryGetInterface(QualifiedName("B.C.I"), out var expected));
 			var actual = assembly.Methods.Single().LocalMethods.Single().LocalMethods.Single().LocalMethods.Single().ReturnType;
 			Assert.Equal(expected, actual);
@@ -178,7 +178,7 @@ namespace B {
 			return 42;
 		}
 	}
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			Assert.True(assembly.TryGetInterface(QualifiedName("B.I"), out var expected));
 			var actual = assembly.Methods.Single().LocalMethods.Single().LocalMethods.Single().LocalMethods.Single().ReturnType;
 			Assert.Equal(expected, actual);
@@ -209,7 +209,7 @@ namespace B {
 			return 42;
 		}
 	}
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			Assert.True(assembly.TryGetInterface(QualifiedName("I"), out var expected));
 			var actual = assembly.Methods.Single().LocalMethods.Single().LocalMethods.Single().LocalMethods.Single().ReturnType;
 			Assert.Equal(expected, actual);
@@ -238,7 +238,7 @@ namespace B {
 			return 42;
 		}
 	}
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			Assert.True(assembly.TryGetInterface(QualifiedName("A.I"), out var expected));
 			var actual = assembly.Methods.Single().LocalMethods.Single().LocalMethods.Single().LocalMethods.Single().ReturnType;
 			Assert.Equal(expected, actual);
@@ -286,7 +286,7 @@ M() : I { return {}; }").VerifyDiagnostics(new Diagnostic(new Location(new TextT
 M() : int {
 	M1() : int { return 5; }
 	return M1();
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var localMethod = m.LocalMethods.Single();
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());

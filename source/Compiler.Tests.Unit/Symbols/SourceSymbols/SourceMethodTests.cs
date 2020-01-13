@@ -96,7 +96,7 @@ M(x : {}) : {} {
 		{
 			var assembly = CreateAssembly(@"
 export M1() : bool { return true; }
-M2() : bool { return true; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+M2() : bool { return true; }").VerifyDiagnostics().VerifyEmit();
 			var m1 = AssertGetMethod(assembly, "M1");
 			Assert.True(m1.IsExported);
 			var m2 = AssertGetMethod(assembly, "M2");
@@ -118,7 +118,7 @@ export M(a : I) : I { return {}; }").VerifyDiagnostics(
 		{
 			CreateAssembly(@"
 export interface I {}
-export M(a : I) : I { return {}; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+export M(a : I) : I { return {}; }").VerifyDiagnostics().VerifyEmit();
 		}
 
 		[Fact]
@@ -126,7 +126,7 @@ export M(a : I) : I { return {}; }").VerifyDiagnostics().VerifyEmit(_testOutputH
 		{
 			CreateAssembly(@"
 export interface I {}
-M(a : I) : I { return {}; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+M(a : I) : I { return {}; }").VerifyDiagnostics().VerifyEmit();
 		}
 
 		[Fact]
@@ -134,7 +134,7 @@ M(a : I) : I { return {}; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 		{
 			CreateAssembly(@"
 interface I {}
-M(a : I) : I { return {}; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+M(a : I) : I { return {}; }").VerifyDiagnostics().VerifyEmit();
 		}
 	}
 }

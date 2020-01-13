@@ -1,10 +1,12 @@
-﻿using FluentLang.Compiler.Symbols.Interfaces;
+﻿using FluentLang.Compiler.Helpers;
+using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Runtime;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -26,7 +28,6 @@ namespace FluentLang.Compiler.Emit
 		public EmitResult Compile(
 			TextReader file,
 			IAssembly assembly,
-			IEnumerable<Assembly> referencedAssemblies,
 			Stream outputStream,
 			Stream? pdbStream = null,
 			CancellationToken cancellationToken = default)
@@ -38,7 +39,7 @@ namespace FluentLang.Compiler.Emit
 				$"{assembly.Name}${assembly.Version}",
 				new[] { syntaxTree },
 				_metadataReferences
-					.Concat(referencedAssemblies.Select(x => MetadataReference.CreateFromFile(x.Location))),
+					.Concat(GetReferences(assembly)),
 				new CSharpCompilationOptions(
 					assembly.Methods.Any(x => x.Name == "Main") ? OutputKind.ConsoleApplication : OutputKind.DynamicallyLinkedLibrary, 
 					moduleName: assembly.Name.ToString(), 
@@ -51,6 +52,18 @@ namespace FluentLang.Compiler.Emit
 				+ string.Join('\n', emitResult.Diagnostics));
 
 			return emitResult;
+		}
+
+		private IEnumerable<MetadataReference> GetReferences(IAssembly assembly)
+		{
+			return assembly
+				.ReferencedAssemblies
+				.Select(x => 
+					x.TryGetAssemblyBytes(out var bytes) 
+						? bytes 
+						: throw new InvalidOperationException(
+							$"Could not get assembly bytes for reference {x.Name}"))
+				.Select(x => MetadataReference.CreateFromStream(x.ToStream()));
 		}
 
 		private static ImmutableArray<PortableExecutableReference> _metadataReferences = 

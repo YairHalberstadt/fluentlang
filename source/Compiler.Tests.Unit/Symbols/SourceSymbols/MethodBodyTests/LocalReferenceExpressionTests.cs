@@ -20,7 +20,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 M() : {} {
 	let x = {};
 	return x; 
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var declarationStatement = Assert.IsAssignableFrom<IDeclarationStatement>(m.Statements.First());
 			var local = declarationStatement.Local;
@@ -37,7 +37,7 @@ M() : {} {
 			var assembly = CreateAssembly(@"
 M(x : {}) : {} {
 	return x; 
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Last());
 			var exp = Assert.IsAssignableFrom<ILocalReferenceExpression>(returnStatement.Expression);
@@ -63,7 +63,7 @@ M(x : {}) : {} {
 		return x;
 	}
 	return {}; 
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var localM = m.LocalMethods.Single();
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(localM.Statements.Last());
@@ -84,7 +84,7 @@ M(x : {}) : {} {
 		return {};
 	}
 	return {}; 
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var localM = m.LocalMethods.Single().LocalMethods.Single();
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(localM.Statements.Last());
@@ -130,7 +130,7 @@ M() : {} {
 		return x;
 	}
 	return {}; 
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var localM = m.LocalMethods.Single();
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(localM.Statements.Last());
@@ -153,7 +153,7 @@ M() : {} {
 		return {};
 	}
 	return {}; 
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var localM = m.LocalMethods.Single().LocalMethods.Single();
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(localM.Statements.Last());
@@ -241,7 +241,7 @@ M() : {} {
 	let x = {};
 	return Local(); 
 }")
-				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+				.VerifyDiagnostics().VerifyEmit();
 		}
 
 		[Fact]
@@ -281,7 +281,7 @@ M() : {} {
 	let x = Local();
 	return x; 
 }")
-				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+				.VerifyDiagnostics().VerifyEmit();
 		}
 
 		[Fact]
@@ -292,7 +292,7 @@ M() : {} {
 	Local() : {} { let x = Local(); return x; }
 	return {}; 
 }")
-				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+				.VerifyDiagnostics().VerifyEmit();
 		}
 	}
 }

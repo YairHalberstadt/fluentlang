@@ -1,4 +1,6 @@
-﻿using FluentLang.Compiler.Diagnostics;
+﻿using FluentLang.Compiler.Compilation;
+using FluentLang.Compiler.Diagnostics;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -10,11 +12,12 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 	{
 		public QualifiedName Name { get; }
 		public Version Version { get; }
+		public ImmutableArray<IAssembly> ReferencedAssemblies { get; }
 		public ImmutableArray<IAssembly> ReferencedAssembliesAndSelf { get; }
 		public ImmutableArray<IInterface> Interfaces { get; }
 		public ImmutableArray<IMethod> Methods { get; }
 
-		internal sealed ImmutableArray<IAssembly> CalculateReferencedAssembliesAndSelf(ImmutableArray<IAssembly> directlyReferencedAssemblies, DiagnosticBag diagnostics)
+		internal sealed IEnumerable<IAssembly> CalculateReferencedAssemblies(ImmutableArray<IAssembly> directlyReferencedAssemblies, DiagnosticBag diagnostics)
 		{
 			{
 				var allByName =
@@ -34,14 +37,18 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 
 				return
 					allByName
-					.Select(x => x.First())
-					.Append(this)
-					.ToImmutableArray();
+					.Select(x => x.First());
 			}
 		}
 
 		public bool TryGetInterface(QualifiedName fullyQualifiedName, [NotNullWhen(true)] out IInterface? @interface);
 		public bool TryGetMethod(QualifiedName fullyQualifiedName, [NotNullWhen(true)] out IMethod? method);
+		public CompilationResult CompileAssembly(
+			out ImmutableArray<byte> assemblyBytes,
+			out ImmutableArray<byte> csharpBytes,
+			out ImmutableArray<byte> pdbBytes);
+
+		public bool TryGetAssemblyBytes(out ImmutableArray<byte> bytes);
 	}
 }
 

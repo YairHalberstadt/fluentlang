@@ -19,7 +19,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 		public void CanInvokeMemberWithNoArguments()
 		{
 			var assembly = CreateAssembly(@"M(param : { M() : int; }) : int { return param.M(); }")
-				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+				.VerifyDiagnostics().VerifyEmit();
 
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -39,7 +39,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 M(param : { M(a : int, b : bool) : int; }) : int { 
 	return param.M(5, false); 
 }")
-				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+				.VerifyDiagnostics().VerifyEmit();
 
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -59,7 +59,7 @@ M(param : { M(a : int, b : bool) : int; }) : int {
 M(param : { M(a : {}) : int; }) : int { 
 	return param.M(param); 
 }")
-				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+				.VerifyDiagnostics().VerifyEmit();
 
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -91,7 +91,7 @@ M(param : { M(a : { M() : bool; }) : int; }) : int {
 M(param : { M(a : {}) : int; M(a : { M() : bool; }) : bool; }) : int { 
 	return param.M(param); 
 }")
-				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+				.VerifyDiagnostics().VerifyEmit();
 
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -124,7 +124,7 @@ M(param : { M() : int; M() : int; }) : int {
 	return param.M(); 
 }")
 				.VerifyDiagnostics()
-				.VerifyEmit(_testOutputHelper);
+				.VerifyEmit();
 		}
 	}
 }

@@ -19,7 +19,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			var assembly = CreateAssembly(@"
 M() : {} {
     return {};
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			Assert.IsAssignableFrom<INewObjectExpression>(returnStatement.Expression);

@@ -21,7 +21,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 M() : {} {
 	let x = {};
 	return x; 
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var declarationStatement = Assert.IsAssignableFrom<IDeclarationStatement>(m.Statements.First());
 			var local = declarationStatement.Local;
@@ -40,7 +40,7 @@ M() : {} {
 M() : {} {
 	let x : {} = {};
 	return x; 
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var declarationStatement = Assert.IsAssignableFrom<IDeclarationStatement>(m.Statements.First());
 			var local = declarationStatement.Local;
@@ -60,7 +60,7 @@ M() : {} {
 	let x : {} = {} + M1;
 	return x; 
 }
-M1(param : {}) : {} { return param; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+M1(param : {}) : {} { return param; }").VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var declarationStatement = Assert.IsAssignableFrom<IDeclarationStatement>(m.Statements.First());
 			var local = declarationStatement.Local;
@@ -91,7 +91,7 @@ M1(param : {}) : {} { return param; }").VerifyDiagnostics(
 M() : {} {
 	_ = {};
 	return {};
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var declarationStatement = Assert.IsAssignableFrom<IDeclarationStatement>(m.Statements.First());
 			Assert.Null(declarationStatement.Local);

@@ -1,4 +1,6 @@
-﻿using FluentLang.Compiler.Symbols;
+﻿using FluentLang.Compiler.Compilation;
+using FluentLang.Compiler.Emit;
+using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Source;
 using Microsoft.Extensions.Logging;
@@ -13,10 +15,16 @@ namespace FluentLang.TestUtils
 	public abstract class TestBase
 	{
 		protected readonly ITestOutputHelper _testOutputHelper;
+		protected readonly IAssemblyCompiler _assemblyCompiler;
+		protected readonly AssemblyFactory _assemblyFactory;
 
 		protected TestBase(ITestOutputHelper testOutputHelper)
 		{
 			_testOutputHelper = testOutputHelper;
+			_assemblyCompiler = new AssemblyCompiler(
+				new FluentlangToCSharpEmitter(new MethodKeyGenerator()),
+				new CSharpToAssemblyCompiler(GetLogger<CSharpToAssemblyCompiler>()));
+			_assemblyFactory = new AssemblyFactory(_assemblyCompiler);
 		}
 
 		protected IAssembly CreateAssembly(string source, string? name = null, Version? version = null, params IAssembly[] references)
@@ -26,7 +34,8 @@ namespace FluentLang.TestUtils
 				QualifiedName(name ?? "Test"),
 				version: version ?? new Version(1, 0, 0),
 				references.ToImmutableArray(),
-				ImmutableArray.Create<IDocument>(document));
+				ImmutableArray.Create(document),
+				_assemblyCompiler);
 		}
 
 		protected IAssembly CreateAssembly(IEnumerable<string> sources)
@@ -35,7 +44,8 @@ namespace FluentLang.TestUtils
 				QualifiedName("Test"),
 				version: new Version(1, 0, 0),
 				ImmutableArray<IAssembly>.Empty,
-				sources.Select(x => DocumentFactory.FromString(x)).ToImmutableArray<IDocument>());
+				sources.Select(x => DocumentFactory.FromString(x)).ToImmutableArray(),
+				_assemblyCompiler);
 		}
 
 		protected static QualifiedName QualifiedName(string qualifiedName)

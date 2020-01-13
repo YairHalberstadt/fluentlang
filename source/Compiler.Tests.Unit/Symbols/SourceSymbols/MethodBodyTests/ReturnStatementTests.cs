@@ -17,7 +17,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 		public void CanReturnSameTypeAsMethod()
 		{
 			var assembly = CreateAssembly("M() : {} { return {}; }")
-				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+				.VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			Assert.True(returnStatement.Expression.Type.IsEquivalentTo(m.ReturnType));
@@ -27,7 +27,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 		public void CanReturnSubTypeOfMethod()
 		{
 			var assembly = CreateAssembly("M(param : { M() : bool; }) : {} { return param; }")
-				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+				.VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			Assert.True(returnStatement.Expression.Type.IsSubtypeOf(m.ReturnType));

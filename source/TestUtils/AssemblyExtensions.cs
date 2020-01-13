@@ -1,15 +1,16 @@
 ﻿using FluentLang.Compiler.Compilation;
 using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Emit;
+using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Metadata;
+using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Immutable;
-using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Xunit;
-using Xunit.Abstractions;
+using Diagnostic = FluentLang.Compiler.Diagnostics.Diagnostic;
 
 namespace FluentLang.TestUtils
 {
@@ -52,48 +53,38 @@ Actual:
 
 		public static IAssembly VerifyEmit(
 			this IAssembly assembly,
-			ITestOutputHelper testOutputHelper,
 			string? expectedCSharp = null,
 			object? expectedResult = null,
-			Action<IAssembly, Assembly>? testEmittedAssembly = null)
+			Action<IAssembly, Assembly, ImmutableArray<byte>>? testEmittedAssembly = null)
 		{
-			var assemblyCompiler = new AssemblyCompiler(
-				new FluentlangToCSharpEmitter(new MethodKeyGenerator()),
-				new CSharpToAssemblyCompiler(new XunitLogger<CSharpToAssemblyCompiler>(testOutputHelper)));
-
-			var assemblyStream = new MemoryStream();
-			var csharpStream = new MemoryStream();
-			var compilationResult = assemblyCompiler.CompileAssembly(assembly, Array.Empty<Assembly>(), assemblyStream, csharpStream);
+			var compilationResult = assembly.CompileAssembly(
+				out var assemblyBytes,
+				out var csharpBytes,
+				out _);
 
 			if (!compilationResult.AssemblyDiagnostics.IsEmpty)
 				throw new InvalidOperationException("cannot emit assembly with errors");
 
 			if (expectedCSharp is { })
 			{
-				csharpStream.Position = 0;
-				var reader = new StreamReader(csharpStream);
-				var actual = reader.ReadToEnd();
+				var actual = Encoding.Default.GetString(csharpBytes.UnsafeAsArray());
 				Assert.True(
 					expectedCSharp == actual,
 					"expected:\n" + expectedCSharp + "\n\nactual:\n" + actual);
-				csharpStream.Position = 0;
 			}
 
 			if (compilationResult.Status != CompilationResultStatus.Succeeded)
 			{
-				csharpStream.Position = 0;
-				var reader = new StreamReader(csharpStream);
 				Assert.False(true,
 					"compiling and emitting csharp failed with diagnostics:\n"
 					+ string.Join('\n', compilationResult.RoslynDiagnostics)
 					+ "\n\ncsharp code was:\n\n"
-					+ reader.ReadToEnd());
+					+ Encoding.Default.GetString(csharpBytes.UnsafeAsArray()));
 			}
 
-			assemblyStream.Position = 0;
 			var assemblyLoadContext = new System.Runtime.Loader.AssemblyLoadContext(null, isCollectible: true);
 			// verify assembly is valid
-			var emittedAssembly = assemblyLoadContext.LoadFromStream(assemblyStream);
+			var emittedAssembly = assemblyLoadContext.LoadFromStream(assemblyBytes.ToStream());
 
 			if (expectedResult is { })
 			{
@@ -101,18 +92,22 @@ Actual:
 				Assert.Equal(expectedResult, emittedAssembly.EntryPoint!.Invoke(null, null));
 			}
 
-			VerifyMetadata(assembly, emittedAssembly);
-			testEmittedAssembly?.Invoke(assembly, emittedAssembly);
+			VerifyMetadata(assembly, emittedAssembly, assemblyBytes);
+			testEmittedAssembly?.Invoke(assembly, emittedAssembly, assemblyBytes);
 
 			assemblyLoadContext.Unload();
 
 			return assembly;
 		}
 
-		private static void VerifyMetadata(IAssembly assembly, Assembly emittedAssembly)
+		private static void VerifyMetadata(
+			IAssembly assembly,
+			Assembly emittedAssembly,
+			ImmutableArray<byte> bytes)
 		{
 			var metadataAssembly = new MetadataAssembly(
-				emittedAssembly, 
+				emittedAssembly,
+				bytes,
 				assembly
 					.ReferencedAssembliesAndSelf
 					.Where(x => x.Name != assembly.Name && x.Version != assembly.Version)
@@ -125,7 +120,7 @@ Actual:
 				assembly.ReferencedAssembliesAndSelf.Where(x => x.Name != assembly.Name),
 				metadataAssembly.ReferencedAssembliesAndSelf.Where(x => x.Name != metadataAssembly.Name));
 
-			var exportedMethods = 
+			var exportedMethods =
 				assembly
 				.Methods
 				.Where(x => x.IsExported)
@@ -133,14 +128,14 @@ Actual:
 			var metadataMethods = metadataAssembly.Methods;
 			Assert.Equal(exportedMethods.Count, metadataMethods.Length);
 
-			foreach(var metadataMethod in metadataMethods)
+			foreach (var metadataMethod in metadataMethods)
 			{
 				Assert.True(exportedMethods.TryGetValue(
-					metadataMethod.FullyQualifiedName, 
+					metadataMethod.FullyQualifiedName,
 					out var exportedMethod));
 				Assert.True(metadataMethod.ReturnType.IsEquivalentTo(exportedMethod!.ReturnType));
 				Assert.Equal(exportedMethod.Parameters.Length, metadataMethod.Parameters.Length);
-				foreach(var (exportedParam, metadataParam) in 
+				foreach (var (exportedParam, metadataParam) in
 					exportedMethod.Parameters.Zip(metadataMethod.Parameters))
 				{
 					Assert.Equal(exportedParam.Name, metadataParam.Name);
@@ -148,7 +143,7 @@ Actual:
 				}
 			}
 
-			var exportedInterfaces = 
+			var exportedInterfaces =
 				assembly
 				.Interfaces
 				.Where(x => x.IsExported)

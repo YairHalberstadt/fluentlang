@@ -19,7 +19,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 		public void CanInvokeMethodWithNoArguments()
 		{
 			var assembly = CreateAssembly(@"M() : int { return M(); }")
-				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+				.VerifyDiagnostics().VerifyEmit();
 
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -36,7 +36,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 M(a : int, b : bool) : int { 
 	return M(5, false); 
 }")
-				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+				.VerifyDiagnostics().VerifyEmit();
 
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -54,7 +54,7 @@ M(a : int, b : bool) : int {
 M(a : { M(a : {}) : int; }, b : {}) : int { 
 	return M(a, a); 
 }")
-				.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+				.VerifyDiagnostics().VerifyEmit();
 
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());

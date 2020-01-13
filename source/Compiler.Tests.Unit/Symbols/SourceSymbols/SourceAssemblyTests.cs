@@ -1,8 +1,10 @@
-﻿using FluentLang.Compiler.Diagnostics;
+﻿using FluentLang.Compiler.Compilation;
+using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Source;
 using FluentLang.TestUtils;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
@@ -23,22 +25,26 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols
 				QualifiedName("1"),
 				version: new Version(1, 0, 0),
 				ImmutableArray<IAssembly>.Empty,
-				ImmutableArray<IDocument>.Empty);
+				ImmutableArray<IDocument>.Empty,
+				new MockAssemblyCompiler());
 			var assembly2 = new SourceAssembly(
 				QualifiedName("2"),
 				version: new Version(1, 0, 0),
 				ImmutableArray.Create<IAssembly>(assembly1),
-				ImmutableArray<IDocument>.Empty);
+				ImmutableArray<IDocument>.Empty,
+				new MockAssemblyCompiler());
 			var assembly3 = new SourceAssembly(
 				QualifiedName("3"),
 				version: new Version(1, 0, 0),
 				ImmutableArray.Create<IAssembly>(assembly2),
-				ImmutableArray<IDocument>.Empty);
+				ImmutableArray<IDocument>.Empty,
+				new MockAssemblyCompiler());
 			var assembly = (IAssembly)new SourceAssembly(
 				QualifiedName("TestAssembly"),
 				version: new Version(1, 0, 0),
 				ImmutableArray.Create<IAssembly>(assembly3),
-				ImmutableArray<IDocument>.Empty);
+				ImmutableArray<IDocument>.Empty,
+				new MockAssemblyCompiler());
 
 			Assert.Equal(new[] { assembly1, assembly2, assembly3, assembly }, assembly.ReferencedAssembliesAndSelf);
 		}
@@ -50,27 +56,32 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols
 				QualifiedName("1"),
 				version: new Version(1, 0, 0),
 				ImmutableArray<IAssembly>.Empty,
-				ImmutableArray<IDocument>.Empty);
+				ImmutableArray<IDocument>.Empty,
+				new MockAssemblyCompiler());
 			var assembly1b = new SourceAssembly(
 				QualifiedName("1"),
 				version: new Version(1, 0, 0),
 				ImmutableArray<IAssembly>.Empty,
-				ImmutableArray<IDocument>.Empty);
+				ImmutableArray<IDocument>.Empty,
+				new MockAssemblyCompiler());
 			var assembly2 = new SourceAssembly(
 				QualifiedName("2"),
 				version: new Version(1, 0, 0),
 				ImmutableArray.Create<IAssembly>(assembly1a),
-				ImmutableArray<IDocument>.Empty);
+				ImmutableArray<IDocument>.Empty,
+				new MockAssemblyCompiler());
 			var assembly3 = new SourceAssembly(
 				QualifiedName("3"),
 				version: new Version(1, 0, 0),
 				ImmutableArray.Create<IAssembly>(assembly1b),
-				ImmutableArray<IDocument>.Empty);
+				ImmutableArray<IDocument>.Empty,
+				new MockAssemblyCompiler());
 			var assembly = (IAssembly)new SourceAssembly(
 				QualifiedName("TestAssembly"),
 				version: new Version(1, 0, 0),
 				ImmutableArray.Create<IAssembly>(assembly2, assembly3),
-				ImmutableArray<IDocument>.Empty);
+				ImmutableArray<IDocument>.Empty,
+				new MockAssemblyCompiler());
 
 			Assert.Equal(new[] { assembly1a, assembly2, assembly3, assembly }, assembly.ReferencedAssembliesAndSelf);
 		}
@@ -82,17 +93,20 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols
 				QualifiedName("1"),
 				version: new Version(1, 0, 0),
 				ImmutableArray<IAssembly>.Empty,
-				ImmutableArray<IDocument>.Empty);
+				ImmutableArray<IDocument>.Empty,
+				new MockAssemblyCompiler());
 			var assembly1b = new SourceAssembly(
 				QualifiedName("1"),
 				version: new Version(1, 0, 1),
 				ImmutableArray<IAssembly>.Empty,
-				ImmutableArray<IDocument>.Empty);
+				ImmutableArray<IDocument>.Empty,
+				new MockAssemblyCompiler());
 			new SourceAssembly(
 				QualifiedName("TestAssembly"),
 				version: new Version(1, 0, 0),
 				ImmutableArray.Create<IAssembly>(assembly1a, assembly1b),
-				ImmutableArray<IDocument>.Empty).VerifyDiagnostics(
+				ImmutableArray<IDocument>.Empty,
+				new MockAssemblyCompiler()).VerifyDiagnostics(
 					new Diagnostic(new Location(new TextToken(@"")), ErrorCode.MultipleVersionsOfSameAssembly));
 		}
 
@@ -119,7 +133,7 @@ interface I { M() : () bool; }").VerifyDiagnostics(new Diagnostic(new Location(n
 		{
 			var assembly = CreateAssembly(@"
 interface I1 { M() : bool; }
-interface I2 { M() : int; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+interface I2 { M() : int; }").VerifyDiagnostics().VerifyEmit();
 
 			Assert.Equal(2, assembly.Interfaces.Length);
 			Assert.Equal(new[] { "I1", "I2" }, assembly.Interfaces.Select(x => x.FullyQualifiedName!.ToString()).OrderBy(x => x));
@@ -130,7 +144,7 @@ interface I2 { M() : int; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
 		{
 			var assembly = CreateAssembly(@"
 M1() : int { return 42; }
-M2() : int { return 42; }").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+M2() : int { return 42; }").VerifyDiagnostics().VerifyEmit();
 
 			Assert.Equal(2, assembly.Methods.Length);
 			Assert.Equal(new[] { "M1", "M2" }, assembly.Methods.Select(x => x.FullyQualifiedName.ToString()).OrderBy(x => x));
@@ -148,7 +162,7 @@ namespace A.B.C
 	{
 		interface I3 { M() : string; }
 	}
-}").VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+}").VerifyDiagnostics().VerifyEmit();
 
 			var i1 = AssertGetInterface(assembly, "I1");
 			Assert.Equal(i1.FullyQualifiedName, QualifiedName("I1"));
@@ -182,6 +196,14 @@ namespace A.B.C
 
 			var m3 = AssertGetMethod(assembly, "A.B.C.D.M3");
 			Assert.Equal(m3.FullyQualifiedName, QualifiedName("A.B.C.D.M3"));
+		}
+
+		private class MockAssemblyCompiler : IAssemblyCompiler
+		{
+			public CompilationResult CompileAssembly(IAssembly assembly, Stream outputStream, Stream? csharpOutputStream = null, Stream? pdbStream = null)
+			{
+				throw new System.NotImplementedException();
+			}
 		}
 	}
 }

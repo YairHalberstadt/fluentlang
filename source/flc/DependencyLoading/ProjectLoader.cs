@@ -18,15 +18,18 @@ namespace FluentLang.flc.DependencyLoading
 	{
 		private readonly ILogger<ProjectLoader> _logger;
 		private readonly IDependencyLoader _dependencyLoader;
+		private readonly AssemblyFactory _assemblyFactory;
 		private readonly IFileSystem _fileSystem;
 
 		public ProjectLoader(
 			ILogger<ProjectLoader> logger,
 			IDependencyLoader dependencyLoader,
+			AssemblyFactory assemblyFactory,
 			IFileSystem fileSystem)
 		{
 			_logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
 			_dependencyLoader = dependencyLoader ?? throw new System.ArgumentNullException(nameof(dependencyLoader));
+			_assemblyFactory = assemblyFactory ?? throw new System.ArgumentNullException(nameof(assemblyFactory));
 			_fileSystem = fileSystem ?? throw new System.ArgumentNullException(nameof(fileSystem));
 		}
 
@@ -83,12 +86,12 @@ namespace FluentLang.flc.DependencyLoading
 			{
 				throw new FlcException($"failed to load included files and folders for {projectInfo.Name}", e);
 			}
-			return AssemblyFactory.FromSource(
+
+			return _assemblyFactory.FromSource(
 				QualifiedName.Parse(projectInfo.Name),
 				(projectInfo.Version.Major, projectInfo.Version.Minor, projectInfo.Version.Suffix),
 				dependencies,
 				documents);
-
 		}
 
 		private string NormalizePath(string path)

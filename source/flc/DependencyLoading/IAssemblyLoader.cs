@@ -7,6 +7,6 @@ namespace FluentLang.flc.DependencyLoading
 {
 	public interface IAssemblyLoader
 	{
-		ValueTask<Assembly?> TryLoadAssemblyAsync(AssemblyLoadContext assemblyLoadContext, Dependency dependency, CancellationToken cancellationToken = default);
+		ValueTask<AssemblyLoadResult?> TryLoadAssemblyAsync(AssemblyLoadContext assemblyLoadContext, Dependency dependency, CancellationToken cancellationToken = default);
 	}
 }

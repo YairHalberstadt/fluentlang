@@ -20,7 +20,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			public void LiteralTrue()
 			{
 				var assembly = CreateAssembly(@"M() : bool { return true }")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<ILiteralExpression>(statement.Expression);
@@ -32,7 +32,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			public void LiteralFalse()
 			{
 				var assembly = CreateAssembly(@"M() : bool { return false }")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<ILiteralExpression>(statement.Expression);
@@ -62,7 +62,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			public void CorrectlyParsesIntLiterals(int val)
 			{
 				var assembly = CreateAssembly($"M() : int {{ return {val} }}")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<ILiteralExpression>(statement.Expression);
@@ -94,7 +94,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			public void CorrectlyParsesDoubleLiteral(double val, string literal)
 			{
 				var assembly = CreateAssembly($"M() : double {{ return {literal} }}")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<ILiteralExpression>(statement.Expression);
@@ -118,7 +118,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			public void CorrectlyParsesSimpleCharLiterals(char val)
 			{
 				var assembly = CreateAssembly($"M() : char {{ return '{val}' }}")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<ILiteralExpression>(statement.Expression);
@@ -134,7 +134,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			public void CorrectlyParsesEscapedCharLiterals(string escapeString, char expected)
 			{
 				var assembly = CreateAssembly($"M() : char {{ return '{escapeString}' }}")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<ILiteralExpression>(statement.Expression);
@@ -150,7 +150,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			public void CorrectlyParsesUnicodeEscapedCharLiterals(string escapeString, char expected)
 			{
 				var assembly = CreateAssembly($"M() : char {{ return '{escapeString}' }}")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<ILiteralExpression>(statement.Expression);
@@ -241,7 +241,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			public void CanParseStringsCorrectly(string literal, string expected)
 			{
 				var assembly = CreateAssembly($"M() : string {{ return \"{literal}\" }}")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<ILiteralExpression>(statement.Expression);

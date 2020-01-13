@@ -19,7 +19,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 		public void CanCompileConditional()
 		{
 			var assembly = CreateAssembly(@"M() : int { return if (true) 0 else 1; }")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			var exp = Assert.IsAssignableFrom<IConditionalExpression>(statement.Expression);
@@ -49,7 +49,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			var assembly = CreateAssembly(@"
 M() : {} { return if (true) {} + M1 else {}; }
 M1(param : {}) : bool { return true; }")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			var exp = Assert.IsAssignableFrom<IConditionalExpression>(statement.Expression);
@@ -62,7 +62,7 @@ M1(param : {}) : bool { return true; }")
 			var assembly = CreateAssembly(@"
 M() : {} { return if (true) {} else {} + M1; }
 M1(param : {}) : bool { return true; }")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			var exp = Assert.IsAssignableFrom<IConditionalExpression>(statement.Expression);

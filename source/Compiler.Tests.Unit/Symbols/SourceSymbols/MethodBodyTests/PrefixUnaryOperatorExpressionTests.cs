@@ -22,7 +22,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			{
 				var assembly = CreateAssembly(@"
 M(param : int) : int { return -param; }")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -36,7 +36,7 @@ M(param : int) : int { return -param; }")
 			{
 				var assembly = CreateAssembly(@"
 M(param : double) : double { return -param; }")
-					.VerifyDiagnostics().VerifyEmit(_testOutputHelper);
+					.VerifyDiagnostics().VerifyEmit();
 
 				var m = AssertGetMethod(assembly, "M");
 				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());

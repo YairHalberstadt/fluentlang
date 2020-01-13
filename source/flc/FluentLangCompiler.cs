@@ -1,12 +1,14 @@
 ﻿using Dependable.Abstractions;
 using FluentLang.Compiler.Compilation;
 using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.flc.DependencyLoading;
 using FluentLang.flc.ProjectSystem;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -23,7 +25,6 @@ namespace FluentLang.flc
 		private readonly ILogger<FluentLangCompiler> _logger;
 		private readonly SolutionFactory _solutionFactory;
 		private readonly IScopeFactory<SolutionInfo, IProjectLoader> _projectLoader;
-		private readonly IAssemblyCompiler _assemblyCompiler;
 		private readonly IFileSystem _fileSystem;
 		private readonly IDiagnosticFormatter _diagnosticFormatter;
 
@@ -31,14 +32,12 @@ namespace FluentLang.flc
 			ILogger<FluentLangCompiler> logger,
 			SolutionFactory solutionFactory,
 			IScopeFactory<SolutionInfo, IProjectLoader> projectLoader,
-			IAssemblyCompiler assemblyCompiler,
 			IFileSystem fileSystem,
 			IDiagnosticFormatter diagnosticFormatter)
 		{
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			_solutionFactory = solutionFactory ?? throw new ArgumentNullException(nameof(solutionFactory));
 			_projectLoader = projectLoader ?? throw new ArgumentNullException(nameof(projectLoader));
-			_assemblyCompiler = assemblyCompiler;
 			_fileSystem = fileSystem;
 			_diagnosticFormatter = diagnosticFormatter;
 		}
@@ -92,13 +91,10 @@ namespace FluentLang.flc
 			IAssembly project,
 			CancellationToken cancellationToken)
 		{
-			var outputStream = new MemoryStream();
-			var csharpOutputStream = new MemoryStream();
-			var compilationResult = _assemblyCompiler.CompileAssembly(
-				project,
-				assemblyLoadContext.Assemblies,
-				outputStream,
-				csharpOutputStream);
+			var compilationResult = project.CompileAssembly(
+				out var assemblyBytes,
+				out var csharpBytes,
+				out _);
 
 			if (compilationResult.Status == CompilationResultStatus.CodeErrors)
 			{
@@ -116,15 +112,14 @@ The following diagnostics were reported when compiling the emitted C# to a dll:
 {string.Join('\n', compilationResult.RoslynDiagnostics.Select(x => x.ToString()))}");
 			}
 
-			outputStream.Position = 0;
-			assemblyLoadContext.LoadFromStream(outputStream);
+			assemblyLoadContext.LoadFromStream(assemblyBytes.ToStream());
 
 			await WriteOutput(
 				outputDirectory,
 				outputCSharp,
 				project,
-				outputStream,
-				csharpOutputStream,
+				assemblyBytes,
+				csharpBytes,
 				cancellationToken);
 
 			return true;
@@ -134,19 +129,19 @@ The following diagnostics were reported when compiling the emitted C# to a dll:
 			string outputDirectory,
 			bool outputCSharp,
 			IAssembly project,
-			MemoryStream outputStream,
-			MemoryStream csharpOutputStream,
+			ImmutableArray<byte> assemblyBytes,
+			ImmutableArray<byte> csharpBytes,
 			CancellationToken cancellationToken)
 		{
 			try
 			{
 				var outputPath = _fileSystem.Path.Combine(outputDirectory, project.Name + ".dll");
-				await WriteStreamToFile(outputStream, outputPath, cancellationToken);
+				await WriteBytesToFile(assemblyBytes, outputPath, cancellationToken);
 				_logger.LogInformation("{0} --> {1}", project.Name, outputPath);
 				if (outputCSharp)
 				{
 					var csharpOutputPath = _fileSystem.Path.Combine(outputDirectory, project.Name + ".cs");
-					await WriteStreamToFile(csharpOutputStream, csharpOutputPath, cancellationToken);
+					await WriteBytesToFile(csharpBytes, csharpOutputPath, cancellationToken);
 					_logger.LogInformation("{0} --> {1}", project.Name, csharpOutputPath);
 				}
 
@@ -160,14 +155,14 @@ The following diagnostics were reported when compiling the emitted C# to a dll:
 			}
 		}
 
-		private async Task WriteStreamToFile(MemoryStream stream, string filePath, CancellationToken cancellationToken)
+		private Task WriteBytesToFile(ImmutableArray<byte> bytes, string filePath, CancellationToken cancellationToken)
 		{
-			stream.Position = 0;
 			var fileInfo = _fileSystem.FileInfo.FromFileName(filePath);
 			fileInfo.Directory.Create();
-			using var file = fileInfo.Create();
-			await stream.CopyToAsync(file, cancellationToken);
-			await stream.FlushAsync(cancellationToken);
+			return _fileSystem.File.WriteAllBytesAsync(
+				filePath,
+				bytes.UnsafeAsArray(),
+				cancellationToken);
 		}
 
 		private async Task<List<IAssembly>> LoadProjects(SolutionInfo solution, IEnumerable<ProjectInfo> buildOrder, AssemblyLoadContext assemblyLoadContext, CancellationToken cancellationToken)

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using FluentLang.Compiler.Helpers;
+using Microsoft.Extensions.Logging;
 using NuGet.Common;
 using NuGet.Packaging.Core;
 using NuGet.Protocol;
@@ -51,7 +52,7 @@ namespace FluentLang.flc.DependencyLoading
 			_nugetFeedUrls = nugetFeedUrls;
 		}
 
-		public async ValueTask<Assembly?> TryLoadAssemblyAsync(
+		public async ValueTask<AssemblyLoadResult?> TryLoadAssemblyAsync(
 			AssemblyLoadContext assemblyLoadContext,
 			Dependency dependency,
 			CancellationToken cancellationToken = default)
@@ -61,20 +62,20 @@ namespace FluentLang.flc.DependencyLoading
 				throw new ArgumentException($"invalid version {dependency.Version} for nuget package {dependency.Name}", nameof(dependency));
 			}
 
-			var assembly = await 
+			var assemblyLoadResult = await 
 				_nugetFeedUrls
 				.ToAsyncEnumerable()
 				.SelectAwait(TryLoadAssemblyFromFeed)
 				.FirstOrDefaultAsync(x => x != null, cancellationToken);
 
-			if (assembly is null)
+			if (assemblyLoadResult is null)
 			{
 				_logger.LogInformation("Could not download nuget package {0} {1} from any nuget feed", dependency.Name, dependency.Version);
 			}
 
-			return assembly;
+			return assemblyLoadResult;
 
-			async ValueTask<Assembly?> TryLoadAssemblyFromFeed(string feedUrl)
+			async ValueTask<AssemblyLoadResult?> TryLoadAssemblyFromFeed(string feedUrl)
 			{
 				_logger.LogInformation(
 					"Attempting to download Nuget Package ID: {0}, Version: {1} from {2}",
@@ -130,8 +131,9 @@ namespace FluentLang.flc.DependencyLoading
 
 				_logger.LogInformation("Loading {0}", libFile);
 				var assembly = assemblyLoadContext.LoadFromStream(decompressed);
+				var bytes = decompressed.ToImmutableArray();
 				_logger.LogInformation("Successfully loaded assembly {0}", assembly.FullName);
-				return assembly;
+				return new AssemblyLoadResult(assembly, bytes);
 			}
 		}
 

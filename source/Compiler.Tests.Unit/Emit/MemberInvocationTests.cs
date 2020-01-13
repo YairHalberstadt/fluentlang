@@ -13,7 +13,7 @@ namespace FluentLang.Compiler.Tests.Unit.Emit
 Main() : int { return ({} + M).M(); }
 M(a : {}) : int { return 42; }")
 				.VerifyDiagnostics()
-				.VerifyEmit(_testOutputHelper, expectedResult: 42);
+				.VerifyEmit(expectedResult: 42);
 		}
 
 		[Fact]
@@ -24,7 +24,7 @@ Main() : int { return ({} + M1, M2).M1(); }
 M1(a : { M2() : int; }) : int { return a.M2(); }
 M2(a : {}) : int { return 42; }")
 				.VerifyDiagnostics()
-				.VerifyEmit(_testOutputHelper, expectedResult: 42);
+				.VerifyEmit(expectedResult: 42);
 		}
 
 		[Fact]
@@ -35,7 +35,7 @@ Main() : int { return ({} + M, N.M).M(); }
 M(a : {}) : int { return 41; }
 namespace N { M(a : {}) : int { return 42; } }")
 				.VerifyDiagnostics()
-				.VerifyEmit(_testOutputHelper, expectedResult: 42);
+				.VerifyEmit(expectedResult: 42);
 		}
 
 		[Fact]
@@ -47,7 +47,7 @@ M(a : {}) : int { return 41; }
 M1(a : { M() : int }) : int { return a.M(); }
 namespace N { M(a : {}) : int { return 42; } }")
 				.VerifyDiagnostics()
-				.VerifyEmit(_testOutputHelper, expectedResult: 42);
+				.VerifyEmit(expectedResult: 42);
 		}
 
 		[Fact]
@@ -58,7 +58,7 @@ Main() : int { return ({} + mixin ({} + M), N.M).M(); }
 M(a : {}) : int { return 41; }
 namespace N { M(a : {}) : int { return 42; } }")
 				.VerifyDiagnostics()
-				.VerifyEmit(_testOutputHelper, expectedResult: 42);
+				.VerifyEmit(expectedResult: 42);
 		}
 
 		public MemberInvocationTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)

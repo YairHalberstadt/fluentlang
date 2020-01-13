@@ -1,4 +1,5 @@
-﻿using FluentLang.Compiler.Diagnostics;
+﻿using FluentLang.Compiler.Compilation;
+using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Source;
 using FluentLang.Runtime.Metadata;
@@ -15,21 +16,23 @@ namespace FluentLang.Compiler.Symbols.Metadata
 	internal sealed class MetadataAssembly : IAssembly
 	{
 		private readonly Assembly _assembly;
+		private readonly ImmutableArray<byte> _assemblyBytes;
 		private readonly Lazy<IReadOnlyDictionary<QualifiedName, IMethod>> _methodsByName;
 		private readonly Lazy<ImmutableArray<IMethod>> _methods;
 		private readonly Lazy<IReadOnlyDictionary<QualifiedName, IInterface>> _interfacesByName;
 		private readonly Lazy<ImmutableArray<IInterface>> _interfaces;
+		private readonly Lazy<ImmutableArray<IAssembly>> _referencedAssemblies;
 		private readonly Lazy<ImmutableArray<IAssembly>> _referencedAssembliesAndSelf;
 
 		private readonly DiagnosticBag _diagnostics;
 		private readonly Lazy<ImmutableArray<Diagnostic>> _allDiagnostics;
 
 
-		public MetadataAssembly(Assembly assembly, ImmutableArray<IAssembly> dependencies)
+		public MetadataAssembly(Assembly assembly, ImmutableArray<byte> assemblyBytes, ImmutableArray<IAssembly> dependencies)
 		{
 			_diagnostics = new DiagnosticBag(this);
 			_assembly = assembly;
-
+			_assemblyBytes = assemblyBytes;
 			if (assembly.FullName is null)
 				_diagnostics.Add(new Diagnostic(
 					new Location(),
@@ -76,8 +79,10 @@ namespace FluentLang.Compiler.Symbols.Metadata
 				}
 			}
 
+			_referencedAssemblies = new Lazy<ImmutableArray<IAssembly>>(
+				() => ((IAssembly)this).CalculateReferencedAssemblies(dependencies, _diagnostics).ToImmutableArray());
 			_referencedAssembliesAndSelf = new Lazy<ImmutableArray<IAssembly>>(
-				() => ((IAssembly)this).CalculateReferencedAssembliesAndSelf(dependencies, _diagnostics));
+				() => ReferencedAssemblies.Add(this));
 
 			_methodsByName = new Lazy<IReadOnlyDictionary<QualifiedName, IMethod>>(GenerateMethods);
 			_methods = new Lazy<ImmutableArray<IMethod>>(() => _methodsByName.Value.Values.ToImmutableArray());
@@ -154,6 +159,8 @@ namespace FluentLang.Compiler.Symbols.Metadata
 
 		public Version Version { get; }
 
+		public ImmutableArray<IAssembly> ReferencedAssemblies => _referencedAssemblies.Value;
+		
 		public ImmutableArray<IAssembly> ReferencedAssembliesAndSelf => _referencedAssembliesAndSelf.Value;
 
 		public ImmutableArray<IInterface> Interfaces => _interfaces.Value;
@@ -170,6 +177,20 @@ namespace FluentLang.Compiler.Symbols.Metadata
 		public bool TryGetMethod(QualifiedName fullyQualifiedName, [NotNullWhen(true)] out IMethod? method)
 		{
 			return _methodsByName.Value.TryGetValue(fullyQualifiedName, out method);
+		}
+
+		public CompilationResult CompileAssembly(
+			out ImmutableArray<byte> assemblyBytes,
+			out ImmutableArray<byte> csharpBytes,
+			out ImmutableArray<byte> pdbBytes)
+		{
+			throw new InvalidOperationException("Cannot compile MetadataAssembly");
+		}
+
+		public bool TryGetAssemblyBytes(out ImmutableArray<byte> bytes)
+		{
+			bytes = _assemblyBytes;
+			return true;
 		}
 
 		void ISymbol.EnsureAllLocalDiagnosticsCollected()
