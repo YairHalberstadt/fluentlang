@@ -118,7 +118,6 @@ The following diagnostics were reported when compiling the emitted C# to a dll:
 				outputDirectory,
 				outputCSharp,
 				project,
-				assemblyBytes,
 				csharpBytes,
 				cancellationToken);
 
@@ -129,15 +128,21 @@ The following diagnostics were reported when compiling the emitted C# to a dll:
 			string outputDirectory,
 			bool outputCSharp,
 			IAssembly project,
-			ImmutableArray<byte> assemblyBytes,
 			ImmutableArray<byte> csharpBytes,
 			CancellationToken cancellationToken)
 		{
 			try
 			{
-				var outputPath = _fileSystem.Path.Combine(outputDirectory, project.Name + ".dll");
-				await WriteBytesToFile(assemblyBytes, outputPath, cancellationToken);
-				_logger.LogInformation("{0} --> {1}", project.Name, outputPath);
+				foreach (var assembly in project.ReferencedAssembliesAndSelf)
+				{
+					if (!assembly.TryGetAssemblyBytes(out var bytes))
+						throw new InvalidOperationException(
+							$"Cannot get bytes for {assembly.Name}. Unable to write output.");
+					var outputPath = GetOutputPath(assembly);
+					await WriteBytesToFile(bytes, outputPath, cancellationToken);
+				}
+
+				_logger.LogInformation("{0} --> {1}", project.Name, GetOutputPath(project));
 				if (outputCSharp)
 				{
 					var csharpOutputPath = _fileSystem.Path.Combine(outputDirectory, project.Name + ".cs");
@@ -152,6 +157,11 @@ The following diagnostics were reported when compiling the emitted C# to a dll:
 				throw new FlcException(
 					$"Error whilst writing assembly for {project.Name} to disk",
 					exception);
+			}
+
+			string GetOutputPath(IAssembly assembly)
+			{
+				return _fileSystem.Path.Combine(outputDirectory, assembly.Name + ".dll");
 			}
 		}
 

@@ -1,12 +1,17 @@
 ﻿using Autofac;
+using FluentLang.Compiler.Helpers;
 using FluentLang.flc;
 using FluentLang.flc.DependencyInjection;
+using FluentLang.flc.DependencyLoading;
 using FluentLang.TestUtils;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
+using System.Runtime.Loader;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -224,35 +229,52 @@ public static class Project_AssemblyLevelMethods
       ""Name"": ""Project"",
       ""Version"": { ""Major"": 0, ""Minor"": 0 },
       ""IncludedFilesAndFolders"": [
-        ""a.fl""
-      ]
-	},
-    {
-      ""Name"": ""Project2"",
-      ""Version"": { ""Major"": 0, ""Minor"": 0 },
-      ""IncludedFilesAndFolders"": [
-        ""b.fl""
-      ]
+        ""./""
+      ],
+	  ""References"": [
+        {
+          ""Type"": ""Assembly"",
+          ""Name"": ""assembly"",
+          ""Version"": ""1.0.0""
+        }
+	  ]
 	}
 	]
 }"
 					},
 					{
-						"a.fl",
-						@"M(}{};"
-					},
-					{
-						"b.fl",
+						"file.fl",
 						@"M() : int { return 42; }"
 					}
 				});
 
+			CreateAssembly("", "assembly").TryGetAssemblyBytes(out var bytes);
 			var builder = CreateBuilder(fileSystem);
+
+			builder.RegisterInstance<IAssemblyLoader>(new MockAssemblyLoader(bytes));
 			using var container = builder.Build();
 			var compiler = container.Resolve<FluentLangCompiler>();
-			await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false);
-			Assert.False(fileSystem.File.Exists("Project1.dll"));
-			Assert.False(fileSystem.File.Exists("Project2.dll"));
+			await compiler.Build("solutionFile", "", outputCSharp: false);
+
+			Assert.Equal(bytes, fileSystem.File.ReadAllBytes("assembly.dll"));
+			Assert.Equal(2560, fileSystem.File.ReadAllBytes("Project.dll").Length);
+		}
+		public class MockAssemblyLoader : IAssemblyLoader
+		{
+			private readonly ImmutableArray<byte> _bytes;
+
+			public MockAssemblyLoader(ImmutableArray<byte> bytes)
+			{
+				_bytes = bytes;
+			}
+
+			public ValueTask<AssemblyLoadResult?> TryLoadAssemblyAsync(AssemblyLoadContext assemblyLoadContext, Dependency dependency, CancellationToken cancellationToken = default)
+			{
+				return new ValueTask<AssemblyLoadResult?>(
+					new AssemblyLoadResult(
+						assemblyLoadContext.LoadFromStream(_bytes.ToStream()),
+						_bytes));
+			}
 		}
 
 		private static ContainerBuilder CreateBuilder(MockFileSystem fileSystem)
