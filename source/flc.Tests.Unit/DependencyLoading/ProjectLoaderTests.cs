@@ -3,10 +3,12 @@ using FluentLang.flc;
 using FluentLang.flc.DependencyLoading;
 using FluentLang.flc.ProjectSystem;
 using FluentLang.TestUtils;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using System.Threading;
 using System.Threading.Tasks;
@@ -104,33 +106,69 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 		}
 
 		[Fact]
-		public async Task DeduplicatesFileIncludedMultipleTimes()
+		public async Task DeduplicatesFileIncludedMultipleTimesWindows()
 		{
-			var projectLoader = new ProjectLoader(
-				GetLogger<ProjectLoader>(),
-				new MockDependencyLoader(),
-				_assemblyFactory,
-				new MockFileSystem(new Dictionary<string, MockFileData>
-				{
-					{"c:/dir/sourceFile.fl", "interface I {}"}
-				}));
-			var assemblyLoadContext = new AssemblyLoadContext(name: null);
-			var result = await projectLoader.LoadProjectAsync(
-				new ProjectInfo("p", new Version(0, 0), ImmutableArray.Create(
-					"dir/sourceFile.fl",
-					"dir/sourceFile.fl",
-					"DIR/sourceFile.fl",
-					"/dir/sourceFile.fl",
-					"dir/sourceFile.fl/",
-					"dir\\sourceFile.fl",
-					"c:/dir/sourceFile.fl",
-					"C:/dir/sourceFile.fl",
-					"dir/../dir/sourceFile.fl",
-					"dir")),
-				assemblyLoadContext,
-				ImmutableArray<IAssembly>.Empty);
-			result.VerifyDiagnostics().VerifyEmit();
-			Assert.Equal("I", result.Interfaces.SingleOrDefault().FullyQualifiedName!.ToString());
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				var projectLoader = new ProjectLoader(
+					GetLogger<ProjectLoader>(),
+					new MockDependencyLoader(),
+					_assemblyFactory,
+					new MockFileSystem(new Dictionary<string, MockFileData>
+					{
+						{"c:/dir/sourceFile.fl", "interface I {}"}
+					}));
+				var assemblyLoadContext = new AssemblyLoadContext(name: null);
+				var result = await projectLoader.LoadProjectAsync(
+					new ProjectInfo("p", new Version(0, 0), ImmutableArray.Create(
+						"dir/sourceFile.fl",
+						"dir/sourceFile.fl",
+						"DIR/sourceFile.fl",
+						"/dir/sourceFile.fl",
+						"dir/sourceFile.fl/",
+						"dir\\sourceFile.fl",
+						"c:/dir/sourceFile.fl",
+						"C:/dir/sourceFile.fl",
+						"dir/../dir/sourceFile.fl",
+						"dir")),
+					assemblyLoadContext,
+					ImmutableArray<IAssembly>.Empty);
+				result.VerifyDiagnostics().VerifyEmit();
+				Assert.Equal("I", result.Interfaces.SingleOrDefault().FullyQualifiedName!.ToString());
+			}
+		}
+
+		[Fact]
+		public async Task DeduplicatesFileIncludedMultipleTimesUnix()
+		{
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				var projectLoader = new ProjectLoader(
+					GetLogger<ProjectLoader>(),
+					new MockDependencyLoader(),
+					_assemblyFactory,
+					new MockFileSystem(new Dictionary<string, MockFileData>
+					{
+						{"/dir/sourceFile.fl", "interface I1 {}"},
+						{"/DIR/sourceFile.fl", "interface I2 {}"}
+					}));
+				var assemblyLoadContext = new AssemblyLoadContext(name: null);
+				var result = await projectLoader.LoadProjectAsync(
+					new ProjectInfo("p", new Version(0, 0), ImmutableArray.Create(
+						"dir/sourceFile.fl",
+						"dir/sourceFile.fl",
+						"DIR/sourceFile.fl",
+						"/dir/sourceFile.fl",
+						"dir/sourceFile.fl/",
+						"dir/../dir/sourceFile.fl",
+						"dir")),
+					assemblyLoadContext,
+					ImmutableArray<IAssembly>.Empty);
+				result.VerifyDiagnostics().VerifyEmit();
+				Assert.Equal(
+					new[] { "I1", "I2" },
+					result.Interfaces.Select(x => x.FullyQualifiedName!.ToString()));
+			}
 		}
 
 		[Theory]
