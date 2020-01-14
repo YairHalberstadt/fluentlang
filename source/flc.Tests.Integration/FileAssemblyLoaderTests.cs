@@ -1,11 +1,8 @@
 ﻿using FluentLang.flc.DependencyLoading;
 using FluentLang.Runtime;
 using Microsoft.Extensions.Logging.Abstractions;
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Runtime.Loader;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -16,7 +13,7 @@ namespace FluentLang.Compiler.Tests.Integration
 		[Fact]
 		public async Task CanLoadAssemblyFromFile()
 		{
-			var loader = new FileAssemblyLoader(NullLogger<FileAssemblyLoader>.Instance, ImmutableArray.Create("data"));
+			var loader = new FileAssemblyLoader(NullLogger<FileAssemblyLoader>.Instance, ImmutableArray.Create("Data"));
 			var assemblyLoadContext = new AssemblyLoadContext(null, true);
 			var assembly = await loader.TryLoadAssemblyAsync(
 				assemblyLoadContext,
