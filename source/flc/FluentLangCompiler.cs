@@ -133,6 +133,7 @@ The following diagnostics were reported when compiling the emitted C# to a dll:
 		{
 			try
 			{
+				outputDirectory = _fileSystem.Path.Combine(outputDirectory, project.Name.ToString());
 				foreach (var assembly in project.ReferencedAssembliesAndSelf)
 				{
 					if (!assembly.TryGetAssemblyBytes(out var bytes))

@@ -55,7 +55,7 @@ namespace FluentLang.Compiler.Tests.Unit
 			using var container = builder.Build();
 			var compiler = container.Resolve<FluentLangCompiler>();
 			await compiler.Build("solutionFile", outputDirectory, outputCSharp: false);
-			Assert.Equal(2560, fileSystem.File.ReadAllBytes(fileSystem.Path.Combine(outputDirectory, "Project.dll")).Length);
+			Assert.Equal(2560, fileSystem.File.ReadAllBytes(fileSystem.Path.Combine(outputDirectory, "Project", "Project.dll")).Length);
 		}
 
 		[Theory]
@@ -93,7 +93,7 @@ namespace FluentLang.Compiler.Tests.Unit
 			using var container = builder.Build();
 			var compiler = container.Resolve<FluentLangCompiler>();
 			await compiler.Build("solutionFile", outputDirectory, outputCSharp: true);
-			Assert.Equal(2560, fileSystem.File.ReadAllBytes(fileSystem.Path.Combine(outputDirectory, "Project.dll")).Length);
+			Assert.Equal(2560, fileSystem.File.ReadAllBytes(fileSystem.Path.Combine(outputDirectory, "Project", "Project.dll")).Length);
 
 			var expectedCSharp = @"
 using FluentLang.Runtime;
@@ -110,7 +110,7 @@ public static class Project_AssemblyLevelMethods
 	}
 }";
 			var actual =
-				fileSystem.File.ReadAllText(fileSystem.Path.Combine(outputDirectory, "Project.cs"));
+				fileSystem.File.ReadAllText(fileSystem.Path.Combine(outputDirectory, "Project", "Project.cs"));
 			Assert.Equal(
 				Normalise(expectedCSharp),
 				Normalise(actual));
@@ -164,8 +164,8 @@ public static class Project_AssemblyLevelMethods
 			using var container = builder.Build();
 			var compiler = container.Resolve<FluentLangCompiler>();
 			await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false);
-			Assert.Equal(2560, fileSystem.File.ReadAllBytes("Project1.dll").Length);
-			Assert.Equal(2560, fileSystem.File.ReadAllBytes("Project2.dll").Length);
+			Assert.Equal(2560, fileSystem.File.ReadAllBytes("Project1/Project1.dll").Length);
+			Assert.Equal(2560, fileSystem.File.ReadAllBytes("Project2/Project2.dll").Length);
 		}
 
 		[Fact]
@@ -210,8 +210,8 @@ public static class Project_AssemblyLevelMethods
 			using var container = builder.Build();
 			var compiler = container.Resolve<FluentLangCompiler>();
 			await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false);
-			Assert.False(fileSystem.File.Exists("Project1.dll"));
-			Assert.False(fileSystem.File.Exists("Project2.dll"));
+			Assert.False(fileSystem.File.Exists("Project1/Project1.dll"));
+			Assert.False(fileSystem.File.Exists("Project2/Project2.dll"));
 		}
 
 		[Fact]
@@ -256,8 +256,8 @@ public static class Project_AssemblyLevelMethods
 			var compiler = container.Resolve<FluentLangCompiler>();
 			await compiler.Build("solutionFile", "", outputCSharp: false);
 
-			Assert.Equal(bytes, fileSystem.File.ReadAllBytes("assembly.dll"));
-			Assert.Equal(2560, fileSystem.File.ReadAllBytes("Project.dll").Length);
+			Assert.Equal(bytes, fileSystem.File.ReadAllBytes("Project/assembly.dll"));
+			Assert.Equal(2560, fileSystem.File.ReadAllBytes("Project/Project.dll").Length);
 		}
 		public class MockAssemblyLoader : IAssemblyLoader
 		{
