@@ -25,7 +25,7 @@ namespace FluentLang.Compiler.Tests.Integration
 		[Fact]
 		public async Task ReturnsNullWhenNameNotFound()
 		{
-			var loader = new FileAssemblyLoader(NullLogger<FileAssemblyLoader>.Instance, ImmutableArray.Create("data"));
+			var loader = new FileAssemblyLoader(NullLogger<FileAssemblyLoader>.Instance, ImmutableArray.Create("Data"));
 			var assemblyLoadContext = new AssemblyLoadContext(null, true);
 			var assembly = await loader.TryLoadAssemblyAsync(
 				assemblyLoadContext,
