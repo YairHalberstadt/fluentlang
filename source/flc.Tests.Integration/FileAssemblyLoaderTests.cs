@@ -37,7 +37,7 @@ namespace FluentLang.Compiler.Tests.Integration
 		[Fact]
 		public async Task ReturnsNullWhenVersionNotFound()
 		{
-			var loader = new FileAssemblyLoader(NullLogger<FileAssemblyLoader>.Instance, ImmutableArray.Create("data"));
+			var loader = new FileAssemblyLoader(NullLogger<FileAssemblyLoader>.Instance, ImmutableArray.Create("Data"));
 			var assemblyLoadContext = new AssemblyLoadContext(null, true);
 			var assembly = await loader.TryLoadAssemblyAsync(
 				assemblyLoadContext,
@@ -49,7 +49,7 @@ namespace FluentLang.Compiler.Tests.Integration
 		[Fact]
 		public async Task IfNotFoundInFirstPathLooksInSecond()
 		{
-			var loader = new FileAssemblyLoader(NullLogger<FileAssemblyLoader>.Instance, ImmutableArray.Create("notADirectory", "data"));
+			var loader = new FileAssemblyLoader(NullLogger<FileAssemblyLoader>.Instance, ImmutableArray.Create("notADirectory", "Data"));
 			var assemblyLoadContext = new AssemblyLoadContext(null, true);
 			var assembly = await loader.TryLoadAssemblyAsync(
 				assemblyLoadContext,
