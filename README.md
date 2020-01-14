@@ -197,3 +197,4 @@ Projects which should be possible for someone else to do with us stepping on eac
 5. Look into APIs for code completion, syntax highlighting, etc.
 6. Come up with design proposals for: Discrimated Unions, Generics, error handling (exceptions?, result types?)
     - Design proposals should be created as issues on this repository with the heading "Proposal:". E.g. "Proposal: design for Discriminated Unions".
+7. [Improve diagnostic messages](https://github.com/YairHalberstadt/fluentlang/issues/7)
