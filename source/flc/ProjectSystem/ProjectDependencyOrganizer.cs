@@ -57,5 +57,31 @@ namespace FluentLang.flc.ProjectSystem
 			public ProjectInfo ProjectInfo { get; }
 			public List<string> RemainingDependencies { get; }
 		}
+
+		public static IEnumerable<ProjectInfo> GetTransitiveDependencies(IEnumerable<ProjectInfo> projects, string projectName)
+		{
+			var projectsDic = projects.ToDictionary(x => x.Name);
+			if (!projectsDic.TryGetValue(projectName, out var target))
+				throw new FlcException($"could not find project with name: {projectName}");
+
+			var dependencies = new Dictionary<string, ProjectInfo>();
+
+			AddTransitiveDependencies(target);
+
+			return dependencies.Values;
+
+			void AddTransitiveDependencies(ProjectInfo projectInfo)
+			{
+				dependencies.Add(projectInfo.Name, projectInfo);
+				foreach (var reference in projectInfo.References.Where(x => x.Type == ReferenceType.Project))
+				{
+					if (dependencies.ContainsKey(reference.Name))
+						continue;
+					if (!projectsDic.TryGetValue(reference.Name, out var dependency))
+						throw new FlcException($"could not find project with name: {reference.Name}");
+					AddTransitiveDependencies(dependency);
+				}
+			}
+		}
 	}
 }

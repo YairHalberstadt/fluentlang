@@ -12,6 +12,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading;
 using System.Threading.Tasks;
@@ -49,7 +50,7 @@ namespace FluentLang.flc
 			_logger.LogDebug("Found solution");
 
 			_logger.LogDebug("Creating build order");
-			var buildOrder = ProjectDependencyOrganizer.CreateBuildOrder(solution.Projects);
+			var buildOrder = ProjectDependencyOrganizer.CreateBuildOrder(solution.Projects).ToList();
 			if (_logger.IsEnabled(LogLevel.Debug))
 			{
 				_logger.LogDebug($"Build order is {string.Join(",", buildOrder.Select(x => x.Name))}");
@@ -65,6 +66,7 @@ namespace FluentLang.flc
 					assemblyLoadContext,
 					cancellationToken);
 
+				_logger.LogDebug("Compiling projects");
 				foreach (var project in projects)
 				{
 					if (!await TryCompileProject(
@@ -96,6 +98,94 @@ namespace FluentLang.flc
 				out var csharpBytes,
 				out _);
 
+			if (!ValidateCompilationResult(compilationResult, project))
+				return false;
+
+			assemblyLoadContext.LoadFromStream(assemblyBytes.ToStream());
+
+			await WriteOutput(
+				outputDirectory,
+				outputCSharp,
+				project,
+				csharpBytes,
+				cancellationToken);
+
+			return true;
+		}
+
+		public async ValueTask<object?> Run(string solutionFilePath, string projectName, CancellationToken cancellationToken = default)
+		{
+			_logger.LogDebug("Loading solution from {0}", solutionFilePath);
+			var solution = await _solutionFactory.ParseFromFileAsync(solutionFilePath).ConfigureAwait(false);
+			_logger.LogDebug("Found solution");
+
+			_logger.LogDebug("Creating build order");
+
+			var transitiveDependencies = ProjectDependencyOrganizer
+				.GetTransitiveDependencies(solution.Projects, projectName);
+			var buildOrder = ProjectDependencyOrganizer
+				.CreateBuildOrder(transitiveDependencies);
+
+			if (_logger.IsEnabled(LogLevel.Debug))
+			{
+				_logger.LogDebug($"Build order is {string.Join(",", buildOrder.Select(x => x.Name))}");
+			}
+
+			_logger.LogDebug("Loading dependencies");
+			var assemblyLoadContext = new AssemblyLoadContext(name: null, isCollectible: true);
+			try
+			{
+				var projects = await LoadProjects(
+					solution,
+					buildOrder,
+					assemblyLoadContext,
+					cancellationToken);
+
+				_logger.LogDebug("Compiling projects");
+				Assembly? assembly = null;
+				foreach (var project in projects)
+				{
+					assembly = TryCompileProjectInMemory(
+						assemblyLoadContext,
+						project);
+
+					if (assembly is null)
+					{
+						return null;
+					}
+				}
+
+				if (assembly!.EntryPoint is null)
+				{
+					throw new FlcException($"{projectName} does not have a Main method suitable for entry");
+				}
+
+				_logger.LogDebug("Running {0}", projectName);
+				return assembly.EntryPoint.Invoke(null, null);
+			}
+			finally
+			{
+				assemblyLoadContext.Unload();
+			}
+		}
+
+		private Assembly? TryCompileProjectInMemory(
+			AssemblyLoadContext assemblyLoadContext,
+			IAssembly project)
+		{
+			var compilationResult = project.CompileAssembly(
+				out var assemblyBytes,
+				out _,
+				out _);
+
+			if (!ValidateCompilationResult(compilationResult, project))
+				return null;
+
+			return assemblyLoadContext.LoadFromStream(assemblyBytes.ToStream());
+		}
+
+		private bool ValidateCompilationResult(CompilationResult compilationResult, IAssembly project)
+		{
 			if (compilationResult.Status == CompilationResultStatus.CodeErrors)
 			{
 				foreach (var error in compilationResult.AssemblyDiagnostics)
@@ -111,16 +201,6 @@ Please report this to the fluentlang maintainers.
 The following diagnostics were reported when compiling the emitted C# to a dll:
 {string.Join('\n', compilationResult.RoslynDiagnostics.Select(x => x.ToString()))}");
 			}
-
-			assemblyLoadContext.LoadFromStream(assemblyBytes.ToStream());
-
-			await WriteOutput(
-				outputDirectory,
-				outputCSharp,
-				project,
-				csharpBytes,
-				cancellationToken);
-
 			return true;
 		}
 
