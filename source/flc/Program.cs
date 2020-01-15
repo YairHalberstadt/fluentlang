@@ -13,13 +13,18 @@ namespace FluentLang.flc
 	{
 		private static async Task Main(string[] args)
 		{
-			var buildCommand = new Command("Build")
+			var buildCommand = new Command("build")
 			{
 				new Argument<FileInfo>("solution-file").ExistingOnly(),
-				new Option<LogLevel>("--verbosity")
+				new Argument<FileInfo>("output-directory"),
+				new Option("--output-csharp")
+				{
+					Argument = new Argument<bool>(defaultValue: () => false)
+				},
+				new Option("--verbosity")
 				{
 					Argument = new Argument<LogLevel>(defaultValue: () => LogLevel.Information)
-				}
+				},
 			};
 
 			var rootCommand = new RootCommand
@@ -28,13 +33,13 @@ namespace FluentLang.flc
 			};
 
 			buildCommand.Handler = CommandHandler.Create(
-				(FileInfo solutionFile, LogLevel verbosity) =>
+				(FileInfo solutionFile, FileInfo outputDirectory, bool outputCSharp, LogLevel verbosity) =>
 				{
 					var builder = new ContainerBuilder();
 					builder.RegisterModule(new FlcModule(verbosity));
 					using var container = builder.Build();
 					var compiler = container.Resolve<FluentLangCompiler>();
-					return compiler.Build(solutionFile.FullName, "", default).AsTask();
+					return compiler.Build(solutionFile.FullName, outputDirectory.FullName, outputCSharp, default).AsTask();
 				});
 
 			await rootCommand.InvokeAsync(args);

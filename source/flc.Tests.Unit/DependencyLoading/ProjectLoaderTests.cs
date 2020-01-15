@@ -3,7 +3,6 @@ using FluentLang.flc;
 using FluentLang.flc.DependencyLoading;
 using FluentLang.flc.ProjectSystem;
 using FluentLang.TestUtils;
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO.Abstractions.TestingHelpers;
@@ -78,7 +77,7 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 				ImmutableArray<IAssembly>.Empty);
 			result.VerifyDiagnostics().VerifyEmit();
 			Assert.Equal(
-				new[] { "I1", "I2" }, 
+				new[] { "I1", "I2" },
 				result.Interfaces.Select(x => x.FullyQualifiedName!.ToString()));
 		}
 
@@ -281,25 +280,25 @@ namespace FluentLang.Compiler.Tests.Unit.DependencyLoading
 				version)
 				.VerifyDiagnostics()
 				.VerifyEmit(testEmittedAssembly: (original, _, _1) =>
-                {
-                    var projectLoader = new ProjectLoader(
+				{
+					var projectLoader = new ProjectLoader(
 						GetLogger<ProjectLoader>(),
-                        new MockDependencyLoader(original),
+						new MockDependencyLoader(original),
 						_assemblyFactory,
-                        new MockFileSystem(new Dictionary<string, MockFileData>
-                    {
-                        {"sourceFile", "interface I {}"}
-                    }));
-                    var assemblyLoadContext = new AssemblyLoadContext(name: null);
-                    var result = projectLoader.LoadProjectAsync(
-                        new ProjectInfo("p", new Version(0, 0), ImmutableArray.Create("sourceFile")),
-                        assemblyLoadContext,
-                        ImmutableArray<IAssembly>.Empty).Result;
-                    result.VerifyDiagnostics().VerifyEmit();
-                    var dependency = result.ReferencedAssembliesAndSelf.First();
-                    Assert.Equal(original.Name, dependency.Name);
-                    Assert.Equal(original.Version, dependency.Version);
-                });
+						new MockFileSystem(new Dictionary<string, MockFileData>
+					{
+						{"sourceFile", "interface I {}"}
+					}));
+					var assemblyLoadContext = new AssemblyLoadContext(name: null);
+					var result = projectLoader.LoadProjectAsync(
+						new ProjectInfo("p", new Version(0, 0), ImmutableArray.Create("sourceFile")),
+						assemblyLoadContext,
+						ImmutableArray<IAssembly>.Empty).Result;
+					result.VerifyDiagnostics().VerifyEmit();
+					var dependency = result.ReferencedAssembliesAndSelf.First();
+					Assert.Equal(original.Name, dependency.Name);
+					Assert.Equal(original.Version, dependency.Version);
+				});
 		}
 	}
 }
