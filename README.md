@@ -170,19 +170,21 @@ Implement Reading of Metadata
 
 Implement Emitting of code
 
-### In progress
-
 Implement Linking
 
 Create compiler.exe
 
+### In progress
+
+Design and implement discriminated unions.
+
 ### ToDo
+
+Create Blazor WebIDE. This may have to wait till client side blazor stabilizes, and possibly till .Net 5 provides some missing APIs.
 
 Implement Standard Libraries. This will be mixed C# Libraries with FluentLang Metadata and FluentLang libraries.
 
 Look into more efficient incremental compilation.
-
-Design and implement discriminated unions.
 
 Design and implement generics.
 
