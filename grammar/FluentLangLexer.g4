@@ -28,6 +28,7 @@ COMMA:                    ',';
 COLON:                    ':';
 SEMICOLON:                ';';
 DISCARD:                  '_';
+LOGICAL_OR:               '|';
 
 //baseTypes
 BOOL:                     'bool';

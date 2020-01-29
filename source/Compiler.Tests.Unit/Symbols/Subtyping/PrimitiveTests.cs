@@ -4,7 +4,7 @@ using FluentLang.TestUtils;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace FluentLang.Compiler.Tests.Unit.Subtyping
+namespace FluentLang.Compiler.Tests.Unit.Symbols.Subtyping
 {
 	public class PrimitiveTests : TestBase
 	{
@@ -49,14 +49,14 @@ namespace FluentLang.Compiler.Tests.Unit.Subtyping
 		[MemberData(nameof(Primitives))]
 		public void PrimitivesAreSubtypesOfThemselves(Primitive primitive)
 		{
-			Assert.True(((IType)primitive).IsSubtypeOf(primitive));
+			Assert.True(primitive.IsSubtypeOf(primitive));
 		}
 
 		[Theory]
 		[MemberData(nameof(PrimitivePairs))]
 		public void PrimitivesAreNotSubtypesOfOtherPrimitives(Primitive a, Primitive b)
 		{
-			Assert.False(((IType)a).IsSubtypeOf(b));
+			Assert.False(a.IsSubtypeOf(b));
 		}
 
 		[Theory]
@@ -64,7 +64,7 @@ namespace FluentLang.Compiler.Tests.Unit.Subtyping
 		public void PrimitivesAreNotSubtypesOfInterface_EvenWithSameName(Primitive primitive)
 		{
 			var @interface = (IInterface)new TestInterface { FullyQualifiedName = primitive.FullyQualifiedName };
-			Assert.False(((IType)primitive).IsSubtypeOf(@interface));
+			Assert.False(primitive.IsSubtypeOf(@interface));
 			Assert.False(@interface.IsSubtypeOf(primitive));
 		}
 	}

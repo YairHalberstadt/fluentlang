@@ -129,6 +129,18 @@ public interface IFluentLangParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitPrimitive_type([NotNull] FluentLangParser.Primitive_typeContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="FluentLangParser.union"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitUnion([NotNull] FluentLangParser.UnionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="FluentLangParser.union_part_type"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitUnion_part_type([NotNull] FluentLangParser.Union_part_typeContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="FluentLangParser.method_declaration"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

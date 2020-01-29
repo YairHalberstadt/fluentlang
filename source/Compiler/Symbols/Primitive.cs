@@ -2,6 +2,7 @@
 using FluentLang.Compiler.Symbols.Interfaces;
 using System;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace FluentLang.Compiler.Symbols
 {
@@ -40,8 +41,11 @@ namespace FluentLang.Compiler.Symbols
 			return ReferenceEquals(this, other);
 		}
 
-		bool IType.IsSubtypeOf(IType other)
+		public bool IsSubtypeOf(IType other)
 		{
+			if (other is IUnion union)
+				return union.Options.Any(x => IsSubtypeOf(x));
+
 			return ReferenceEquals(this, other);
 		}
 

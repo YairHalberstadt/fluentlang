@@ -28,12 +28,35 @@ namespace FluentLang.Compiler.Symbols.Source
 			}
 			if (context.qualified_name() is { } qualifiedName)
 			{
-				var @interface = sourceSymbolContext.GetInterfaceOrError(qualifiedName.GetQualifiedName(), out var diagnostic);
-				if (diagnostic != null)
-					diagnostics.Add(diagnostic(new Location(qualifiedName)));
-				if (diagnostic is null && isExported && !@interface.IsExported)
-					diagnostics.Add(new Diagnostic(new Location(qualifiedName), ErrorCode.CannotUseUnexportedInterfaceFromExportedMember));
-				return @interface;
+				return BindQualifiedNameAsType(sourceSymbolContext, isExported, diagnostics, qualifiedName);
+			}
+			if (context.anonymous_interface_declaration() is { } interfaceContext)
+			{
+				return new SourceInterface(
+					interfaceContext,
+					sourceSymbolContext,
+					fullyQualifiedName: null,
+					isExported: isExported,
+					diagnostics);
+			}
+			if (context.union() is { } union)
+			{
+				return new SourceUnion(union, sourceSymbolContext, isExported, diagnostics);
+			}
+
+			diagnostics.Add(new Diagnostic(new Location(context), ErrorCode.InvalidParseTree, ImmutableArray.Create<object?>(context)));
+			return ErrorType.Instance;
+		}
+
+		public static IType BindUnionPartType(this Union_part_typeContext context, SourceSymbolContext sourceSymbolContext, bool isExported, DiagnosticBag diagnostics)
+		{
+			if (context.primitive_type() is { } primitive)
+			{
+				return primitive.BindPrimitive();
+			}
+			if (context.qualified_name() is { } qualifiedName)
+			{
+				return BindQualifiedNameAsType(sourceSymbolContext, isExported, diagnostics, qualifiedName);
 			}
 			if (context.anonymous_interface_declaration() is { } interfaceContext)
 			{
@@ -47,6 +70,16 @@ namespace FluentLang.Compiler.Symbols.Source
 
 			diagnostics.Add(new Diagnostic(new Location(context), ErrorCode.InvalidParseTree, ImmutableArray.Create<object?>(context)));
 			return ErrorType.Instance;
+		}
+
+		private static IType BindQualifiedNameAsType(SourceSymbolContext sourceSymbolContext, bool isExported, DiagnosticBag diagnostics, Qualified_nameContext qualifiedName)
+		{
+			var @interface = sourceSymbolContext.GetInterfaceOrError(qualifiedName.GetQualifiedName(), out var diagnostic);
+			if (diagnostic != null)
+				diagnostics.Add(diagnostic(new Location(qualifiedName)));
+			if (diagnostic is null && isExported && !@interface.IsExported)
+				diagnostics.Add(new Diagnostic(new Location(qualifiedName), ErrorCode.CannotUseUnexportedInterfaceFromExportedMember));
+			return @interface;
 		}
 
 		public static Primitive BindPrimitive(this Primitive_typeContext context)
