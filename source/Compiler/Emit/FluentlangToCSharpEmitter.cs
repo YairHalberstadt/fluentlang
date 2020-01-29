@@ -2,6 +2,7 @@
 using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -89,7 +90,7 @@ namespace FluentLang.Compiler.Emit
 
 			foreach (var statement in method.Statements)
 			{
-				Emit(statement, textWriter);
+				Emit(statement, method.ReturnType, textWriter);
 				textWriter.WriteLine();
 			}
 
@@ -102,7 +103,7 @@ namespace FluentLang.Compiler.Emit
 			textWriter.Write("}");
 		}
 
-		private void Emit(IStatement statement, TextWriter textWriter)
+		private void Emit(IStatement statement, IType returnType, TextWriter textWriter)
 		{
 			if (statement is IDeclarationStatement declarationStatement)
 			{
@@ -118,21 +119,22 @@ namespace FluentLang.Compiler.Emit
 				}
 				textWriter.Write(" = ");
 
-				Emit(declarationStatement.Expression, textWriter);
+				Emit(declarationStatement.Expression, declarationStatement.Type, textWriter);
 			}
 			else if (statement is IReturnStatement returnStatement)
 			{
 				textWriter.Write("return ");
-				Emit(returnStatement.Expression, textWriter);
+				Emit(returnStatement.Expression, returnType, textWriter);
 			}
 			else throw Release.Fail($"unexpected type of statement: {statement.GetType()}");
 
 			textWriter.Write(";");
 		}
 
-		private void Emit(IExpression expression, TextWriter textWriter)
+		private void Emit(IExpression expression, IType? targetType, TextWriter textWriter)
 		{
 			textWriter.Write("(");
+			EmitUpcastIfNecessary(expression.Type, targetType ?? expression.Type, () => {
 			switch (expression)
 			{
 				case INewObjectExpression noe: Emit(noe, textWriter); break;
@@ -145,8 +147,14 @@ namespace FluentLang.Compiler.Emit
 				case IConditionalExpression ce: Emit(ce, textWriter); break;
 				case ILocalReferenceExpression lre: Emit(lre, textWriter); break;
 				default: throw Release.Fail($"unexpected type of expression: {expression.GetType()}");
-			};
+			} });
 			textWriter.Write(")");
+		}
+
+		private void EmitUpcastIfNecessary(IType type, IType targetType, Action emitInner)
+		{
+			//todo: Implement this.
+			emitInner();
 		}
 
 		private void Emit(ILocalReferenceExpression lre, TextWriter textWriter)
@@ -156,24 +164,24 @@ namespace FluentLang.Compiler.Emit
 
 		private void Emit(IConditionalExpression ce, TextWriter textWriter)
 		{
-			Emit(ce.Condition, textWriter);
+			Emit(ce.Condition, null, textWriter);
 			textWriter.Write(" ? ");
-			Emit(ce.IfTrue, textWriter);
+			Emit(ce.IfTrue, ce.Type, textWriter);
 			textWriter.Write(" : ");
-			Emit(ce.IfTrue, textWriter);
+			Emit(ce.IfTrue, ce.Type, textWriter);
 		}
 
 		private void Emit(IMemberInvocationExpression mie, TextWriter textWriter)
 		{
 			var method = mie.Method;
 			var methodKey = _keyGenerator.GenerateMethodKey(method);
-			Emit(mie.Expression, textWriter);
+			Emit(mie.Expression, null, textWriter);
 			textWriter.Write(".GetMethod<");
 			EmitDelegateType(method.Parameters, method.ReturnType, textWriter);
 			textWriter.Write(">(");
 			EmitMethodKey(methodKey, textWriter);
 			textWriter.Write(")(");
-			EmitArguments(mie.Arguments, textWriter);
+			EmitArguments(mie.Arguments, mie.Method.Parameters, textWriter);
 			textWriter.Write(")");
 		}
 
@@ -184,10 +192,10 @@ namespace FluentLang.Compiler.Emit
 			textWriter.Write("\")");
 		}
 
-		private void EmitArguments(IEnumerable<IExpression> arguments, TextWriter textWriter)
+		private void EmitArguments(IEnumerable<IExpression> arguments, IEnumerable<IParameter> parameters, TextWriter textWriter)
 		{
 			var isFirst = true;
-			foreach (var argument in arguments)
+			foreach (var (argument, parameter) in arguments.Zip(parameters, (a,b) => (a,b)))
 			{
 				if (isFirst)
 				{
@@ -197,7 +205,7 @@ namespace FluentLang.Compiler.Emit
 				{
 					textWriter.Write(",");
 				}
-				Emit(argument, textWriter);
+				Emit(argument, parameter.Type, textWriter);
 			}
 		}
 
@@ -218,7 +226,7 @@ namespace FluentLang.Compiler.Emit
 			var method = sie.Method;
 			EmitMethodName(method, textWriter);
 			textWriter.Write("(");
-			EmitArguments(sie.Arguments, textWriter);
+			EmitArguments(sie.Arguments, sie.Method.Parameters, textWriter);
 			textWriter.Write(")");
 		}
 
@@ -290,17 +298,17 @@ namespace FluentLang.Compiler.Emit
 		private void Emit(IPrefixUnaryOperatorExpression puoe, TextWriter textWriter)
 		{
 			Emit(puoe.Operator, textWriter);
-			Emit(puoe.Expression, textWriter);
+			Emit(puoe.Expression, null, textWriter);
 		}
 
 		private void Emit(IBinaryOperatorExpression boe, TextWriter textWriter)
 		{
-			Emit(boe.Left, textWriter);
+			Emit(boe.Left, null, textWriter);
 			if ((boe.Left.Type == Primitive.String || boe.Left.Type == Primitive.Bool)
 				&& IsInequalityOperator(boe.Operator))
 			{
 				textWriter.Write(".CompareTo(");
-				Emit(boe.Right, textWriter);
+				Emit(boe.Right, null, textWriter);
 				textWriter.Write(")");
 				Emit(boe.Operator, textWriter);
 				textWriter.Write("0");
@@ -308,7 +316,7 @@ namespace FluentLang.Compiler.Emit
 			else
 			{
 				Emit(boe.Operator, textWriter);
-				Emit(boe.Right, textWriter);
+				Emit(boe.Right, null, textWriter);
 			}
 
 			static bool IsInequalityOperator(Operator @operator)
@@ -352,11 +360,11 @@ namespace FluentLang.Compiler.Emit
 				EmitPatch(patch, textWriter);
 			}
 			textWriter.Write("; return Target; })))(");
-			Emit(ope.Expression, textWriter);
+			Emit(ope.Expression, null, textWriter);
 			foreach (var mie in ope.Patches.Select(x => x.MixedInExpression).Where(x => x != null))
 			{
 				textWriter.Write(",");
-				Emit(mie!, textWriter);
+				Emit(mie!, null, textWriter);
 			}
 			textWriter.Write(")");
 
@@ -379,13 +387,21 @@ namespace FluentLang.Compiler.Emit
 					}
 					textWriter.Write(") => ");
 					EmitMethodName(method, textWriter);
-					textWriter.Write("(Target");
+					
+					textWriter.Write("(");
+
+					EmitUpcastIfNecessary(
+						ope.Expression.Type,
+						method.Parameters[0].Type,
+						() => textWriter.Write("Target"));
+
 					foreach (var i in Enumerable.Range(0, paramsCount))
 					{
 						textWriter.Write(",");
 						textWriter.Write("Temp");
 						textWriter.Write(i);
 					}
+
 					textWriter.Write(")))");
 				}
 				else if (patch.MixedInExpression is { } mixedInExpression)
@@ -522,6 +538,7 @@ namespace FluentLang.Compiler.Emit
 				}
 				textWriter.Write("):");
 				Emit(method.ReturnType, textWriter);
+				textWriter.Write("; ");
 			}
 
 			private static void Emit(Primitive primitive, TextWriter textWriter)

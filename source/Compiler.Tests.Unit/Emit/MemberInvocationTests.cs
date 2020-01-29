@@ -44,7 +44,7 @@ namespace N { M(a : {}) : int { return 42; } }")
 			CreateAssembly(@"
 Main() : int { return ({} + M, mixin ({} + N.M, M1), M).M1(); }
 M(a : {}) : int { return 41; }
-M1(a : { M() : int }) : int { return a.M(); }
+M1(a : { M() : int; }) : int { return a.M(); }
 namespace N { M(a : {}) : int { return 42; } }")
 				.VerifyDiagnostics()
 				.VerifyEmit(expectedResult: 42);

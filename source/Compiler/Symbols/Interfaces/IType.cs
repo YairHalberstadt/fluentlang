@@ -11,4 +11,3 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 		public bool IsSubtypeOf(IType other);
 	}
 }
-
