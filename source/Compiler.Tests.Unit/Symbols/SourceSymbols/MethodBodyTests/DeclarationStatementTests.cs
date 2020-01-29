@@ -77,7 +77,7 @@ M1(param : {}) : {} { return param; }").VerifyDiagnostics().VerifyEmit();
 		{
 			CreateAssembly(@"
 M() : {} {
-	let x : { M2() : {} } = {} + M1;
+	let x : { M2() : {}; } = {} + M1;
 	return x; 
 }
 M1(param : {}) : {} { return param; }").VerifyDiagnostics(
