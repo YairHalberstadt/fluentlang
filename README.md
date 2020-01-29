@@ -176,7 +176,7 @@ Create compiler.exe
 
 ### In progress
 
-Design and implement discriminated unions.
+Design and implement unions. See #6, #8.
 
 ### ToDo
 
