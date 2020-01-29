@@ -5,7 +5,7 @@ using System.Diagnostics;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace FluentLang.Compiler.Tests.Unit.Subtyping
+namespace FluentLang.Compiler.Tests.Unit.Symbols.Subtyping
 {
 	public class InterfaceTests : TestBase
 	{

@@ -228,6 +228,30 @@ public partial class FluentLangParserBaseListener : IFluentLangParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitPrimitive_type([NotNull] FluentLangParser.Primitive_typeContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="FluentLangParser.union"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterUnion([NotNull] FluentLangParser.UnionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="FluentLangParser.union"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitUnion([NotNull] FluentLangParser.UnionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="FluentLangParser.union_part_type"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterUnion_part_type([NotNull] FluentLangParser.Union_part_typeContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="FluentLangParser.union_part_type"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitUnion_part_type([NotNull] FluentLangParser.Union_part_typeContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.method_declaration"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

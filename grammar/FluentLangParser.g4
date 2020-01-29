@@ -65,6 +65,7 @@ type
     : qualified_name
     | primitive_type
     | anonymous_interface_declaration
+    | union
     ;
 
 primitive_type
@@ -73,6 +74,16 @@ primitive_type
     | DOUBLE
     | CHAR
     | STRING
+    ;
+
+union
+    : union_part_type (LOGICAL_OR union_part_type)+
+    ;
+
+union_part_type
+    : qualified_name
+    | primitive_type
+    | anonymous_interface_declaration
     ;
 
 method_declaration

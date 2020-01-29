@@ -68,20 +68,25 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 				return true;
 			}
 
-			if (!(other is IInterface otherInterface))
+			if (other is IUnion union)
 			{
-				return false;
+				return union.Options.Any(x => IsSubtypeOf(x));
 			}
 
-			foreach (var method in otherInterface.Methods)
+			if (other is IInterface otherInterface)
 			{
-				if (!Methods.Any(x => x.IsEquivalentTo(method, null)))
+				foreach (var method in otherInterface.Methods)
 				{
-					return false;
+					if (!Methods.Any(x => x.IsEquivalentTo(method, null)))
+					{
+						return false;
+					}
 				}
+
+				return true;
 			}
 
-			return true;
+			return false;
 		}
 	}
 }
