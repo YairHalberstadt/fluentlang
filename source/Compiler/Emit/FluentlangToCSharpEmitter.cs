@@ -155,7 +155,9 @@ namespace FluentLang.Compiler.Emit
 
 		private void EmitUpcastIfNecessary(IType type, IType targetType, TextWriter textWriter, Action emitInner)
         {
-			if (type is IInterface && targetType is IInterface || type is Primitive && targetType is Primitive)
+			if (type is IInterface && targetType is IInterface 
+				|| type is Primitive && targetType is Primitive
+				|| type is IUnion && targetType is IUnion && type.IsEquivalentTo(targetType))
 			{
 				emitInner();
 			}
@@ -490,13 +492,16 @@ namespace FluentLang.Compiler.Emit
 			textWriter.Write("FLObject.Empty");
 		}
 
-		private void Emit(IType returnType, TextWriter textWriter)
+		private void Emit(IType type, TextWriter textWriter)
 		{
-			if (returnType is IInterface)
+			if (type is IInterface)
 				textWriter.Write("FLObject");
-			else if (returnType is Primitive p)
+			else if (type is Primitive p)
 				textWriter.Write(p.ToString());
-			else throw Release.Fail("this location is thought to be unreachable");
+			else if (type is IUnion)
+				textWriter.Write("Union");
+			else 
+				Release.Fail("this location is thought to be unreachable");
 		}
 
 		private void Emit(Operator @operator, TextWriter textWriter)
@@ -566,9 +571,13 @@ namespace FluentLang.Compiler.Emit
 				{
 					Emit(@interface, textWriter, isDeclaration: false);
 				}
+				else if (type is IUnion union)
+				{
+					Emit(union, textWriter);
+				}
 				else
 				{
-					throw Release.Fail("This location is thought to be unreachable");
+					Release.Fail("This location is thought to be unreachable");
 				}
 			}
 
@@ -607,6 +616,20 @@ namespace FluentLang.Compiler.Emit
 			private static void Emit(Primitive primitive, TextWriter textWriter)
 			{
 				textWriter.Write(primitive.ToString());
+			}
+
+			private static void Emit(IUnion union, TextWriter textWriter)
+			{
+				var any = false;
+				foreach (var option in union.Options)
+				{
+					if (any)
+					{
+						textWriter.WriteLine("|");
+					}
+					any = true;
+					Emit(option, textWriter);
+				}
 			}
 
 			internal static void EmitAssemblyFileVersionAttribute(Version version, TextWriter textWriter)

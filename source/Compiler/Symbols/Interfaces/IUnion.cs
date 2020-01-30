@@ -17,27 +17,12 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 				return true;
 			}
 
-			if (other is IUnion union)
+			if (other is IUnion union && Options.Length == union.Options.Length)
 			{
-				// We don't check if number of options are equal, as we don't deduplicate options.
-
-				foreach (var option in Options)
-				{
-					if (!union.Options.Any(x => x.IsEquivalentTo(option, dependantEqualities)))
-					{
-						return false;
-					}
-				}
-
-				foreach (var option in union.Options)
-				{
-					if (!Options.Any(x => x.IsEquivalentTo(option, dependantEqualities)))
-					{
-						return false;
-					}
-				}
-
-				return true;
+				return 
+					Options
+					.Zip(union.Options, (a, b) => a.IsEquivalentTo(b, dependantEqualities))
+					.All(x => x);
 			}
 
 			return false;

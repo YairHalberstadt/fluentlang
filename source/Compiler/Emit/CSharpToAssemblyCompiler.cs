@@ -68,6 +68,7 @@ namespace FluentLang.Compiler.Emit
 
 		private static ImmutableArray<PortableExecutableReference> _metadataReferences = 
 			Directory.GetFiles(Path.GetDirectoryName(typeof(object).Assembly.Location), "System.*.dll")
+			.Concat(Directory.GetFiles(Path.GetDirectoryName(typeof(object).Assembly.Location), "netstandard.dll"))
 			.Append(typeof(FLObject).Assembly.Location)
 			.Select(x => MetadataReference.CreateFromFile(x))
 			.ToImmutableArray();

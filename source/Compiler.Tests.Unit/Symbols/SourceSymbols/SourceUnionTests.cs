@@ -20,7 +20,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols
 		[Fact]
 		public void CanParseUnion()
 		{
-			var assembly = CreateAssembly("M() : int | {} { return 42; }").VerifyDiagnostics();
+			var assembly = CreateAssembly("M() : int | {} { return 42; }").VerifyDiagnostics().VerifyEmit();
 			var m = AssertGetMethod(assembly, "M");
 			var union = Assert.IsAssignableFrom<IUnion>(m.ReturnType);
 			Assert.Equal(Primitive.Int, union.Options[0]);

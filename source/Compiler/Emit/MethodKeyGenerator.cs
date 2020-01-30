@@ -1,6 +1,7 @@
 ﻿using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,7 +74,16 @@ namespace FluentLang.Compiler.Emit
 				return GeneratePrimitiveKey(primitive);
 			if (type is IInterface @interface)
 				return GenerateInterfaceKey(@interface, parentInterfaces);
+			if (type is IUnion union)
+				return GenerateUnionKey(union, parentInterfaces);
 			throw Release.Fail("this location is thought to be unreachable");
+		}
+
+		private string GenerateUnionKey(IUnion union, Stack<(IInterface @interface, int index)> parentInterfaces)
+		{
+			return "(" + string.Join(
+				"|",
+				union.Options.Select(x => GenerateTypeKey(x, parentInterfaces))) + ")";
 		}
 
 		private string GeneratePrimitiveKey(Primitive primitive)
