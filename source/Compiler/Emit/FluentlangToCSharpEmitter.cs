@@ -133,28 +133,90 @@ namespace FluentLang.Compiler.Emit
 
 		private void Emit(IExpression expression, IType? targetType, TextWriter textWriter)
 		{
-			textWriter.Write("(");
-			EmitUpcastIfNecessary(expression.Type, targetType ?? expression.Type, () => {
-			switch (expression)
-			{
-				case INewObjectExpression noe: Emit(noe, textWriter); break;
-				case IObjectPatchingExpression ope: Emit(ope, textWriter); break;
-				case IBinaryOperatorExpression boe: Emit(boe, textWriter); break;
-				case IPrefixUnaryOperatorExpression puoe: Emit(puoe, textWriter); break;
-				case ILiteralExpression le: Emit(le, textWriter); break;
-				case IStaticInvocationExpression sie: Emit(sie, textWriter); break;
-				case IMemberInvocationExpression mie: Emit(mie, textWriter); break;
-				case IConditionalExpression ce: Emit(ce, textWriter); break;
-				case ILocalReferenceExpression lre: Emit(lre, textWriter); break;
-				default: throw Release.Fail($"unexpected type of expression: {expression.GetType()}");
-			} });
-			textWriter.Write(")");
+			EmitUpcastIfNecessary(expression.Type, targetType ?? expression.Type, textWriter, () =>
+            {
+                textWriter.Write("(");
+                switch (expression)
+                {
+                    case INewObjectExpression noe: Emit(noe, textWriter); break;
+                    case IObjectPatchingExpression ope: Emit(ope, textWriter); break;
+                    case IBinaryOperatorExpression boe: Emit(boe, textWriter); break;
+                    case IPrefixUnaryOperatorExpression puoe: Emit(puoe, textWriter); break;
+                    case ILiteralExpression le: Emit(le, textWriter); break;
+                    case IStaticInvocationExpression sie: Emit(sie, textWriter); break;
+                    case IMemberInvocationExpression mie: Emit(mie, textWriter); break;
+                    case IConditionalExpression ce: Emit(ce, textWriter); break;
+                    case ILocalReferenceExpression lre: Emit(lre, textWriter); break;
+                    default: throw Release.Fail($"unexpected type of expression: {expression.GetType()}");
+                }
+                textWriter.Write(")");
+            });
 		}
 
-		private void EmitUpcastIfNecessary(IType type, IType targetType, Action emitInner)
+		private void EmitUpcastIfNecessary(IType type, IType targetType, TextWriter textWriter, Action emitInner)
+        {
+			if (type is IInterface && targetType is IInterface || type is Primitive && targetType is Primitive)
+			{
+				emitInner();
+			}
+			else if (type is IUnion && targetType is IInterface)
+			{
+				textWriter.Write("((FLObject)");
+				emitInner();
+				textWriter.Write(".Inner)");
+			}
+			else if (type is IUnion && targetType is Primitive primitive)
+			{
+				textWriter.Write("((");
+				textWriter.Write(primitive.ToString());
+				textWriter.Write(")");
+				emitInner();
+				textWriter.Write(".Inner)");
+			}
+			else if ((type is IInterface || type is Primitive) && targetType is IUnion union)
+			{
+				textWriter.Write("(new Union(");
+				emitInner();
+				textWriter.Write(", (ulong)");
+				textWriter.Write(GetMatchingOptions(type, union));
+				textWriter.Write("))");
+			}
+			else if (type is IUnion sourceUnion && targetType is IUnion targetUnion)
+			{
+				textWriter.Write("(new Union(");
+				emitInner();
+				textWriter.Write(", stackalloc ulong[] {");
+				var any = false;
+				foreach (var option in sourceUnion.Options)
+				{
+					if (any)
+					{
+						textWriter.Write(",");
+					}
+					any = true;
+					textWriter.Write(GetMatchingOptions(option, targetUnion));
+				}
+				textWriter.Write("}))");
+			}
+			else 
+			{
+				Release.Fail("unreachable"); 
+			}
+		}
+
+		private static ulong GetMatchingOptions(IType type, IUnion targetUnion)
 		{
-			//todo: Implement this.
-			emitInner();
+			ulong bits = 0;
+			for (var i = 0; i < targetUnion.Options.Length; i++)
+			{
+				var option = targetUnion.Options[i];
+				if (type.IsSubtypeOf(option))
+				{
+					bits |= ((ulong)1) << i;
+				}
+			}
+
+			return bits;
 		}
 
 		private void Emit(ILocalReferenceExpression lre, TextWriter textWriter)
@@ -391,8 +453,9 @@ namespace FluentLang.Compiler.Emit
 					textWriter.Write("(");
 
 					EmitUpcastIfNecessary(
-						ope.Expression.Type,
-						method.Parameters[0].Type,
+                        ope.Expression.Type,
+                        method.Parameters[0].Type,
+						textWriter,
 						() => textWriter.Write("Target"));
 
 					foreach (var i in Enumerable.Range(0, paramsCount))

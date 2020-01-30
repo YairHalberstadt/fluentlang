@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;netstandard1.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <RootNamespace>FluentLang.Runtime</RootNamespace>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
@@ -24,5 +24,4 @@
   <ItemGroup>
     <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
   </ItemGroup>
-
 </Project>
