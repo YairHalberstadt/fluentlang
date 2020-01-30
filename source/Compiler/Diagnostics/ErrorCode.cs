@@ -36,5 +36,6 @@
 		InvalidMetadataAssembly,
 		CannotUseUnexportedInterfaceFromExportedMember,
 		MultipleVersionsOfSameAssembly,
+		TooManyOptionsInUnion,
 	}
 }

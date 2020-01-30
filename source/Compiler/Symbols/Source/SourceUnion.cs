@@ -31,11 +31,21 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		private ImmutableArray<IType> BindOptions()
 		{
-			return
+			var options =
 				_context
 				.union_part_type()
 				.Select(x => x.BindUnionPartType(_sourceSymbolContext, _isExported, _diagnostics))
 				.ToImmutableArray();
+
+			if (options.Length > 64)
+			{
+				_diagnostics.Add(new Diagnostic(
+					new Location(_context),
+					ErrorCode.TooManyOptionsInUnion,
+					ImmutableArray.Create<object?>(this)));
+			}
+
+			return options;
 		}
 
 		protected override void EnsureAllLocalDiagnosticsCollected()
