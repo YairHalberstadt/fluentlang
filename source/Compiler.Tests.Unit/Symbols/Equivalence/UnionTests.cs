@@ -17,7 +17,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.Equivalence
 		{
 			var assembly = CreateAssembly(@"
 M1() : int | {} { return 42; }
-M2() : int | {} { return {}; }").VerifyDiagnostics();
+M2() : int | {} { return {}; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
 			var u2 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M2").ReturnType);
@@ -26,29 +26,29 @@ M2() : int | {} { return {}; }").VerifyDiagnostics();
 		}
 
 		[Fact]
-		public void UnionIsEquivalentToUnionWithSameTypesInDifferentOrder()
+		public void UnionIsNotEquivalentToUnionWithSameTypesInDifferentOrder()
 		{
 			var assembly = CreateAssembly(@"
 M1() : int | {} { return 42; }
-M2() : {} | int { return {}; }").VerifyDiagnostics();
+M2() : {} | int { return {}; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
 			var u2 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M2").ReturnType);
-			Assert.True(u1.IsEquivalentTo(u2));
-			Assert.True(u2.IsEquivalentTo(u1));
+			Assert.False(u1.IsEquivalentTo(u2));
+			Assert.False(u2.IsEquivalentTo(u1));
 		}
 
 		[Fact]
-		public void UnionIsEquivalentToUnionWithSameTypesDuplicated()
+		public void UnionIsNotEquivalentToUnionWithSameTypesDuplicated()
 		{
 			var assembly = CreateAssembly(@"
 M1() : int | {} { return 42; }
-M2() : {} | int | {} { return {}; }").VerifyDiagnostics();
+M2() : {} | int | {} { return {}; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
 			var u2 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M2").ReturnType);
-			Assert.True(u1.IsEquivalentTo(u2));
-			Assert.True(u2.IsEquivalentTo(u1));
+			Assert.False(u1.IsEquivalentTo(u2));
+			Assert.False(u2.IsEquivalentTo(u1));
 		}
 
 		[Fact]
@@ -56,7 +56,7 @@ M2() : {} | int | {} { return {}; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 M1() : int | {} { return 42; }
-M2() : {} | int | string { return {}; }").VerifyDiagnostics();
+M2() : {} | int | string { return {}; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
 			var u2 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M2").ReturnType);
@@ -69,7 +69,7 @@ M2() : {} | int | string { return {}; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 M1() : int | {} { return 42; }
-M2() : {} | string { return {}; }").VerifyDiagnostics();
+M2() : {} | string { return {}; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
 			var u2 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M2").ReturnType);
@@ -82,7 +82,7 @@ M2() : {} | string { return {}; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 M1() : int | {} { return 42; }
-M2() : {} { return {}; }").VerifyDiagnostics();
+M2() : {} { return {}; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
 			var u2 = Assert.IsAssignableFrom<IInterface>(AssertGetMethod(assembly, "M2").ReturnType);
@@ -93,7 +93,7 @@ M2() : {} { return {}; }").VerifyDiagnostics();
 		[Fact]
 		public void UnionIsNotEquivalentToPrimitive()
 		{
-			var assembly = CreateAssembly(@"M() : int | {} { return 42; }").VerifyDiagnostics();
+			var assembly = CreateAssembly(@"M() : int | {} { return 42; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M").ReturnType);
 			Assert.False(u1.IsEquivalentTo(Primitive.Int));

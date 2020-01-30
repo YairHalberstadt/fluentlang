@@ -17,7 +17,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.Subtyping
 		{
 			var assembly = CreateAssembly(@"
 M1() : int | {} { return 42; }
-M2() : int | {} { return {}; }").VerifyDiagnostics();
+M2() : int | {} { return {}; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
 			var u2 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M2").ReturnType);
@@ -30,7 +30,7 @@ M2() : int | {} { return {}; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 M1() : int | {} { return 42; }
-M2() : {} | int { return {}; }").VerifyDiagnostics();
+M2() : {} | int { return {}; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
 			var u2 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M2").ReturnType);
@@ -43,7 +43,7 @@ M2() : {} | int { return {}; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 M1() : int | {} { return 42; }
-M2() : {} | int | {} { return {}; }").VerifyDiagnostics();
+M2() : {} | int | {} { return {}; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
 			var u2 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M2").ReturnType);
@@ -56,7 +56,7 @@ M2() : {} | int | {} { return {}; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 M1() : int | {} { return 42; }
-M2() : {} | int | string { return {}; }").VerifyDiagnostics();
+M2() : {} | int | string { return {}; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
 			var u2 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M2").ReturnType);
@@ -69,7 +69,7 @@ M2() : {} | int | string { return {}; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 M1() : int | {} { return 42; }
-M2() : {} | string { return {}; }").VerifyDiagnostics();
+M2() : {} | string { return {}; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
 			var u2 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M2").ReturnType);
@@ -82,7 +82,7 @@ M2() : {} | string { return {}; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 M1(a: { M() : int; }) : { M() : int; } | { M(): int; M1(): string } { return a; }
-M2(a: { M() : int; }) : { M() : int; } { return a; }").VerifyDiagnostics();
+M2(a: { M() : int; }) : { M() : int; } { return a; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
 			var u2 = Assert.IsAssignableFrom<IInterface>(AssertGetMethod(assembly, "M2").ReturnType);
@@ -95,7 +95,7 @@ M2(a: { M() : int; }) : { M() : int; } { return a; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 M1(a: { M() : int; }) : { M() : int; } | int { return a; }
-M2(a: { M() : int; }) : { M() : int; } { return a; }").VerifyDiagnostics();
+M2(a: { M() : int; }) : { M() : int; } { return a; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
 			var u2 = Assert.IsAssignableFrom<IInterface>(AssertGetMethod(assembly, "M2").ReturnType);
@@ -108,7 +108,7 @@ M2(a: { M() : int; }) : { M() : int; } { return a; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 M1() : int | { M(): int; M1(): string } { return 42; }
-M2() : { M() : int; } | int { return 42; }").VerifyDiagnostics();
+M2() : { M() : int; } | int { return 42; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
 			var u2 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M2").ReturnType);
@@ -121,7 +121,7 @@ M2() : { M() : int; } | int { return 42; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 M1() : int | { M(): int; M1(): string } { return 42; }
-M2() : { M() : int; } | string { return """"; }").VerifyDiagnostics();
+M2() : { M() : int; } | string { return """"; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
 			var u2 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M2").ReturnType);
@@ -134,7 +134,7 @@ M2() : { M() : int; } | string { return """"; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 M1() : int | int { return 42; }
-M2() : int { return 42; }").VerifyDiagnostics();
+M2() : int { return 42; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
 			var u2 = Assert.IsAssignableFrom<Primitive>(AssertGetMethod(assembly, "M2").ReturnType);
@@ -147,7 +147,7 @@ M2() : int { return 42; }").VerifyDiagnostics();
 		{
 			var assembly = CreateAssembly(@"
 M1() : { M() : int; } | int { return 42; }
-M2() : int { return 42; }").VerifyDiagnostics();
+M2() : int { return 42; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
 			var u2 = Assert.IsAssignableFrom<Primitive>(AssertGetMethod(assembly, "M2").ReturnType);
