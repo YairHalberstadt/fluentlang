@@ -29,6 +29,7 @@ COLON:                    ':';
 SEMICOLON:                ';';
 DISCARD:                  '_';
 LOGICAL_OR:               '|';
+RIGHT_ARROW:              '=>';
 
 //baseTypes
 BOOL:                     'bool';
@@ -55,6 +56,7 @@ MIXIN: 'mixin';
 EXPORT: 'export';
 OPEN: 'open';
 LET: 'let';
+MATCH: 'match';
 
 //identifiers
 

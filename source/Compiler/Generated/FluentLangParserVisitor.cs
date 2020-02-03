@@ -213,6 +213,13 @@ public interface IFluentLangParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitMember_invocation_expression([NotNull] FluentLangParser.Member_invocation_expressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>match_expression</c>
+	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMatch_expression([NotNull] FluentLangParser.Match_expressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>literal_expression</c>
 	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
 	/// </summary>
@@ -288,6 +295,12 @@ public interface IFluentLangParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitArguments([NotNull] FluentLangParser.ArgumentsContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="FluentLangParser.match_expression_arm"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMatch_expression_arm([NotNull] FluentLangParser.Match_expression_armContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="FluentLangParser.parameter_metadata"/>.
 	/// </summary>

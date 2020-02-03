@@ -119,6 +119,7 @@ expression
     | IF OPEN_PARENS expression CLOSE_PARENS expression ELSE expression   #conditional_expression
     | OPEN_PARENS expression CLOSE_PARENS                                 #parenthesized_expression
     | LOWERCASE_IDENTIFIER                                                #local_reference_expression
+    | expression MATCH OPEN_BRACE match_expression_arm* CLOSE_BRACE       #match_expression
     ;
 
 empty_interface
@@ -132,12 +133,7 @@ object_patch
 
 fully_qualified_method
     : qualified_name
-//  | qualified_name OPEN_PARENS fully_qualified_method_parameters CLOSE_PARENS type_declaration
     ;
-
-//fully_qualified_method_parameters
-//    : type (COMMA type)*
-//    ;
 
 operator
     : PLUS
@@ -174,6 +170,9 @@ arguments
     : (expression (COMMA expression)*)?
     ;
 
+match_expression_arm
+    : (LOWERCASE_IDENTIFIER COLON)? type RIGHT_ARROW expression SEMICOLON
+    ;
 /*
  ***********************************************************************************
  *                                   METADATA RULES                                *
