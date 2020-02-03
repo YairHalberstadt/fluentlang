@@ -31,7 +31,7 @@ M(a : string | { M() : int; } | { M() : bool; }) : int {
 		x : { M() : int; } => 2;
 		{ M() : bool; } => 3;
 	};
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<IMatchExpression>(statement.Expression);
@@ -50,7 +50,7 @@ M(a : string | { M() : int; } | { M() : bool; }) : int {
 		x : { M() : int; } => 2;
 		{} => 3;
 	};
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<IMatchExpression>(statement.Expression);
@@ -68,7 +68,7 @@ M(a : string | { M() : int; } | { M() : bool; }) : int {
 		string => 1;
 		{} => 2;
 	};
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<IMatchExpression>(statement.Expression);
@@ -106,7 +106,7 @@ M(a : string | { M() : int; } | { M() : bool; }) : int {
 		x : { M() : int; } => 2;
 		{ M() : bool; } => 3;
 	};
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<IMatchExpression>(statement.Expression);
@@ -123,7 +123,7 @@ M(a : string | { M() : int; } | { M() : bool; }, b : { M() : {}; }, c : { M() : 
 		x : { M() : int; } => b;
 		{ M() : bool; } => c;
 	};
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<IMatchExpression>(statement.Expression);
@@ -161,7 +161,7 @@ M(a : string | int) : int {
 		string => 1;
 		x : int => x;
 	};
-}").VerifyDiagnostics();
+}").VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 				var exp = Assert.IsAssignableFrom<IMatchExpression>(statement.Expression);
@@ -181,6 +181,37 @@ M(a : string | int) : int {
 					new Diagnostic(new Location(new TextToken(@"returnamatch{x:string=>1;int=>x;};")), ErrorCode.ReturnTypeDoesNotMatch),
 					new Diagnostic(new Location(new TextToken(@"amatch{x:string=>1;int=>x;}")), ErrorCode.NoBestType),
 					new Diagnostic(new Location(new TextToken(@"x")), ErrorCode.InvalidLocalReference));
+			}
+
+			[Fact]
+			public void LocalCannotHideAnotherLocal()
+			{
+				CreateAssembly(@"
+M(a : string | int) : int { 
+	return a match  {
+		string => 1;
+		a : int => a;
+	};
+}").VerifyDiagnostics(
+					new Diagnostic(new Location(new TextToken(@"returnamatch{string=>1;a:int=>a;};")), ErrorCode.ReturnTypeDoesNotMatch),
+					new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.HidesLocal));
+			}
+
+			[Fact]
+			public void LocalCanHaveSameNameAsLocaInOtherArm()
+			{
+				var assembly = CreateAssembly(@"
+M(a : string | int) : int { 
+	return a match  {
+		x : string => 1;
+		x : int => x;
+	};
+}").VerifyDiagnostics().VerifyEmit();
+
+				var m = AssertGetMethod(assembly, "M");
+				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
+				var exp = Assert.IsAssignableFrom<IMatchExpression>(statement.Expression);
+				Assert.Equal(Primitive.Int, exp.Type);
 			}
 		}
 

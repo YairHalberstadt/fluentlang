@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using static FluentLang.Compiler.Emit.CSharpNameEscaper;
 using Version = FluentLang.Compiler.Symbols.Interfaces.Version;
 
@@ -15,6 +16,7 @@ namespace FluentLang.Compiler.Emit
 	public class FluentlangToCSharpEmitter
 	{
 		private readonly MethodKeyGenerator _keyGenerator;
+		private readonly UniqueIdentifierGenerator _uniqueIdentifierGenerator = new UniqueIdentifierGenerator();
 
 		public FluentlangToCSharpEmitter(MethodKeyGenerator keyGenerator)
 		{
@@ -147,10 +149,44 @@ namespace FluentLang.Compiler.Emit
                     case IMemberInvocationExpression mie: Emit(mie, textWriter); break;
                     case IConditionalExpression ce: Emit(ce, textWriter); break;
                     case ILocalReferenceExpression lre: Emit(lre, textWriter); break;
+					case IMatchExpression me: Emit(me, textWriter); break;
                     default: throw Release.Fail($"unexpected type of expression: {expression.GetType()}");
                 }
                 textWriter.Write(")");
             });
+		}
+
+		private void Emit(IMatchExpression me, TextWriter textWriter)
+		{
+			Emit(me.Expression, null, textWriter);
+			textWriter.WriteLine(" switch {");
+
+			var matchingOptionsIdentifier = _uniqueIdentifierGenerator.GenerateIdentifier();
+			foreach (var arm in me.Arms)
+			{
+				//Union { Inner: _, MatchingOptions: var i1}
+				textWriter.Write("Union { Inner: ");
+				if (arm.Local is { Identifier: var identifier, Type: var type })
+				{
+					Emit(type, textWriter);
+					textWriter.Write(" ");
+					textWriter.Write(identifier);
+				}
+				else
+				{
+					textWriter.Write("_");
+				}
+				textWriter.Write(", MatchingOptions: var ");
+				textWriter.Write(matchingOptionsIdentifier);
+				textWriter.Write("} when (");
+				textWriter.Write(matchingOptionsIdentifier);
+				textWriter.Write("& (ulong)");
+				textWriter.Write(GetSubtypeOptions(arm.Type, (IUnion)me.Expression.Type));
+				textWriter.Write(") != 0 => ");
+				Emit(arm.Expression, me.Type, textWriter);
+				textWriter.Write(",");
+			}
+			textWriter.Write("}");
 		}
 
 		private void EmitUpcastIfNecessary(IType type, IType targetType, TextWriter textWriter, Action emitInner)
@@ -180,7 +216,7 @@ namespace FluentLang.Compiler.Emit
 				textWriter.Write("(new Union(");
 				emitInner();
 				textWriter.Write(", (ulong)");
-				textWriter.Write(GetMatchingOptions(type, union));
+				textWriter.Write(GetSupertypeOptions(type, union));
 				textWriter.Write("))");
 			}
 			else if (type is IUnion sourceUnion && targetType is IUnion targetUnion)
@@ -196,7 +232,7 @@ namespace FluentLang.Compiler.Emit
 						textWriter.Write(",");
 					}
 					any = true;
-					textWriter.Write(GetMatchingOptions(option, targetUnion));
+					textWriter.Write(GetSupertypeOptions(option, targetUnion));
 				}
 				textWriter.Write("}))");
 			}
@@ -206,13 +242,28 @@ namespace FluentLang.Compiler.Emit
 			}
 		}
 
-		private static ulong GetMatchingOptions(IType type, IUnion targetUnion)
+		private static ulong GetSupertypeOptions(IType type, IUnion union)
 		{
 			ulong bits = 0;
-			for (var i = 0; i < targetUnion.Options.Length; i++)
+			for (var i = 0; i < union.Options.Length; i++)
 			{
-				var option = targetUnion.Options[i];
+				var option = union.Options[i];
 				if (type.IsSubtypeOf(option))
+				{
+					bits |= ((ulong)1) << i;
+				}
+			}
+
+			return bits;
+		}
+
+		private static ulong GetSubtypeOptions(IType type, IUnion union)
+		{
+			ulong bits = 0;
+			for (var i = 0; i < union.Options.Length; i++)
+			{
+				var option = union.Options[i];
+				if (option.IsSubtypeOf(type))
 				{
 					bits |= ((ulong)1) << i;
 				}
@@ -654,6 +705,12 @@ namespace FluentLang.Compiler.Emit
 				EmitStringLiteral(name.ToString(), textWriter);
 				textWriter.WriteLine(")]");
 			}
+		}
+
+		private class UniqueIdentifierGenerator
+		{
+			private int _index = 0;
+			public string GenerateIdentifier() => "i" + Interlocked.Increment(ref _index);
 		}
 	}
 }

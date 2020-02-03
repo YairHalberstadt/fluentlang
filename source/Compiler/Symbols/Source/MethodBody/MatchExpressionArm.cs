@@ -3,6 +3,8 @@ using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using System;
+using System.Collections.Immutable;
+using System.Linq;
 using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.Symbols.Source.MethodBody
@@ -35,6 +37,14 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 
 		private IExpression BindExpression()
 		{
+			if (IdentifierName != null && _methodBodySymbolContext.Locals.Any(x => x.Identifier == IdentifierName))
+			{
+				_diagnostics.Add(new Diagnostic(
+					new Location(_context.LOWERCASE_IDENTIFIER()),
+					ErrorCode.HidesLocal,
+					ImmutableArray.Create<object?>(Local, _methodBodySymbolContext.Locals.First(x => x.Identifier == IdentifierName))));
+			}
+
 			return _context.expression().BindExpression(
 				Local is { } local ? _methodBodySymbolContext.WithLocal(local) : _methodBodySymbolContext,
 				_diagnostics);
