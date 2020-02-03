@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.RegularExpressions;
 
 namespace FluentLang.Runtime
 {
@@ -11,7 +10,7 @@ namespace FluentLang.Runtime
 			MatchingOptions = matchingOptions;
 		}
 
-		public Union(Union union, Span<ulong> matchingTargetOptionsPerOption) 
+		public Union(Union union, Span<ulong> matchingTargetOptionsPerOption)
 			: this(union.Inner, union.GetUpcastToUnionMatchingOptions(matchingTargetOptionsPerOption))
 		{
 		}
