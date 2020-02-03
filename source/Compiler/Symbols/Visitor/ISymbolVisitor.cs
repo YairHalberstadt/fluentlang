@@ -11,9 +11,11 @@ namespace FluentLang.Compiler.Symbols.Visitor
 	{
 		[return: MaybeNull] T Visit(IBinaryOperatorExpression binaryOperatorExpression);
 		[return: MaybeNull] T Visit(IStaticInvocationExpression staticInvocationExpression);
+		[return: MaybeNull] T Visit(IMatchExpression matchExpression);
 		[return: MaybeNull] T Visit(IMethod method);
 		[return: MaybeNull] T Visit(IReturnStatement returnStatement);
 		[return: MaybeNull] T Visit(IPrefixUnaryOperatorExpression prefixUnaryOperatorExpression);
+		[return: MaybeNull] T Visit(IMatchExpressionArm matchExpressionArm);
 		[return: MaybeNull] T Visit(INewObjectExpression newObjectExpression);
 		[return: MaybeNull] T Visit(IObjectPatchingExpression objectPatchingExpression);
 		[return: MaybeNull] T Visit(IMemberInvocationExpression memberInvocationExpression);

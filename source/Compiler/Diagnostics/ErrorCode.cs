@@ -37,5 +37,7 @@
 		CannotUseUnexportedInterfaceFromExportedMember,
 		MultipleVersionsOfSameAssembly,
 		TooManyOptionsInUnion,
+		CannotMatchOnNonUnion,
+		MatchNotExhaustive,
 	}
 }

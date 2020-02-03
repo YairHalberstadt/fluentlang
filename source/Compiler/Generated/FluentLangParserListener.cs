@@ -334,6 +334,18 @@ public interface IFluentLangParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitMember_invocation_expression([NotNull] FluentLangParser.Member_invocation_expressionContext context);
 	/// <summary>
+	/// Enter a parse tree produced by the <c>match_expression</c>
+	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterMatch_expression([NotNull] FluentLangParser.Match_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>match_expression</c>
+	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitMatch_expression([NotNull] FluentLangParser.Match_expressionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by the <c>literal_expression</c>
 	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
 	/// </summary>
@@ -461,6 +473,16 @@ public interface IFluentLangParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitArguments([NotNull] FluentLangParser.ArgumentsContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="FluentLangParser.match_expression_arm"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterMatch_expression_arm([NotNull] FluentLangParser.Match_expression_armContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="FluentLangParser.match_expression_arm"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitMatch_expression_arm([NotNull] FluentLangParser.Match_expression_armContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.parameter_metadata"/>.
 	/// </summary>

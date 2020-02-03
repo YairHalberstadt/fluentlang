@@ -396,6 +396,20 @@ public partial class FluentLangParserBaseListener : IFluentLangParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitMember_invocation_expression([NotNull] FluentLangParser.Member_invocation_expressionContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by the <c>match_expression</c>
+	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterMatch_expression([NotNull] FluentLangParser.Match_expressionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by the <c>match_expression</c>
+	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitMatch_expression([NotNull] FluentLangParser.Match_expressionContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by the <c>literal_expression</c>
 	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
 	/// <para>The default implementation does nothing.</para>
@@ -547,6 +561,18 @@ public partial class FluentLangParserBaseListener : IFluentLangParserListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitArguments([NotNull] FluentLangParser.ArgumentsContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="FluentLangParser.match_expression_arm"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterMatch_expression_arm([NotNull] FluentLangParser.Match_expression_armContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="FluentLangParser.match_expression_arm"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitMatch_expression_arm([NotNull] FluentLangParser.Match_expression_armContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.parameter_metadata"/>.
 	/// <para>The default implementation does nothing.</para>

@@ -128,5 +128,22 @@ namespace FluentLang.Compiler.Symbols.Visitor
 					x.IfTrue.Visit(this),
 					x.IfFalse.Visit(this)});
 		}
+
+		[return: MaybeNull]
+		T ISymbolVisitor<T>.Visit(IMatchExpression matchExpression)
+		{
+			return DefaultVisit(
+				matchExpression,
+				x =>
+					x.Arms.Select(a => a.Visit(this))
+					.Prepend(x.Expression.Visit(this)));
+		}
+
+		T ISymbolVisitor<T>.Visit(IMatchExpressionArm matchExpressionArm)
+		{
+			return DefaultVisit(
+				matchExpressionArm,
+				x => new[] { x.Expression.Visit(this) });
+		}
 	}
 }

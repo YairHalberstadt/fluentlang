@@ -150,6 +150,7 @@ namespace FluentLang.Compiler.Symbols.Source
 				Conditional_expressionContext cec => new ConditionalExpression(cec, methodBodySymbolContext, diagnostics),
 				Parenthesized_expressionContext pec => pec.expression().BindExpression(methodBodySymbolContext, diagnostics),
 				Local_reference_expressionContext lrec => new LocalReferenceExpression(lrec, methodBodySymbolContext, diagnostics),
+				Match_expressionContext mec => new MatchExpression(mec, methodBodySymbolContext, diagnostics),
 				_ => throw Release.Fail($"unexpected expression: {context}")
 			};
 		}
