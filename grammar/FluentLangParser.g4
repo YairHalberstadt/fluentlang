@@ -37,7 +37,7 @@ type_parameter_list
     ;
 
 type_parameter
-    : UPPERCASE_IDENTIFIER (COLON type)?
+    : UPPERCASE_IDENTIFIER type_declaration?
     ;
 
 anonymous_interface_declaration
