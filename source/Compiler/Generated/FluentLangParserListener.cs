@@ -102,6 +102,16 @@ public interface IFluentLangParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitInterface_declaration([NotNull] FluentLangParser.Interface_declarationContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="FluentLangParser.type_parameter_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterType_parameter_list([NotNull] FluentLangParser.Type_parameter_listContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="FluentLangParser.type_parameter_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitType_parameter_list([NotNull] FluentLangParser.Type_parameter_listContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.anonymous_interface_declaration"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

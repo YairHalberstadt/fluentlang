@@ -120,6 +120,18 @@ public partial class FluentLangParserBaseListener : IFluentLangParserListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitInterface_declaration([NotNull] FluentLangParser.Interface_declarationContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="FluentLangParser.type_parameter_list"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterType_parameter_list([NotNull] FluentLangParser.Type_parameter_listContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="FluentLangParser.type_parameter_list"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitType_parameter_list([NotNull] FluentLangParser.Type_parameter_listContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.anonymous_interface_declaration"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

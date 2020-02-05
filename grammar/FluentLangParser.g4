@@ -29,7 +29,11 @@ namespace_declaration
     ;
 
 interface_declaration
-    : EXPORT? INTERFACE UPPERCASE_IDENTIFIER anonymous_interface_declaration
+    : EXPORT? INTERFACE UPPERCASE_IDENTIFIER type_parameter_list anonymous_interface_declaration
+    ;
+
+type_parameter_list
+    : LT UPPERCASE_IDENTIFIER (COMMA UPPERCASE_IDENTIFIER)* GT
     ;
 
 anonymous_interface_declaration
@@ -46,7 +50,7 @@ interface_member_declaration
     ;
 
 method_signature
-    : UPPERCASE_IDENTIFIER OPEN_PARENS parameters CLOSE_PARENS type_declaration
+    : UPPERCASE_IDENTIFIER type_parameter_list OPEN_PARENS parameters CLOSE_PARENS type_declaration
     ;
 
 parameters
