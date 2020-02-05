@@ -81,6 +81,12 @@ public interface IFluentLangParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitType_parameter_list([NotNull] FluentLangParser.Type_parameter_listContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="FluentLangParser.type_argument"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType_argument([NotNull] FluentLangParser.Type_argumentContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="FluentLangParser.anonymous_interface_declaration"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
