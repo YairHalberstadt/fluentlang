@@ -33,10 +33,10 @@ interface_declaration
     ;
 
 type_parameter_list
-    : (LT type_argument (COMMA type_argument)* GT)?
+    : (LT type_parameter (COMMA type_parameter)* GT)?
     ;
 
-type_argument
+type_parameter
     : UPPERCASE_IDENTIFIER (COLON type)?
     ;
 

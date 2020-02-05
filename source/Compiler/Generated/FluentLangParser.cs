@@ -48,7 +48,7 @@ public partial class FluentLangParser : Parser {
 	public const int
 		RULE_compilation_unit = 0, RULE_open_directives = 1, RULE_open_directive = 2, 
 		RULE_qualified_name = 3, RULE_namespace_member_declaration = 4, RULE_namespace_declaration = 5, 
-		RULE_interface_declaration = 6, RULE_type_parameter_list = 7, RULE_type_argument = 8, 
+		RULE_interface_declaration = 6, RULE_type_parameter_list = 7, RULE_type_parameter = 8, 
 		RULE_anonymous_interface_declaration = 9, RULE_simple_anonymous_interface_declaration = 10, 
 		RULE_interface_member_declaration = 11, RULE_method_signature = 12, RULE_parameters = 13, 
 		RULE_parameter = 14, RULE_type_declaration = 15, RULE_type = 16, RULE_primitive_type = 17, 
@@ -63,7 +63,7 @@ public partial class FluentLangParser : Parser {
 	public static readonly string[] ruleNames = {
 		"compilation_unit", "open_directives", "open_directive", "qualified_name", 
 		"namespace_member_declaration", "namespace_declaration", "interface_declaration", 
-		"type_parameter_list", "type_argument", "anonymous_interface_declaration", 
+		"type_parameter_list", "type_parameter", "anonymous_interface_declaration", 
 		"simple_anonymous_interface_declaration", "interface_member_declaration", 
 		"method_signature", "parameters", "parameter", "type_declaration", "type", 
 		"primitive_type", "union", "union_part_type", "method_declaration", "method_body", 
@@ -574,11 +574,11 @@ public partial class FluentLangParser : Parser {
 
 	public partial class Type_parameter_listContext : ParserRuleContext {
 		public ITerminalNode LT() { return GetToken(FluentLangParser.LT, 0); }
-		public Type_argumentContext[] type_argument() {
-			return GetRuleContexts<Type_argumentContext>();
+		public Type_parameterContext[] type_parameter() {
+			return GetRuleContexts<Type_parameterContext>();
 		}
-		public Type_argumentContext type_argument(int i) {
-			return GetRuleContext<Type_argumentContext>(i);
+		public Type_parameterContext type_parameter(int i) {
+			return GetRuleContext<Type_parameterContext>(i);
 		}
 		public ITerminalNode GT() { return GetToken(FluentLangParser.GT, 0); }
 		public ITerminalNode[] COMMA() { return GetTokens(FluentLangParser.COMMA); }
@@ -619,7 +619,7 @@ public partial class FluentLangParser : Parser {
 			if (_la==LT) {
 				{
 				State = 129; Match(LT);
-				State = 130; type_argument();
+				State = 130; type_parameter();
 				State = 135;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
@@ -627,7 +627,7 @@ public partial class FluentLangParser : Parser {
 					{
 					{
 					State = 131; Match(COMMA);
-					State = 132; type_argument();
+					State = 132; type_parameter();
 					}
 					}
 					State = 137;
@@ -651,36 +651,36 @@ public partial class FluentLangParser : Parser {
 		return _localctx;
 	}
 
-	public partial class Type_argumentContext : ParserRuleContext {
+	public partial class Type_parameterContext : ParserRuleContext {
 		public ITerminalNode UPPERCASE_IDENTIFIER() { return GetToken(FluentLangParser.UPPERCASE_IDENTIFIER, 0); }
 		public ITerminalNode COLON() { return GetToken(FluentLangParser.COLON, 0); }
 		public TypeContext type() {
 			return GetRuleContext<TypeContext>(0);
 		}
-		public Type_argumentContext(ParserRuleContext parent, int invokingState)
+		public Type_parameterContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
 		}
-		public override int RuleIndex { get { return RULE_type_argument; } }
+		public override int RuleIndex { get { return RULE_type_parameter; } }
 		public override void EnterRule(IParseTreeListener listener) {
 			IFluentLangParserListener typedListener = listener as IFluentLangParserListener;
-			if (typedListener != null) typedListener.EnterType_argument(this);
+			if (typedListener != null) typedListener.EnterType_parameter(this);
 		}
 		public override void ExitRule(IParseTreeListener listener) {
 			IFluentLangParserListener typedListener = listener as IFluentLangParserListener;
-			if (typedListener != null) typedListener.ExitType_argument(this);
+			if (typedListener != null) typedListener.ExitType_parameter(this);
 		}
 		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
 			IFluentLangParserVisitor<TResult> typedVisitor = visitor as IFluentLangParserVisitor<TResult>;
-			if (typedVisitor != null) return typedVisitor.VisitType_argument(this);
+			if (typedVisitor != null) return typedVisitor.VisitType_parameter(this);
 			else return visitor.VisitChildren(this);
 		}
 	}
 
 	[RuleVersion(0)]
-	public Type_argumentContext type_argument() {
-		Type_argumentContext _localctx = new Type_argumentContext(Context, State);
-		EnterRule(_localctx, 16, RULE_type_argument);
+	public Type_parameterContext type_parameter() {
+		Type_parameterContext _localctx = new Type_parameterContext(Context, State);
+		EnterRule(_localctx, 16, RULE_type_parameter);
 		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);

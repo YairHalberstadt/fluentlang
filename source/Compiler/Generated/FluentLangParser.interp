@@ -109,7 +109,7 @@ namespace_member_declaration
 namespace_declaration
 interface_declaration
 type_parameter_list
-type_argument
+type_parameter
 anonymous_interface_declaration
 simple_anonymous_interface_declaration
 interface_member_declaration
