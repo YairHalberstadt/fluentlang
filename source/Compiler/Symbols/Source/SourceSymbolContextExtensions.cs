@@ -1,20 +1,49 @@
 ﻿using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Symbols.ErrorSymbols;
 using FluentLang.Compiler.Symbols.Interfaces;
-using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-
 namespace FluentLang.Compiler.Symbols.Source
 {
 	internal static class SourceSymbolContextExtensions
 	{
-		public static IReadOnlyList<IInterface> GetPossibleInterfaces(this SourceSymbolContext context, QualifiedName name)
+		public static IType? GetTypeParameter(this SourceSymbolContext context, string name)
 		{
-			return GetPossibleTs<IInterface>(
+
+			{
+				if (context.CurrentLevelTypeParameters().FirstOrDefault(x => x.Name == name) is { } typeParameter)
+				{
+					return typeParameter;
+				}
+			}
+
+			var scope = context.Scope;
+			while (scope != null)
+			{
+				if (scope.TypeParameters.FirstOrDefault(x => x.Name == name) is { } typeParameter)
+				{
+					return typeParameter;
+				}
+				scope = scope.DeclaringMethod;
+			}
+
+			return null;
+		}
+
+		public static IReadOnlyList<IType> GetPossibleTypes(this SourceSymbolContext context, QualifiedName name)
+		{
+			if (name.Parent is null)
+			{
+				if (context.GetTypeParameter(name.Name) is { } typeParameter)
+				{
+					return new[] { typeParameter };
+				}
+			}
+
+			return GetPossibleTs(
 				context,
 				name,
 				(IAssembly x, QualifiedName n, out IInterface? i) => x.TryGetInterface(n, out i),
@@ -24,7 +53,7 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		public static IReadOnlyList<IMethod> GetPossibleMethods(this SourceSymbolContext context, QualifiedName name)
 		{
-			return GetPossibleTs<IMethod>(
+			return GetPossibleTs(
 				context,
 				name,
 				(IAssembly x, QualifiedName n, out IMethod? i) => x.TryGetMethod(n, out i),
@@ -111,12 +140,12 @@ namespace FluentLang.Compiler.Symbols.Source
 			}
 		}
 
-		public static IInterface GetInterfaceOrError(
+		public static IType GetTypeOrError(
 			this SourceSymbolContext context,
 			QualifiedName name,
 			out Func<Location, Diagnostic>? diagnostic)
 		{
-			var possibleInterfaces = context.GetPossibleInterfaces(name);
+			var possibleInterfaces = context.GetPossibleTypes(name);
 
 			if (possibleInterfaces.Count == 0)
 			{

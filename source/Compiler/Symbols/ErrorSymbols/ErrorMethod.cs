@@ -19,6 +19,8 @@ namespace FluentLang.Compiler.Symbols.ErrorSymbols
 
 		public QualifiedName FullyQualifiedName { get; }
 
+		public ImmutableArray<ITypeParameter> TypeParameters => ImmutableArray<ITypeParameter>.Empty;
+
 		public IType ReturnType => ErrorType.Instance;
 
 		public ImmutableArray<IParameter> Parameters { get; }

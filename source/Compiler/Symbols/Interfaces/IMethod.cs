@@ -16,6 +16,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 		public string Name => FullyQualifiedName.Name;
 		public QualifiedName? Namespace => FullyQualifiedName.Parent;
 		public IType ReturnType { get; }
+		public ImmutableArray<ITypeParameter> TypeParameters { get; }
 		public ImmutableArray<IParameter> Parameters { get; }
 		public ImmutableArray<IParameterLocal> ParameterLocals { get; }
 		public ImmutableArray<IInterface> LocalInterfaces { get; }

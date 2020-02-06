@@ -199,6 +199,10 @@ anonymous_interface_declaration_metadata
     : anonymous_interface_declaration EOF
     ;
 
+type_parameter_metadata
+    : type_parameter EOF
+    ;
+
 full_qualified_name_metadata
     : qualified_name
     ;

@@ -10,6 +10,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 		public bool IsExported { get; }
 		public QualifiedName? FullyQualifiedName { get; }
 		public ImmutableArray<IInterfaceMethod> Methods { get; }
+		public ImmutableArray<ITypeParameter> TypeParameters { get; }
 		bool IType.IsEquivalentTo(IType other, Stack<(IType, IType)>? dependantEqualities)
 		{
 			if (ReferenceEquals(this, other))

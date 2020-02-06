@@ -39,5 +39,7 @@
 		TooManyOptionsInUnion,
 		CannotMatchOnNonUnion,
 		MatchNotExhaustive,
+		CanOnlyCombineInterfaces,
+		TypeParametersShareNames,
 	}
 }

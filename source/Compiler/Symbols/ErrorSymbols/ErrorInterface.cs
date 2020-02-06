@@ -15,6 +15,8 @@ namespace FluentLang.Compiler.Symbols.ErrorSymbols
 
 		public bool IsExported => false;
 
+		public ImmutableArray<ITypeParameter> TypeParameters => ImmutableArray<ITypeParameter>.Empty;
+
 		public ImmutableArray<IInterfaceMethod> Methods => ImmutableArray<IInterfaceMethod>.Empty;
 
 		public ImmutableArray<Diagnostic> AllDiagnostics => ImmutableArray<Diagnostic>.Empty;

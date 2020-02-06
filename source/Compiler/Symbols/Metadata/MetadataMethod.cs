@@ -12,6 +12,7 @@ namespace FluentLang.Compiler.Symbols.Metadata
 	internal sealed class MetadataMethod : SymbolBase, IMethod
 	{
 		private readonly MethodSignatureAttribute _attribute;
+		private readonly Lazy<ImmutableArray<ITypeParameter>> _typeParameters;
 		private readonly Lazy<IType> _returnType;
 		private readonly Lazy<ImmutableArray<IParameter>> _parameters;
 		private readonly SourceSymbolContext _sourceSymbolContext;
@@ -23,10 +24,25 @@ namespace FluentLang.Compiler.Symbols.Metadata
 		{
 			DeclaringAssembly = metadataAssembly;
 			_attribute = attribute;
-			_sourceSymbolContext = new SourceSymbolContext(null, DeclaringAssembly, ImmutableArray<QualifiedName>.Empty, null);
+			_sourceSymbolContext = new SourceSymbolContext(null, DeclaringAssembly, ImmutableArray<QualifiedName>.Empty, null, () => TypeParameters);
 			FullyQualifiedName = QualifiedName.Parse(attribute.FullyQualifiedName);
+			_typeParameters = new Lazy<ImmutableArray<ITypeParameter>>(GenerateTypeParameters);
 			_returnType = new Lazy<IType>(GenerateReturnType);
 			_parameters = new Lazy<ImmutableArray<IParameter>>(GenerateParameters);
+		}
+
+		private ImmutableArray<ITypeParameter> GenerateTypeParameters()
+		{
+			return
+				_attribute
+				.TypeParameters
+				.Select(x =>
+					new SourceTypeParameter(
+						Utils.Parse(x, p => p.type_parameter_metadata(), _diagnostics).type_parameter(),
+						_sourceSymbolContext,
+						isExported: true,
+						_diagnostics))
+				.ToImmutableArray<ITypeParameter>();
 		}
 
 		private ImmutableArray<IParameter> GenerateParameters()
@@ -53,6 +69,8 @@ namespace FluentLang.Compiler.Symbols.Metadata
 		public bool IsExported => true;
 
 		public QualifiedName FullyQualifiedName { get; }
+
+		public ImmutableArray<ITypeParameter> TypeParameters => _typeParameters.Value;
 
 		public IType ReturnType => _returnType.Value;
 

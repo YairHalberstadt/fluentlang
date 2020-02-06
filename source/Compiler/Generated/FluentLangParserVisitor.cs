@@ -332,6 +332,12 @@ public interface IFluentLangParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitAnonymous_interface_declaration_metadata([NotNull] FluentLangParser.Anonymous_interface_declaration_metadataContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="FluentLangParser.type_parameter_metadata"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType_parameter_metadata([NotNull] FluentLangParser.Type_parameter_metadataContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="FluentLangParser.full_qualified_name_metadata"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

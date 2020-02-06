@@ -4,6 +4,7 @@ using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -591,8 +592,9 @@ namespace FluentLang.Compiler.Emit
 					Emit(method.Parameters[i], textWriter);
 					textWriter.Write("\"");
 				}
-				textWriter.Write("})]");
-
+				textWriter.Write("},");
+				Emit(method.TypeParameters, textWriter);
+				textWriter.Write(")]");
 			}
 
 			public static void EmitInterfaceAttribute(IInterface @interface, TextWriter textWriter)
@@ -602,7 +604,9 @@ namespace FluentLang.Compiler.Emit
 				textWriter.Write(@interface.FullyQualifiedName.ToString());
 				textWriter.Write("\",\"");
 				Emit(@interface, textWriter, isDeclaration: true);
-				textWriter.Write("\")]");
+				textWriter.Write("\",");
+				Emit(@interface.TypeParameters, textWriter);
+				textWriter.Write(")]");
 			}
 
 			private static void Emit(IParameter parameter, TextWriter textWriter)
@@ -610,6 +614,30 @@ namespace FluentLang.Compiler.Emit
 				textWriter.Write(parameter.Name);
 				textWriter.Write(":");
 				Emit(parameter.Type, textWriter);
+			}
+
+			private static void Emit(ImmutableArray<ITypeParameter> typeParameters, TextWriter textWriter)
+			{
+				textWriter.Write("new string[]{");
+				for (var i = 0; i < typeParameters.Length; i++)
+				{
+					if (i != 0)
+						textWriter.Write(",");
+					textWriter.Write("\"");
+					Emit(typeParameters[i], textWriter);
+					textWriter.Write("\"");
+				}
+				textWriter.Write("}");
+			}
+
+			private static void Emit(ITypeParameter typeParameter, TextWriter textWriter)
+			{
+				textWriter.Write(typeParameter.Name);
+				if (typeParameter.ConstrainedTo is { } constrainedTo)
+				{
+					textWriter.Write(":");
+					Emit(constrainedTo, textWriter);
+				}
 			}
 
 			private static void Emit(IType type, TextWriter textWriter)

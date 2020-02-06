@@ -141,6 +141,8 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 
 			public bool IsExported => false;
 
+			public ImmutableArray<ITypeParameter> TypeParameters => ImmutableArray<ITypeParameter>.Empty;
+
 			public ImmutableArray<IInterfaceMethod> Methods => _methods.Value;
 
 			public ImmutableArray<Diagnostic> AllDiagnostics => ImmutableArray<Diagnostic>.Empty;
@@ -181,6 +183,8 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 				public QualifiedName? FullyQualifiedName => null;
 
 				public bool IsExported => false;
+
+				public ImmutableArray<ITypeParameter> TypeParameters => ImmutableArray<ITypeParameter>.Empty;
 
 				public ImmutableArray<IInterfaceMethod> Methods { get; }
 

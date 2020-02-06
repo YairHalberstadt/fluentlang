@@ -32,10 +32,9 @@ namespace FluentLang.Compiler.Symbols.Source
 			}
 			if (context.anonymous_interface_declaration() is { } interfaceContext)
 			{
-				return new SourceInterface(
+				return new SourceAnonymousInterface(
 					interfaceContext,
 					sourceSymbolContext,
-					fullyQualifiedName: null,
 					isExported: isExported,
 					diagnostics);
 			}
@@ -60,10 +59,9 @@ namespace FluentLang.Compiler.Symbols.Source
 			}
 			if (context.anonymous_interface_declaration() is { } interfaceContext)
 			{
-				return new SourceInterface(
+				return new SourceAnonymousInterface(
 					interfaceContext,
 					sourceSymbolContext,
-					fullyQualifiedName: null,
 					isExported: isExported,
 					diagnostics);
 			}
@@ -74,12 +72,12 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		private static IType BindQualifiedNameAsType(SourceSymbolContext sourceSymbolContext, bool isExported, DiagnosticBag diagnostics, Qualified_nameContext qualifiedName)
 		{
-			var @interface = sourceSymbolContext.GetInterfaceOrError(qualifiedName.GetQualifiedName(), out var diagnostic);
+			var type = sourceSymbolContext.GetTypeOrError(qualifiedName.GetQualifiedName(), out var diagnostic);
 			if (diagnostic != null)
 				diagnostics.Add(diagnostic(new Location(qualifiedName)));
-			if (diagnostic is null && isExported && !@interface.IsExported)
+			if (diagnostic is null && isExported && type is IInterface {IsExported: false })
 				diagnostics.Add(new Diagnostic(new Location(qualifiedName), ErrorCode.CannotUseUnexportedInterfaceFromExportedMember));
-			return @interface;
+			return type;
 		}
 
 		public static Primitive BindPrimitive(this Primitive_typeContext context)
@@ -122,6 +120,32 @@ namespace FluentLang.Compiler.Symbols.Source
 					diagnostics.Add(new Diagnostic(
 						new Location(context.parameters().parameter(index)),
 						ErrorCode.ParametersShareNames,
+						ImmutableArray.Create<object?>(param, sameName)));
+				}
+			}
+			return parameters;
+		}
+
+		public static ImmutableArray<ITypeParameter> BindTypeParameters(
+			this Type_parameter_listContext context,
+			SourceSymbolContext sourceSymbolContext,
+			bool isExported,
+			DiagnosticBag diagnostics)
+		{
+			var parameters =
+				context
+				.type_parameter()
+				.Select(x => new SourceTypeParameter(x, sourceSymbolContext, isExported, diagnostics))
+				.ToImmutableArray<ITypeParameter>();
+
+			foreach (var (param, index) in parameters.Select((x, i) => (x, i)))
+			{
+				if ((parameters.Take(index).FirstOrDefault(x => x.Name == param.Name)
+					?? sourceSymbolContext.GetTypeParameter(param.Name)) is { } sameName)
+				{
+					diagnostics.Add(new Diagnostic(
+						new Location(context.type_parameter(index)),
+						ErrorCode.TypeParametersShareNames,
 						ImmutableArray.Create<object?>(param, sameName)));
 				}
 			}

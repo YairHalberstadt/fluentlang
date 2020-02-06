@@ -15,6 +15,7 @@ namespace FluentLang.Compiler.Symbols.Source
 		private readonly Method_declarationContext _context;
 		private readonly MethodBodySymbolContext _parentMethodBodySymbolContext;
 		private readonly Lazy<IType> _returnType;
+		private readonly Lazy<ImmutableArray<ITypeParameter>> _typeParameters;
 		private readonly Lazy<ImmutableArray<IParameter>> _parameters;
 		private readonly Lazy<ImmutableArray<IInterface>> _localInterfaces;
 		private readonly Lazy<ImmutableArray<IMethod>> _localMethods;
@@ -24,7 +25,7 @@ namespace FluentLang.Compiler.Symbols.Source
 		private readonly Lazy<ImmutableArray<IMethod>> _invokedLocalMethods;
 		private readonly Lazy<IDeclarationStatement?> _inScopeAfter;
 
-		private SourceSymbolContext ParentSourceSymbolContext => _parentMethodBodySymbolContext.SourceSymbolContext;
+		private readonly SourceSymbolContext _parentSourceSymbolContextWithTypeParameters;
 		private readonly Lazy<MethodBodySymbolContext> _methodBodySymbolContext;
 		
 
@@ -35,7 +36,8 @@ namespace FluentLang.Compiler.Symbols.Source
 		{
 			_context = context;
 			_parentMethodBodySymbolContext = methodBodySymbolContext;
-			var @namespace = ParentSourceSymbolContext.Scope is null ? ParentSourceSymbolContext.NameSpace : null;
+			_parentSourceSymbolContextWithTypeParameters = _parentMethodBodySymbolContext.SourceSymbolContext.WithTypeParameters(() => TypeParameters);
+			var @namespace = _parentSourceSymbolContextWithTypeParameters.Scope is null ? _parentSourceSymbolContextWithTypeParameters.NameSpace : null;
 			FullyQualifiedName = new QualifiedName(context.method_signature().UPPERCASE_IDENTIFIER().Symbol.Text, @namespace);
 
 			_methodBodySymbolContext = 
@@ -43,6 +45,7 @@ namespace FluentLang.Compiler.Symbols.Source
 					() => _parentMethodBodySymbolContext.WithScope(this));
 
 			_returnType = new Lazy<IType>(BindReturnType);
+			_typeParameters = new Lazy<ImmutableArray<ITypeParameter>>(BindTypeParameters);
 			_parameters = new Lazy<ImmutableArray<IParameter>>(BindParameters);
 			_localInterfaces = new Lazy<ImmutableArray<IInterface>>(BindLocalInterfaces);
 			_localMethods = new Lazy<ImmutableArray<IMethod>>(BindLocalMethods);
@@ -55,7 +58,16 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		private IType BindReturnType()
 		{
-			return _context.method_signature().BindReturnType(ParentSourceSymbolContext, IsExported, _diagnostics);
+			return _context.method_signature().BindReturnType(_parentSourceSymbolContextWithTypeParameters, IsExported, _diagnostics);
+		}
+
+		private ImmutableArray<ITypeParameter> BindTypeParameters()
+		{
+			return
+				_context
+				.method_signature()
+				.type_parameter_list()
+				.BindTypeParameters(_parentMethodBodySymbolContext.SourceSymbolContext, IsExported, _diagnostics);
 		}
 
 		private ImmutableArray<IParameter> BindParameters()
@@ -63,7 +75,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			return
 				_context
 				.method_signature()
-				.BindParameters(ParentSourceSymbolContext, IsExported, _diagnostics);
+				.BindParameters(_parentSourceSymbolContextWithTypeParameters, IsExported, _diagnostics);
 		}
 
 		private ImmutableArray<IInterface> BindLocalInterfaces()
@@ -88,11 +100,9 @@ namespace FluentLang.Compiler.Symbols.Source
 
 			return
 				interfaceDeclarations
-				.Select(x => new SourceInterface(
-					x.anonymous_interface_declaration(),
+				.Select(x => new SourceNamedInterface(
+					x,
 					_methodBodySymbolContext.Value.SourceSymbolContext,
-					fullyQualifiedName: new QualifiedName(x.UPPERCASE_IDENTIFIER().Symbol.Text),
-					isExported: false,
 					_diagnostics))
 				.ToImmutableArray<IInterface>();
 		}
@@ -240,15 +250,17 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		public IType ReturnType => _returnType.Value;
 
+		public ImmutableArray<ITypeParameter> TypeParameters => _typeParameters.Value;
+
 		public ImmutableArray<IParameter> Parameters => _parameters.Value;
 
 		public ImmutableArray<IInterface> LocalInterfaces => _localInterfaces.Value;
 
 		public ImmutableArray<IMethod> LocalMethods => _localMethods.Value;
 
-		public IMethod? DeclaringMethod => ParentSourceSymbolContext.Scope;
+		public IMethod? DeclaringMethod => _parentSourceSymbolContextWithTypeParameters.Scope;
 
-		public IAssembly DeclaringAssembly => ParentSourceSymbolContext.Assembly;
+		public IAssembly DeclaringAssembly => _parentSourceSymbolContextWithTypeParameters.Assembly;
 
 		public ImmutableArray<IStatement> Statements => _bindStatementsResult.Value.statements;
 
