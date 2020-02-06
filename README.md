@@ -174,9 +174,11 @@ Implement Linking
 
 Create compiler.exe
 
+Design and implement unions. See #6, #8.
+
 ### In progress
 
-Design and implement unions. See #6, #8.
+Design and implement generics. See #9, #10.
 
 ### ToDo
 
@@ -185,8 +187,6 @@ Create Blazor WebIDE. This may have to wait till client side blazor stabilizes, 
 Implement Standard Libraries. This will be mixed C# Libraries with FluentLang Metadata and FluentLang libraries.
 
 Look into more efficient incremental compilation.
-
-Design and implement generics.
 
 ## Contributing
 
@@ -200,3 +200,4 @@ Projects which should be possible for someone else to do with us stepping on eac
 6. Come up with design proposals for: Discrimated Unions, Generics, error handling (exceptions?, result types?)
     - Design proposals should be created as issues on this repository with the heading "Proposal:". E.g. "Proposal: design for Discriminated Unions".
 7. [Improve diagnostic messages](https://github.com/YairHalberstadt/fluentlang/issues/7)
+8. Create Blazor WebIDE - this is a big task, but completely seperate from the main development, and so perfect for anyone who knows web development well.
