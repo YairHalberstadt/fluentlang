@@ -103,7 +103,20 @@ namespace FluentLang.Compiler.Emit
 				textWriter.Write(parameter.Name);
 
 			}
-			textWriter.WriteLine(") {");
+			textWriter.WriteLine(")");
+
+			foreach(var tp in method.TypeParameters)
+			{
+				if (tp.ConstrainedTo is { } constrainedTo)
+				{
+					textWriter.Write(" where ");
+					Emit(tp, textWriter);
+					textWriter.Write(" : ");
+					Emit(constrainedTo, textWriter);
+				}
+			}
+
+			textWriter.WriteLine("{");
 
 			foreach (var statement in method.Statements)
 			{

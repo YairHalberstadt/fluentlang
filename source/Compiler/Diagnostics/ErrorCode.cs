@@ -41,5 +41,6 @@
 		MatchNotExhaustive,
 		CanOnlyCombineInterfaces,
 		TypeParametersShareNames,
+		CannotConstrainToPrimitive,
 	}
 }

@@ -201,5 +201,52 @@ M<T>() : int {
 }").VerifyDiagnostics(
 				new Diagnostic(new Location(new TextToken(@"T")), ErrorCode.TypeParametersShareNames));
 		}
+
+		[Fact]
+		public void TypeParameterCanSubtypeTypeParameters()
+		{
+			CreateAssembly(@"
+M<T>() : int {
+	M<T1 : T>(a : T1) : T { return a; }
+	return 42;
+}").VerifyDiagnostics().VerifyEmit();
+		}
+
+		[Fact]
+		public void TypeParameterCanSubtypeUnion()
+		{
+			CreateAssembly(@"
+M<T : int | string>(a : T) : int | string {
+	return a;
+}").VerifyDiagnostics().VerifyEmit();
+		}
+
+		[Fact]
+		public void TypeParameterCanSubtypeInterface()
+		{
+			CreateAssembly(@"
+M<T : {}>(a : T) : {} {
+	return a;
+}").VerifyDiagnostics().VerifyEmit();
+		}
+
+		[Fact]
+		public void TypeParameterCannotBeConstrainedToPrimitive()
+		{
+			CreateAssembly(@"
+M<T : int>(a : T) : int {
+	return a;
+}").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@":int")), ErrorCode.CannotConstrainToPrimitive));
+		}
+
+		[Fact]
+		public void CanHaveMultipleTypeParametersWithConstraints()
+		{
+			CreateAssembly(@"
+M<T1 : {}, T2 : int | string>(a : T1) : {} {
+	return a;
+}").VerifyDiagnostics().VerifyEmit();
+		}
 	}
 }
