@@ -285,6 +285,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			_ = _inScopeAfter.Value;
 			_ = _invokedLocalMethods.Value;
 			_ = _directlyCapturedDeclaredLocals.Value;
+			_ = _typeParameters.Value;
 			CheckStatementsForDiagnostics();
 		}
 	}

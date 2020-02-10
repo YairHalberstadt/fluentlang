@@ -1,5 +1,7 @@
 ﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.TestUtils;
+using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -54,6 +56,64 @@ export interface I2 {}").VerifyDiagnostics().VerifyEmit();
 			CreateAssembly(@"
 interface I1 { M() : I2 }
 interface I2 {}").VerifyDiagnostics().VerifyEmit();
+		}
+
+		[Fact]
+		public void TypeParametersAreAvailableInsideInterface()
+		{
+			var assembly = CreateAssembly(@"interface I<T> { M(a : { M(a : T) : int; }) : T; }")
+				.VerifyDiagnostics().VerifyEmit();
+
+			var @interface = AssertGetInterface(assembly, "I");
+			var tp = @interface.TypeParameters.SingleOrDefault();
+			var m = @interface.Methods.SingleOrDefault();
+			Assert.Equal(tp, m.ReturnType);
+			var parameterInterface = Assert.IsAssignableFrom<IInterface>(m.Parameters.SingleOrDefault().Type);
+			Assert.Equal(tp, parameterInterface.Methods.SingleOrDefault().Parameters.SingleOrDefault().Type);
+		}
+
+		[Fact]
+		public void TypeParametersHideInterface()
+		{
+			var assembly = CreateAssembly(@"
+interface I<T> { M() : T; }
+interface T {}").VerifyDiagnostics().VerifyEmit();
+
+			var @interface = AssertGetInterface(assembly, "I");
+			var tp = @interface.TypeParameters.SingleOrDefault();
+			var m = @interface.Methods.SingleOrDefault();
+			Assert.Equal(tp, m.ReturnType);
+		}
+
+		[Fact]
+		public void CannotAddTypeParameterToInterface()
+		{
+			CreateAssembly(@"
+interface I<T> { } + T
+interface T {}").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@"T")), ErrorCode.CanOnlyCombineInterfaces));
+		}
+
+		[Fact]
+		public void CannotHaveMultipleTypeParametersWithSameName()
+		{
+			CreateAssembly(@"
+interface I<T, T> { }").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@"T")), ErrorCode.TypeParametersShareNames));
+		}
+
+		[Fact]
+		public void CanHaveMultipleTypeParameters()
+		{
+			var assembly = CreateAssembly(@"interface I<T1, T2> { M(a : T2) : T1; }")
+				.VerifyDiagnostics().VerifyEmit();
+
+			var @interface = AssertGetInterface(assembly, "I");
+			var t1 = @interface.TypeParameters.First();
+			var t2 = @interface.TypeParameters.Last();
+			var m = @interface.Methods.SingleOrDefault();
+			Assert.Equal(t1, m.ReturnType);
+			Assert.Equal(t2, m.Parameters.SingleOrDefault().Type);
 		}
 	}
 }

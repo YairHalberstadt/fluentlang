@@ -23,7 +23,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			DiagnosticBag diagnostics) : base(diagnostics)
 		{
 			_context = context;
-			_sourceSymbolContext = sourceSymbolContext.WithTypeParameters(() => TypeParameters);
+			_sourceSymbolContext = sourceSymbolContext;
 			IsExported = isExported;
 
 			_methods = new Lazy<ImmutableArray<IInterfaceMethod>>(GenerateMethods);

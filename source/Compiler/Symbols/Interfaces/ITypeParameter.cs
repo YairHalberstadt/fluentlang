@@ -14,7 +14,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 
 		bool IType.IsSubtypeOf(IType other)
 		{
-			return ConstrainedTo?.IsSubtypeOf(other) ?? false;
+			return IsEquivalentTo(other) || (ConstrainedTo?.IsSubtypeOf(other) ?? false);
 		}
 	}
 }

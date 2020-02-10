@@ -25,7 +25,11 @@ namespace FluentLang.Compiler.Symbols.Source
 				_diagnostics);
 			_context = context;
 			_sourceSymbolContext = sourceSymbolContext;
-			FullyQualifiedName = new QualifiedName(context.UPPERCASE_IDENTIFIER().Symbol.Text, sourceSymbolContext.NameSpace);
+			FullyQualifiedName = new QualifiedName(
+				context.UPPERCASE_IDENTIFIER().Symbol.Text,
+				sourceSymbolContext.Scope is null 
+					? sourceSymbolContext.NameSpace
+					: null);
 			_typeParameters = new Lazy<ImmutableArray<ITypeParameter>>(GenerateTypeParameters);
 		}
 

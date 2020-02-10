@@ -12,7 +12,6 @@ namespace FluentLang.Compiler.Symbols.Source
 	{
 		public static IType? GetTypeParameter(this SourceSymbolContext context, string name)
 		{
-
 			{
 				if (context.CurrentLevelTypeParameters().FirstOrDefault(x => x.Name == name) is { } typeParameter)
 				{

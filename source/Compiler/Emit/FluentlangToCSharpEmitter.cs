@@ -78,6 +78,20 @@ namespace FluentLang.Compiler.Emit
 			{
 				textWriter.Write(method.Name);
 			}
+
+			if (!method.TypeParameters.IsEmpty)
+			{
+				textWriter.Write("<");
+				for (var i = 0; i < method.TypeParameters.Length; i++)
+				{
+					if (i != 0)
+						textWriter.Write(",");
+					var typeParameter = method.TypeParameters[i];
+					textWriter.Write(typeParameter.Name);
+				}
+				textWriter.Write(">");
+			}
+
 			textWriter.Write('(');
 			for (var i = 0; i < method.Parameters.Length; i++)
 			{
@@ -194,6 +208,7 @@ namespace FluentLang.Compiler.Emit
         {
 			if (type is IInterface && targetType is IInterface 
 				|| type is Primitive && targetType is Primitive
+				|| type is ITypeParameter && targetType is ITypeParameter && type.IsEquivalentTo(targetType)
 				|| type is IUnion && targetType is IUnion && type.IsEquivalentTo(targetType))
 			{
 				emitInner();
@@ -212,13 +227,43 @@ namespace FluentLang.Compiler.Emit
 				emitInner();
 				textWriter.Write(".Inner)");
 			}
-			else if ((type is IInterface || type is Primitive) && targetType is IUnion union)
+			else if (type is IUnion && targetType is ITypeParameter typeParameter)
+			{
+				textWriter.Write("((");
+				textWriter.Write(typeParameter.Name);
+				textWriter.Write(")");
+				emitInner();
+				textWriter.Write(".Inner)");
+			}
+			else if ((type is IInterface || type is Primitive || type is ITypeParameter) && targetType is IUnion union)
 			{
 				textWriter.Write("(new Union(");
 				emitInner();
 				textWriter.Write(", (ulong)");
 				textWriter.Write(GetSupertypeOptions(type, union));
 				textWriter.Write("))");
+			}
+			else if (type is ITypeParameter && targetType is IInterface)
+			{
+				textWriter.Write("((FLObject)");
+				emitInner();
+				textWriter.Write(")");
+			}
+			else if (type is ITypeParameter && targetType is Primitive primitive1)
+			{
+				textWriter.Write("((");
+				textWriter.Write(primitive1.ToString());
+				textWriter.Write(")");
+				emitInner();
+				textWriter.Write(")");
+			}
+			else if (type is ITypeParameter && targetType is ITypeParameter typeParameter1)
+			{
+				textWriter.Write("((");
+				textWriter.Write(typeParameter1.Name);
+				textWriter.Write(")");
+				emitInner();
+				textWriter.Write(")");
 			}
 			else if (type is IUnion sourceUnion && targetType is IUnion targetUnion)
 			{
@@ -552,7 +597,9 @@ namespace FluentLang.Compiler.Emit
 				textWriter.Write(p.ToString());
 			else if (type is IUnion)
 				textWriter.Write("Union");
-			else 
+			else if (type is ITypeParameter tp)
+				textWriter.Write(tp.Name);
+			else
 				Release.Fail("this location is thought to be unreachable");
 		}
 
@@ -624,13 +671,13 @@ namespace FluentLang.Compiler.Emit
 					if (i != 0)
 						textWriter.Write(",");
 					textWriter.Write("\"");
-					Emit(typeParameters[i], textWriter);
+					EmitTypeParameter(typeParameters[i], textWriter);
 					textWriter.Write("\"");
 				}
 				textWriter.Write("}");
 			}
 
-			private static void Emit(ITypeParameter typeParameter, TextWriter textWriter)
+			private static void EmitTypeParameter(ITypeParameter typeParameter, TextWriter textWriter)
 			{
 				textWriter.Write(typeParameter.Name);
 				if (typeParameter.ConstrainedTo is { } constrainedTo)
@@ -653,6 +700,10 @@ namespace FluentLang.Compiler.Emit
 				else if (type is IUnion union)
 				{
 					Emit(union, textWriter);
+				}
+				else if (type is ITypeParameter typeParameter)
+				{
+					Emit(typeParameter, textWriter);
 				}
 				else
 				{
@@ -709,6 +760,11 @@ namespace FluentLang.Compiler.Emit
 					any = true;
 					Emit(option, textWriter);
 				}
+			}
+
+			private static void Emit(ITypeParameter typeParameter, TextWriter textWriter)
+			{
+				textWriter.Write(typeParameter.Name);
 			}
 
 			internal static void EmitAssemblyFileVersionAttribute(Version version, TextWriter textWriter)

@@ -76,6 +76,8 @@ namespace FluentLang.Compiler.Emit
 				return GenerateInterfaceKey(@interface, parentInterfaces);
 			if (type is IUnion union)
 				return GenerateUnionKey(union, parentInterfaces);
+			if (type is ITypeParameter typeParameter)
+				return typeParameter.Name;
 			throw Release.Fail("this location is thought to be unreachable");
 		}
 
