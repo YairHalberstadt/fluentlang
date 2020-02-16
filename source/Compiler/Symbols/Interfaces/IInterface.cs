@@ -1,4 +1,5 @@
 ﻿using FluentLang.Compiler.Helpers;
+using FluentLang.Compiler.Symbols.Substituted;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -89,6 +90,10 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 
 			return false;
 		}
+
+		IType IType.Substitute(IReadOnlyDictionary<ITypeParameter, IType> substitutions)
+			=> new SubstitutedInterface(this, substitutions);
+		
 	}
 }
 

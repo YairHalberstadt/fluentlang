@@ -31,5 +31,10 @@ namespace FluentLang.Compiler.Symbols.ErrorSymbols
 		void ISymbol.EnsureAllLocalDiagnosticsCollected()
 		{
 		}
+
+		IType IType.Substitute(IReadOnlyDictionary<ITypeParameter, IType> substitutions)
+		{
+			return this;
+		}
 	}
 }

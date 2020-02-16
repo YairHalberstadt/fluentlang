@@ -1,6 +1,7 @@
 ﻿using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Symbols.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -36,7 +37,7 @@ namespace FluentLang.Compiler.Symbols
 			return base.GetHashCode();
 		}
 
-		bool IType.IsEquivalentTo(IType other, System.Collections.Generic.Stack<(IType, IType)>? dependantEqualities)
+		bool IType.IsEquivalentTo(IType other, Stack<(IType, IType)>? dependantEqualities)
 		{
 			return ReferenceEquals(this, other);
 		}
@@ -58,6 +59,11 @@ namespace FluentLang.Compiler.Symbols
 
 		void ISymbol.EnsureAllLocalDiagnosticsCollected()
 		{
+		}
+
+		IType IType.Substitute(IReadOnlyDictionary<ITypeParameter, IType> substitutions)
+		{
+			return this;
 		}
 	}
 }

@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace FluentLang.Compiler.Symbols.Interfaces
 {
-	public interface ITypeParameter : IType 
+	public interface ITypeParameter : IType, IEquatable<ITypeParameter>
 	{
 		public string Name { get; }
 		public IType? ConstrainedTo { get; }
@@ -16,6 +17,15 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 		{
 			return IsEquivalentTo(other) || (ConstrainedTo?.IsSubtypeOf(other) ?? false);
 		}
+
+		IType IType.Substitute(IReadOnlyDictionary<ITypeParameter, IType> substitutions)
+		{
+			return substitutions.TryGetValue(this, out var substitution)
+				? substitution
+				: this;
+		}
+
+		bool IEquatable<ITypeParameter>.Equals(ITypeParameter other) => ReferenceEquals(this, other);
 	}
 }
 

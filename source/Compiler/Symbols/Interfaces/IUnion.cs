@@ -1,12 +1,11 @@
-﻿using System;
+﻿using FluentLang.Compiler.Symbols.Substituted;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 
 namespace FluentLang.Compiler.Symbols.Interfaces
 {
-	interface IUnion : IType
+	public interface IUnion : IType
 	{
 		ImmutableArray<IType> Options { get; }
 
@@ -19,7 +18,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 
 			if (other is IUnion union && Options.Length == union.Options.Length)
 			{
-				return 
+				return
 					Options
 					.Zip(union.Options, (a, b) => a.IsEquivalentTo(b, dependantEqualities))
 					.All(x => x);
@@ -37,5 +36,8 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 
 			return Options.All(x => x.IsSubtypeOf(other));
 		}
+
+		IType IType.Substitute(IReadOnlyDictionary<ITypeParameter, IType> substitutions)
+			=> new SubstitutedUnion(this, substitutions);
 	}
 }

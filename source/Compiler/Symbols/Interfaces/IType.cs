@@ -9,5 +9,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 		internal bool IsEquivalentTo(IType other, Stack<(IType, IType)>? dependantEqualities);
 
 		public bool IsSubtypeOf(IType other);
+
+		internal IType Substitute(IReadOnlyDictionary<ITypeParameter, IType> substitutions);
 	}
 }
