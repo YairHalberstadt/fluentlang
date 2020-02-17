@@ -1,4 +1,5 @@
 ﻿using FluentLang.Compiler.Symbols.Visitor;
+using System.Collections.Immutable;
 
 namespace FluentLang.Compiler.Symbols.Interfaces.MethodBody
 {
@@ -8,5 +9,6 @@ namespace FluentLang.Compiler.Symbols.Interfaces.MethodBody
 			=> visitor.Visit(this);
 		IMethod Method { get; }
 		QualifiedName MethodName { get; }
+		ImmutableArray<IType> TypeArguments { get; }
 	}
 }

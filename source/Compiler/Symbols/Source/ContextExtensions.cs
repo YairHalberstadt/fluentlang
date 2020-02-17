@@ -26,9 +26,9 @@ namespace FluentLang.Compiler.Symbols.Source
 			{
 				return primitive.BindPrimitive();
 			}
-			if (context.qualified_name() is { } qualifiedName)
+			if (context.named_type_reference() is { } namedTypeReference)
 			{
-				return BindQualifiedNameAsType(sourceSymbolContext, isExported, diagnostics, qualifiedName);
+				return namedTypeReference.BindNamedTypeReference(sourceSymbolContext, isExported, diagnostics);
 			}
 			if (context.anonymous_interface_declaration() is { } interfaceContext)
 			{
@@ -53,9 +53,9 @@ namespace FluentLang.Compiler.Symbols.Source
 			{
 				return primitive.BindPrimitive();
 			}
-			if (context.qualified_name() is { } qualifiedName)
+			if (context.named_type_reference() is { } namedTypeReference)
 			{
-				return BindQualifiedNameAsType(sourceSymbolContext, isExported, diagnostics, qualifiedName);
+				return namedTypeReference.BindNamedTypeReference(sourceSymbolContext, isExported, diagnostics);
 			}
 			if (context.anonymous_interface_declaration() is { } interfaceContext)
 			{
@@ -70,9 +70,34 @@ namespace FluentLang.Compiler.Symbols.Source
 			return ErrorType.Instance;
 		}
 
-		private static IType BindQualifiedNameAsType(SourceSymbolContext sourceSymbolContext, bool isExported, DiagnosticBag diagnostics, Qualified_nameContext qualifiedName)
+		public static ImmutableArray<IType> BindTypeArgumentList(
+            this Type_argument_listContext context,
+            SourceSymbolContext sourceSymbolContext,
+            DiagnosticBag diagnostics)
+        {
+			return 
+				context
+				.type()
+				.Select(x => x.BindType(sourceSymbolContext, false, diagnostics))
+				.ToImmutableArray();
+		}
+
+		private static IType BindNamedTypeReference(
+			this Named_type_referenceContext context,
+			SourceSymbolContext sourceSymbolContext,
+			bool isExported,
+			DiagnosticBag diagnostics)
 		{
-			var type = sourceSymbolContext.GetTypeOrError(qualifiedName.GetQualifiedName(), out var diagnostic);
+			var qualifiedName = context.qualified_name();
+			var typeArguments =
+				context
+				.type_argument_list()
+				.BindTypeArgumentList(sourceSymbolContext, diagnostics);
+
+			var type = sourceSymbolContext.GetTypeOrError(
+				qualifiedName.GetQualifiedName(),
+				typeArguments,
+				out var diagnostic);
 			if (diagnostic != null)
 				diagnostics.Add(diagnostic(new Location(qualifiedName)));
 			if (diagnostic is null && isExported && type is IInterface {IsExported: false })

@@ -48,11 +48,14 @@ namespace FluentLang.Compiler.Symbols.Source
 				.Concat(
 					_context
 					.simple_anonymous_interface_declaration()
-					.Select(x => x.qualified_name())
-					.OfType<Qualified_nameContext>()
+					.Select(x => x.named_type_reference())
+					.OfType<Named_type_referenceContext>()
 					.Select(x =>
 					{
-						var type = _sourceSymbolContext.GetTypeOrError(x.GetQualifiedName(), out var diagnostic);
+						var type = _sourceSymbolContext.GetTypeOrError(
+							x.qualified_name().GetQualifiedName(),
+							x.type_argument_list().BindTypeArgumentList(_sourceSymbolContext, _diagnostics),
+                            out var diagnostic); ;
 						if (diagnostic != null)
 						{
 							_diagnostics.Add(diagnostic(new Location(x)));
@@ -63,7 +66,7 @@ namespace FluentLang.Compiler.Symbols.Source
 							_diagnostics.Add(new Diagnostic(
 								new Location(x),
 								ErrorCode.CanOnlyCombineInterfaces,
-								ImmutableArray.Create<object?>(x.GetQualifiedName(), type)));
+								ImmutableArray.Create<object?>(x.qualified_name().GetQualifiedName(), type)));
 							@interface = ErrorInterface.Instance;
 						}
 						return (@interface, name: x);

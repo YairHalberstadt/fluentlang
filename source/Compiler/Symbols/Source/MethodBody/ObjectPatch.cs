@@ -28,11 +28,16 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 
 		private IMethod? BindMethod()
 		{
-			if (_context.fully_qualified_method() is { } fullyQualifiedMethod)
+			if (_context.method_reference() is { } methodReference)
 			{
-				var method = _methodBodySymbolContext.SourceSymbolContext.GetMethodOrError(fullyQualifiedMethod.qualified_name().GetQualifiedName(), out var diagnostic);
+				var method = _methodBodySymbolContext.SourceSymbolContext.GetMethodOrError(
+					methodReference.qualified_name().GetQualifiedName(),
+					methodReference.type_argument_list().BindTypeArgumentList(
+                        _methodBodySymbolContext.SourceSymbolContext,
+                        _diagnostics),
+					out var diagnostic);
 				if (diagnostic != null)
-					_diagnostics.Add(diagnostic(new Location(fullyQualifiedMethod)));
+					_diagnostics.Add(diagnostic(new Location(methodReference)));
 				return method;
 			}
 			return null;

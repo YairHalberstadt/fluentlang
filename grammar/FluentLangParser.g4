@@ -46,7 +46,15 @@ anonymous_interface_declaration
 
 simple_anonymous_interface_declaration
     : OPEN_BRACE interface_member_declaration* CLOSE_BRACE
-    | qualified_name
+    | named_type_reference
+    ;
+
+named_type_reference
+    : qualified_name type_argument_list
+    ;
+
+type_argument_list
+    : (LT type (COMMA type)* GT)?
     ;
 
 interface_member_declaration
@@ -70,7 +78,7 @@ type_declaration
     ;
 
 type
-    : qualified_name
+    : named_type_reference
     | primitive_type
     | anonymous_interface_declaration
     | union
@@ -89,7 +97,7 @@ union
     ;
 
 union_part_type
-    : qualified_name
+    : named_type_reference
     | primitive_type
     | anonymous_interface_declaration
     ;
@@ -122,7 +130,7 @@ expression
     | expression operator expression                                      #binary_operator_expression
     | prefix_unary_operator expression                                    #prefix_unary_operator_expression
     | literal                                                             #literal_expression
-    | qualified_name invocation                                           #static_invocation_expression
+    | method_reference invocation                                           #static_invocation_expression
     | expression DOT UPPERCASE_IDENTIFIER invocation                      #member_invocation_expression
     | IF OPEN_PARENS expression CLOSE_PARENS expression ELSE expression   #conditional_expression
     | OPEN_PARENS expression CLOSE_PARENS                                 #parenthesized_expression
@@ -135,12 +143,12 @@ empty_interface
     ;
 
 object_patch
-    : fully_qualified_method
+    : method_reference
     | MIXIN expression
     ;
 
-fully_qualified_method
-    : qualified_name
+method_reference
+    : qualified_name type_argument_list
     ;
 
 operator

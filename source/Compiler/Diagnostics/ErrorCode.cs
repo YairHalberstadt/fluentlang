@@ -42,5 +42,7 @@
 		CanOnlyCombineInterfaces,
 		TypeParametersShareNames,
 		CannotConstrainToPrimitive,
+		WrongNumberOfTypeArguments,
+		TypeArgumentDoesntMatchConstraints,
 	}
 }
