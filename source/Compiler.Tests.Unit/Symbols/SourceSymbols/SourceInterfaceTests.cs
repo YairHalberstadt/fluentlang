@@ -1,4 +1,5 @@
 ﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.TestUtils;
 using System.Linq;
@@ -114,6 +115,56 @@ interface I<T, T> { }").VerifyDiagnostics(
 			var m = @interface.Methods.SingleOrDefault();
 			Assert.Equal(t1, m.ReturnType);
 			Assert.Equal(t2, m.Parameters.SingleOrDefault().Type);
+		}
+
+		[Fact]
+		public void InterfaceReferenceCanNotHaveTooFewTypeArguments()
+		{
+			CreateAssembly(@"
+interface I1<T1, T2> { M(a : T2) : T1; }
+interface I2 I1<int>")
+				.VerifyDiagnostics(new Diagnostic(new Location(new TextToken(@"I1<int>")), ErrorCode.InterfaceNotFound));
+		}
+
+		[Fact]
+		public void InterfaceReferenceCanNotHaveNoTypeArgumentsWhenInterfaceHasTypeParameters()
+		{
+			CreateAssembly(@"
+interface I1<T1, T2> { M(a : T2) : T1; }
+interface I2 I1")
+				.VerifyDiagnostics(new Diagnostic(new Location(new TextToken(@"I1")), ErrorCode.InterfaceNotFound));
+		}
+
+		[Fact]
+		public void InterfaceReferenceCanNotHaveTooManyTypeArguments()
+		{
+			CreateAssembly(@"
+interface I1<T1, T2> { M(a : T2) : T1; }
+interface I2 I1<int, string, {}>")
+				.VerifyDiagnostics(new Diagnostic(new Location(new TextToken(@"I1<int,string,{}>")), ErrorCode.InterfaceNotFound));
+		}
+
+		[Fact]
+		public void InterfaceReferenceMustMatchAllConstraints()
+		{
+			CreateAssembly(@"
+interface I1<T1 : { M() : int; }, T2> { M(a : T2) : T1; }
+interface I2 I1<{}, string>")
+				.VerifyDiagnostics(new Diagnostic(new Location(new TextToken(@"I1<{},string>")), ErrorCode.TypeArgumentDoesntMatchConstraints));
+		}
+
+		[Fact]
+		public void InterfaceReferenceIsValidWhenItMatchesAllConstraints()
+		{
+			var assembly = CreateAssembly(@"
+interface I1<T1 : { M() : int; }, T2> { M(a : T2) : T1; }
+interface I2 I1<{ M() : int; M1() : bool; }, string>")
+				.VerifyDiagnostics();
+
+			var i = AssertGetInterface(assembly, "I2");
+			var m = i.Methods.Single();
+			var param = m.Parameters.Single();
+			Assert.Equal(Primitive.String, param.Type);
 		}
 	}
 }

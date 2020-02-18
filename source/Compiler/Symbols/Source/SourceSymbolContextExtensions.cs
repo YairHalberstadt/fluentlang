@@ -217,11 +217,11 @@ namespace FluentLang.Compiler.Symbols.Source
 						l,
 						ErrorCode.TypeArgumentDoesntMatchConstraints,
 						ImmutableArray.Create<object?>(typeArgument, typeParameter));
-					return true;
+					return false;
 				}
 			}
 			diagnostic = default;
-			return false;
+			return true;
 		}
 
 		public static IMethod GetMethodOrError(
