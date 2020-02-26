@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace FluentLang.Compiler.Symbols.Visitor
 {
-	public sealed class IsDescendantVisitor : IBaseSymbolVisitor<bool>
+	public sealed class IsDescendantVisitor : BaseSymbolVisitor<bool>
 	{
 		private readonly ISymbol _target;
 
@@ -17,13 +17,13 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		bool IBaseSymbolVisitor<bool>.MergeResults(IEnumerable<bool> results)
+		protected override bool MergeResults(IEnumerable<bool> results)
 		{
 			throw Release.Fail("unreachable");
 		}
 
 		[return: MaybeNull]
-		bool IBaseSymbolVisitor<bool>.DefaultVisit<T>(T symbol, Func<T, IEnumerable<bool>> visitChildren)
+		protected override bool DefaultVisit<T>(T symbol, Func<T, IEnumerable<bool>> visitChildren)
 		{
 			return _target.Equals(symbol) ? true : visitChildren(symbol).Any();
 		}

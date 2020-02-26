@@ -7,19 +7,19 @@ using System.Linq;
 
 namespace FluentLang.Compiler.Symbols.Visitor
 {
-	public interface IBaseSymbolVisitor<T> : ISymbolVisitor<T>
+	public abstract class BaseSymbolVisitor<T> : ISymbolVisitor<T>
 	{
 		[return: MaybeNull]
-		public abstract T MergeResults(IEnumerable<T> results);
+		protected abstract T MergeResults(IEnumerable<T> results);
 
 		[return: MaybeNull]
-		public virtual T DefaultVisit<TSymbol>(TSymbol symbol, Func<TSymbol, IEnumerable<T>> visitChildren) where TSymbol : ISymbol
+		protected virtual T DefaultVisit<TSymbol>(TSymbol symbol, Func<TSymbol, IEnumerable<T>> visitChildren) where TSymbol : ISymbol
 		{
 			return MergeResults(visitChildren(symbol));
 		}
 
 		[return: MaybeNull] 
-		T ISymbolVisitor<T>.Visit(IMethod method)
+		public virtual T Visit(IMethod method)
 		{
 			return DefaultVisit(
 				method,
@@ -30,7 +30,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(IBinaryOperatorExpression binaryOperatorExpression)
+		public virtual T Visit(IBinaryOperatorExpression binaryOperatorExpression)
 		{
 			return DefaultVisit(
 				binaryOperatorExpression,
@@ -42,7 +42,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(IStaticInvocationExpression staticInvocationExpression)
+		public virtual T Visit(IStaticInvocationExpression staticInvocationExpression)
 		{
 			return DefaultVisit(
 				staticInvocationExpression,
@@ -50,7 +50,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(IReturnStatement returnStatement)
+		public virtual T Visit(IReturnStatement returnStatement)
 		{
 			return DefaultVisit(
 				returnStatement,
@@ -58,7 +58,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(IPrefixUnaryOperatorExpression prefixUnaryOperatorExpression)
+		public virtual T Visit(IPrefixUnaryOperatorExpression prefixUnaryOperatorExpression)
 		{
 			return DefaultVisit(
 				prefixUnaryOperatorExpression,
@@ -66,7 +66,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(INewObjectExpression newObjectExpression)
+		public virtual T Visit(INewObjectExpression newObjectExpression)
 		{
 			return DefaultVisit(
 				newObjectExpression,
@@ -74,7 +74,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(IObjectPatchingExpression objectPatchingExpression)
+		public virtual T Visit(IObjectPatchingExpression objectPatchingExpression)
 		{
 			return DefaultVisit(
 				objectPatchingExpression,
@@ -87,7 +87,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(IMemberInvocationExpression memberInvocationExpression)
+		public virtual T Visit(IMemberInvocationExpression memberInvocationExpression)
 		{
 			return DefaultVisit(
 				memberInvocationExpression,
@@ -98,7 +98,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(ILocalReferenceExpression localReferenceExpression)
+		public virtual T Visit(ILocalReferenceExpression localReferenceExpression)
 		{
 			return DefaultVisit(
 				localReferenceExpression,
@@ -106,7 +106,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(ILiteralExpression literalExpression)
+		public virtual T Visit(ILiteralExpression literalExpression)
 		{
 			return DefaultVisit(
 				literalExpression,
@@ -114,7 +114,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(IDeclarationStatement declarationStatement)
+		public virtual T Visit(IDeclarationStatement declarationStatement)
 		{
 			return DefaultVisit(
 				declarationStatement,
@@ -122,7 +122,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(IConditionalExpression conditionalExpression)
+		public virtual T Visit(IConditionalExpression conditionalExpression)
 		{
 			return DefaultVisit(
 				conditionalExpression,
@@ -133,7 +133,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(IMatchExpression matchExpression)
+		public virtual T Visit(IMatchExpression matchExpression)
 		{
 			return DefaultVisit(
 				matchExpression,
@@ -143,7 +143,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(IMatchExpressionArm matchExpressionArm)
+		public virtual T Visit(IMatchExpressionArm matchExpressionArm)
 		{
 			return DefaultVisit(
 				matchExpressionArm,
@@ -151,7 +151,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(Primitive primitive)
+		public virtual T Visit(Primitive primitive)
 		{
 			return DefaultVisit(
 				primitive,
@@ -159,7 +159,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(IUnion union)
+		public virtual T Visit(IUnion union)
 		{
 			return DefaultVisit(
 				union,
@@ -167,7 +167,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(IInterface @interface)
+		public virtual T Visit(IInterface @interface)
 		{
 			return DefaultVisit(
 				@interface,
@@ -175,7 +175,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(IInterfaceMethod method)
+		public virtual T Visit(IInterfaceMethod method)
 		{
 			return DefaultVisit(
 				method,
@@ -183,7 +183,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return:MaybeNull]
-		T ISymbolVisitor<T>.Visit(IParameter parameter)
+		public virtual T Visit(IParameter parameter)
 		{
 			return DefaultVisit(
 				parameter,
@@ -191,7 +191,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		}
 
 		[return: MaybeNull]
-		T ISymbolVisitor<T>.Visit(ITypeParameter typeParameter)
+		public virtual T Visit(ITypeParameter typeParameter)
 		{
 			return DefaultVisit(typeParameter, x => new T[0]);
 		}
