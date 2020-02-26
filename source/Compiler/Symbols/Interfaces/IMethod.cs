@@ -1,9 +1,9 @@
-﻿using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
+﻿using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.Compiler.Symbols.Substituted;
 using FluentLang.Compiler.Symbols.Visitor;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using static MoreLinq.Extensions.MaxByExtension;
 
@@ -11,6 +11,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 {
 	public interface IMethod : IVisitableSymbol
 	{
+		[return: MaybeNull]
 		T IVisitableSymbol.Visit<T>(ISymbolVisitor<T> visitor)
 			=> visitor.Visit(this);
 		public bool IsExported { get; }

@@ -23,7 +23,10 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		{
 			return DefaultVisit(
 				method,
-				x => x.Statements.Select(s => s.Visit(this)));
+				x => 
+					x.Parameters.Select(x => x.Visit(this))
+					.Append(x.ReturnType.Visit(this))
+					.Concat(x.Statements.Select(s => s.Visit(this))));
 		}
 
 		[return: MaybeNull]
@@ -139,11 +142,58 @@ namespace FluentLang.Compiler.Symbols.Visitor
 					.Prepend(x.Expression.Visit(this)));
 		}
 
+		[return: MaybeNull]
 		T ISymbolVisitor<T>.Visit(IMatchExpressionArm matchExpressionArm)
 		{
 			return DefaultVisit(
 				matchExpressionArm,
 				x => new[] { x.Expression.Visit(this) });
+		}
+
+		[return: MaybeNull]
+		T ISymbolVisitor<T>.Visit(Primitive primitive)
+		{
+			return DefaultVisit(
+				primitive,
+				x => new T[0]);
+		}
+
+		[return: MaybeNull]
+		T ISymbolVisitor<T>.Visit(IUnion union)
+		{
+			return DefaultVisit(
+				union,
+				x => x.Options.Select(x => x.Visit(this)));
+		}
+
+		[return: MaybeNull]
+		T ISymbolVisitor<T>.Visit(IInterface @interface)
+		{
+			return DefaultVisit(
+				@interface,
+				x => x.Methods.Select(x => x.Visit(this)));
+		}
+
+		[return: MaybeNull]
+		T ISymbolVisitor<T>.Visit(IInterfaceMethod method)
+		{
+			return DefaultVisit(
+				method,
+				x => x.Parameters.Select(x => x.Visit(this)).Append(x.ReturnType.Visit(this)));
+		}
+
+		[return:MaybeNull]
+		T ISymbolVisitor<T>.Visit(IParameter parameter)
+		{
+			return DefaultVisit(
+				parameter,
+				x => new[] { x.Type.Visit(this) });
+		}
+
+		[return: MaybeNull]
+		T ISymbolVisitor<T>.Visit(ITypeParameter typeParameter)
+		{
+			return DefaultVisit(typeParameter, x => new T[0]);
 		}
 	}
 }

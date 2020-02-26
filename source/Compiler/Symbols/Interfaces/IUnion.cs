@@ -1,12 +1,18 @@
 ﻿using FluentLang.Compiler.Symbols.Substituted;
+using FluentLang.Compiler.Symbols.Visitor;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace FluentLang.Compiler.Symbols.Interfaces
 {
 	public interface IUnion : IType
 	{
+		[return: MaybeNull]
+		T IVisitableSymbol.Visit<T>(ISymbolVisitor<T> visitor)
+			=> visitor.Visit(this);
+
 		ImmutableArray<IType> Options { get; }
 
 		bool IType.IsEquivalentTo(IType other, Stack<(IType, IType)>? dependantEqualities)

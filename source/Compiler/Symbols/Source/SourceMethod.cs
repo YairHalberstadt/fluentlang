@@ -222,8 +222,8 @@ namespace FluentLang.Compiler.Symbols.Source
 				.ToHashSet();
 
 			return
-				this
-				.DescendantNodes()
+				Statements
+				.SelectMany(x => x.DescendantNodes())
 				.OfType<ILocalReferenceExpression>()
 				.Select(x => x.Local)
 				.OfType<IDeclaredLocal>()
@@ -235,8 +235,8 @@ namespace FluentLang.Compiler.Symbols.Source
 		private ImmutableArray<IMethod> CalculateInvokedLocalMethods()
 		{
 			return
-				this
-				.DescendantNodes()
+				Statements
+				.SelectMany(x => x.DescendantNodes())
 				.OfType<IStaticInvocationExpression>()
 				.Select(x => x.Method)
 				.Where(x => x.DeclaringMethod != null)

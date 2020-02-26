@@ -1,9 +1,6 @@
 ﻿using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 
 namespace FluentLang.Compiler.Symbols.Visitor
 {
@@ -11,7 +8,13 @@ namespace FluentLang.Compiler.Symbols.Visitor
 	{
 		[return: MaybeNull] T Visit(IBinaryOperatorExpression binaryOperatorExpression);
 		[return: MaybeNull] T Visit(IStaticInvocationExpression staticInvocationExpression);
+		[return: MaybeNull] T Visit(IParameter parameter);
+		[return: MaybeNull] T Visit(ITypeParameter typeParameter);
+		[return: MaybeNull] T Visit(IInterfaceMethod interfaceMethod);
+		[return: MaybeNull] T Visit(IUnion union);
+		[return: MaybeNull] T Visit(IInterface @interface);
 		[return: MaybeNull] T Visit(IMatchExpression matchExpression);
+		[return: MaybeNull] T Visit(Primitive primitive);
 		[return: MaybeNull] T Visit(IMethod method);
 		[return: MaybeNull] T Visit(IReturnStatement returnStatement);
 		[return: MaybeNull] T Visit(IPrefixUnaryOperatorExpression prefixUnaryOperatorExpression);

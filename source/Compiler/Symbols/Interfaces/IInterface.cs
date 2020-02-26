@@ -1,13 +1,19 @@
 ﻿using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Substituted;
+using FluentLang.Compiler.Symbols.Visitor;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace FluentLang.Compiler.Symbols.Interfaces
 {
 	public interface IInterface : IType
 	{
+		[return: MaybeNull]
+		T IVisitableSymbol.Visit<T>(ISymbolVisitor<T> visitor)
+			=> visitor.Visit(this);
+
 		public bool IsExported { get; }
 		public QualifiedName? FullyQualifiedName { get; }
 		public ImmutableArray<IInterfaceMethod> Methods { get; }

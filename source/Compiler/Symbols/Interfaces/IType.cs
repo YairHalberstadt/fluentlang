@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using FluentLang.Compiler.Symbols.Visitor;
+using System.Collections.Generic;
 
 namespace FluentLang.Compiler.Symbols.Interfaces
 {
-	public interface IType : ISymbol
+	public interface IType : IVisitableSymbol
 	{
 		public sealed bool IsEquivalentTo(IType other) => IsEquivalentTo(other, null);
 
