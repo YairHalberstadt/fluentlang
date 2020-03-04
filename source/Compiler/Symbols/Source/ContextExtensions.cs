@@ -4,7 +4,6 @@ using FluentLang.Compiler.Symbols.ErrorSymbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.Compiler.Symbols.Source.MethodBody;
-using System;
 using System.Collections.Immutable;
 using System.Linq;
 using static FluentLang.Compiler.Generated.FluentLangParser;
@@ -71,11 +70,11 @@ namespace FluentLang.Compiler.Symbols.Source
 		}
 
 		public static ImmutableArray<IType> BindTypeArgumentList(
-            this Type_argument_listContext context,
-            SourceSymbolContext sourceSymbolContext,
-            DiagnosticBag diagnostics)
-        {
-			return 
+			this Type_argument_listContext context,
+			SourceSymbolContext sourceSymbolContext,
+			DiagnosticBag diagnostics)
+		{
+			return
 				context
 				.type()
 				.Select(x => x.BindType(sourceSymbolContext, false, diagnostics))
@@ -100,7 +99,7 @@ namespace FluentLang.Compiler.Symbols.Source
 				out var diagnostic);
 			if (diagnostic != null)
 				diagnostics.Add(diagnostic(new Location(qualifiedName)));
-			if (diagnostic is null && isExported && type is IInterface {IsExported: false })
+			if (diagnostic is null && isExported && type is IInterface { IsExported: false })
 				diagnostics.Add(new Diagnostic(new Location(qualifiedName), ErrorCode.CannotUseUnexportedInterfaceFromExportedMember));
 			return type;
 		}
@@ -138,7 +137,7 @@ namespace FluentLang.Compiler.Symbols.Source
 				.Select(x => new SourceParameter(x, sourceSymbolContext, isExported, diagnostics))
 				.ToImmutableArray<IParameter>();
 
-			foreach (var (param, index) in parameters.Select((x,i) => (x,i)))
+			foreach (var (param, index) in parameters.Select((x, i) => (x, i)))
 			{
 				if (parameters.Take(index).FirstOrDefault(x => x.Name == param.Name) is { } sameName)
 				{

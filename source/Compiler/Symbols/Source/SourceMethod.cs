@@ -1,4 +1,5 @@
 ﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.Compiler.Symbols.Source.MethodBody;
@@ -10,7 +11,7 @@ using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.Symbols.Source
 {
-	internal sealed class SourceMethod : SymbolBase, IMethod
+	internal sealed partial class SourceMethod : SymbolBase, IMethod
 	{
 		private readonly Method_declarationContext _context;
 		private readonly MethodBodySymbolContext _parentMethodBodySymbolContext;
@@ -27,7 +28,7 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		private readonly SourceSymbolContext _parentSourceSymbolContextWithTypeParameters;
 		private readonly Lazy<MethodBodySymbolContext> _methodBodySymbolContext;
-		
+		private readonly Lazy<ImmutableArray<MethodOrInterfaceMethod>> _requiredMethodKeys;
 
 		public SourceMethod(
 			Method_declarationContext context,
@@ -40,7 +41,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			var @namespace = _parentSourceSymbolContextWithTypeParameters.Scope is null ? _parentSourceSymbolContextWithTypeParameters.NameSpace : null;
 			FullyQualifiedName = new QualifiedName(context.method_signature().UPPERCASE_IDENTIFIER().Symbol.Text, @namespace);
 
-			_methodBodySymbolContext = 
+			_methodBodySymbolContext =
 				new Lazy<MethodBodySymbolContext>(
 					() => _parentMethodBodySymbolContext.WithScope(this));
 
@@ -54,6 +55,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			_directlyCapturedDeclaredLocals = new Lazy<ImmutableArray<IDeclaredLocal>>(CalculateDirectlyCapturedDeclaredLocals);
 			_invokedLocalMethods = new Lazy<ImmutableArray<IMethod>>(CalculateInvokedLocalMethods);
 			_inScopeAfter = new Lazy<IDeclarationStatement?>(((IMethod)this).CalculateInScopeAfter);
+			_requiredMethodKeys = new Lazy<ImmutableArray<MethodOrInterfaceMethod>>(CalculateRequiredMethodKeys);
 		}
 
 		private IType BindReturnType()
@@ -165,7 +167,7 @@ namespace FluentLang.Compiler.Symbols.Source
 
 				return;
 			}
-			
+
 			var lastStatement = Statements.Last();
 			if (lastStatement is IReturnStatement returnStatement)
 			{
@@ -244,6 +246,13 @@ namespace FluentLang.Compiler.Symbols.Source
 				.ToImmutableArray();
 		}
 
+		private ImmutableArray<MethodOrInterfaceMethod> CalculateRequiredMethodKeys()
+		{
+			var visitor = new RequiredMethodKeysVisitor(this);
+			visitor.Visit(this);
+			return visitor._methods?.ToImmutableArray()  ?? ImmutableArray<MethodOrInterfaceMethod>.Empty;
+		}
+
 		public bool IsExported => _context.EXPORT() is { };
 
 		public QualifiedName FullyQualifiedName { get; }
@@ -271,6 +280,8 @@ namespace FluentLang.Compiler.Symbols.Source
 		ImmutableArray<IDeclaredLocal> IMethod.DirectlyCapturedDeclaredLocals => _directlyCapturedDeclaredLocals.Value;
 
 		ImmutableArray<IMethod> IMethod.InvokedLocalMethods => _invokedLocalMethods.Value;
+
+		ImmutableArray<MethodOrInterfaceMethod> IMethod.RequiredMethodKeys => _requiredMethodKeys.Value;
 
 		protected override void EnsureAllLocalDiagnosticsCollected()
 		{

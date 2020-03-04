@@ -101,6 +101,7 @@ namespace FluentLang.Compiler.Symbols.Metadata
 		ImmutableArray<IMethod> IMethod.InvokedLocalMethods
 			=> ImmutableArray<IMethod>.Empty;
 
+		ImmutableArray<MethodOrInterfaceMethod> IMethod.RequiredMethodKeys => throw new NotImplementedException();
 		protected override void EnsureAllLocalDiagnosticsCollected()
 		{
 			// Touch all lazy fields to force binding;

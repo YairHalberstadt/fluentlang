@@ -1,4 +1,5 @@
 ﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -11,10 +12,10 @@ namespace FluentLang.Compiler.Symbols.Substituted
 		private readonly IParameter _original;
 		private readonly Lazy<IType> _type;
 
-		public SubstitutedParameter(IParameter original, IReadOnlyDictionary<ITypeParameter, IType> substitutions)
+		public SubstitutedParameter(IParameter original, ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
 		{
 			_original = original;
-			_type = new Lazy<IType>(_original.Type.Substitute(substitutions));
+			_type = new Lazy<IType>(() => _original.Type.Substitute(substitutions));
 		}
 
 		public string Name => _original.Name;

@@ -97,7 +97,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 			return false;
 		}
 
-		IType IType.Substitute(IReadOnlyDictionary<ITypeParameter, IType> substitutions)
+		IType IType.Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
 			=> new SubstitutedInterface(this, substitutions);
 		
 	}

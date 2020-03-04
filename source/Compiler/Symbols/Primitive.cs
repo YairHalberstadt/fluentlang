@@ -1,4 +1,5 @@
 ﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Visitor;
 using System;
@@ -67,7 +68,7 @@ namespace FluentLang.Compiler.Symbols
 		{
 		}
 
-		IType IType.Substitute(IReadOnlyDictionary<ITypeParameter, IType> substitutions)
+		IType IType.Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
 		{
 			return this;
 		}

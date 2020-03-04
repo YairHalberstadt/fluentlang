@@ -47,6 +47,9 @@ namespace FluentLang.Compiler.Symbols.ErrorSymbols
 
 		public IAssembly DeclaringAssembly => throw Release.Fail("unreachable");
 
+		ImmutableArray<MethodOrInterfaceMethod> IMethod.RequiredMethodKeys =>
+			ImmutableArray<MethodOrInterfaceMethod>.Empty;
+
 		void ISymbol.EnsureAllLocalDiagnosticsCollected()
 		{
 		}

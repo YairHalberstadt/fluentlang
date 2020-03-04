@@ -74,9 +74,8 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		{
 			return VisitMany(
 				objectPatchingExpression.Patches
-					.Select(p => p.MixedInExpression)
-					.Where(m => m != null)
-					.Select(m => m!)
+					.OfType<IMixinPatch>()
+					.Select(p => p.Expression)
 					.Prepend(objectPatchingExpression.Expression));
 		}
 

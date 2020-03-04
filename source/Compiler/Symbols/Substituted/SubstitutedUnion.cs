@@ -1,4 +1,5 @@
 ﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -11,10 +12,10 @@ namespace FluentLang.Compiler.Symbols.Substituted
 	{
 		private readonly Lazy<ImmutableArray<IType>> _options;
 
-		public SubstitutedUnion(IUnion original, IReadOnlyDictionary<ITypeParameter, IType> substitutions)
+		public SubstitutedUnion(IUnion original, ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
 		{
 			_options = new Lazy<ImmutableArray<IType>>(
-				original.Options.Select(x => x.Substitute(substitutions)).ToImmutableArray());
+				() => original.Options.Select(x => x.Substitute(substitutions)).ToImmutableArray());
 		}
 
 		public ImmutableArray<IType> Options => _options.Value;

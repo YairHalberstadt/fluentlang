@@ -1,4 +1,5 @@
 ﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -14,12 +15,12 @@ namespace FluentLang.Compiler.Symbols.Substituted
 		private readonly Lazy<IType> _returnType;
 		private readonly Lazy<ImmutableArray<IParameter>> _parameters;
 
-		public SubstitutedInterfaceMethod(IInterfaceMethod original, IReadOnlyDictionary<ITypeParameter, IType> substitutions)
+		public SubstitutedInterfaceMethod(IInterfaceMethod original, ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
 		{
 			_original = original;
 			_returnType = new Lazy<IType>(_original.ReturnType.Substitute(substitutions));
 			_parameters = new Lazy<ImmutableArray<IParameter>>(
-				_original.Parameters.Select(x => x.Substitute(substitutions)).ToImmutableArray());
+				() => _original.Parameters.Select(x => x.Substitute(substitutions)).ToImmutableArray());
 		}
 
 		public string Name => _original.Name;

@@ -1,8 +1,8 @@
 ﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -13,13 +13,16 @@ namespace FluentLang.Compiler.Symbols.Substituted
 		private readonly IMethod _original;
 		private readonly Lazy<IType> _returnType;
 		private readonly Lazy<ImmutableArray<IParameter>> _parameters;
+		private readonly Lazy<ImmutableArray<MethodOrInterfaceMethod>> _requiredMethodKeys;
 
-		public SubstitutedMethod(IMethod original, IReadOnlyDictionary<ITypeParameter, IType> substitutions)
+		public SubstitutedMethod(IMethod original, ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
 		{
 			_original = original;
 			_returnType = new Lazy<IType>(_original.ReturnType.Substitute(substitutions));
 			_parameters = new Lazy<ImmutableArray<IParameter>>(
-				_original.Parameters.Select(x => x.Substitute(substitutions)).ToImmutableArray());
+				() => _original.Parameters.Select(x => x.Substitute(substitutions)).ToImmutableArray());
+			_requiredMethodKeys = new Lazy<ImmutableArray<MethodOrInterfaceMethod>>(
+				() => _original.RequiredMethodKeys.Select(x => x.SubstituteTypeParameters(substitutions)).ToImmutableArray());
 		}
 
 		public bool IsExported => _original.IsExported;
@@ -52,6 +55,8 @@ namespace FluentLang.Compiler.Symbols.Substituted
 			=> throw new InvalidOperationException();
 
 		ImmutableArray<IMethod> IMethod.InvokedLocalMethods => throw new InvalidOperationException();
+
+		ImmutableArray<MethodOrInterfaceMethod> IMethod.RequiredMethodKeys => _requiredMethodKeys.Value;
 
 		void ISymbol.EnsureAllLocalDiagnosticsCollected() {}
 	}

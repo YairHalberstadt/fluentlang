@@ -1,4 +1,5 @@
-﻿using FluentLang.Compiler.Symbols.Visitor;
+﻿using FluentLang.Compiler.Helpers;
+using FluentLang.Compiler.Symbols.Visitor;
 using System.Collections.Generic;
 
 namespace FluentLang.Compiler.Symbols.Interfaces
@@ -11,6 +12,6 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 
 		public bool IsSubtypeOf(IType other);
 
-		internal IType Substitute(IReadOnlyDictionary<ITypeParameter, IType> substitutions);
+		internal IType Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions);
 	}
 }

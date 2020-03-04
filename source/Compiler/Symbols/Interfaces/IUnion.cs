@@ -1,4 +1,5 @@
-﻿using FluentLang.Compiler.Symbols.Substituted;
+﻿using FluentLang.Compiler.Helpers;
+using FluentLang.Compiler.Symbols.Substituted;
 using FluentLang.Compiler.Symbols.Visitor;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -43,7 +44,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 			return Options.All(x => x.IsSubtypeOf(other));
 		}
 
-		IType IType.Substitute(IReadOnlyDictionary<ITypeParameter, IType> substitutions)
+		IType IType.Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
 			=> new SubstitutedUnion(this, substitutions);
 	}
 }

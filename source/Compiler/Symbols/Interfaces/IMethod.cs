@@ -1,4 +1,5 @@
-﻿using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
+﻿using FluentLang.Compiler.Helpers;
+using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.Compiler.Symbols.Substituted;
 using FluentLang.Compiler.Symbols.Visitor;
 using System.Collections.Generic;
@@ -53,8 +54,9 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 					.FirstOrDefault();
 		}
 
-		internal IMethod Substitute(IReadOnlyDictionary<ITypeParameter, IType> substitutions)
+		internal IMethod Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
 			=> new SubstitutedMethod(this, substitutions);
+
+		internal ImmutableArray<MethodOrInterfaceMethod> RequiredMethodKeys { get; }
 	}
 }
-

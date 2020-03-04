@@ -1,4 +1,5 @@
-﻿using FluentLang.Compiler.Symbols.Visitor;
+﻿using FluentLang.Compiler.Helpers;
+using FluentLang.Compiler.Symbols.Visitor;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -24,7 +25,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 			return IsEquivalentTo(other) || (ConstrainedTo?.IsSubtypeOf(other) ?? false);
 		}
 
-		IType IType.Substitute(IReadOnlyDictionary<ITypeParameter, IType> substitutions)
+		IType IType.Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
 		{
 			return substitutions.TryGetValue(this, out var substitution)
 				? substitution
