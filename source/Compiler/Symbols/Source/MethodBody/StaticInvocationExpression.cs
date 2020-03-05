@@ -51,28 +51,39 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 		{
 			var methods = _methodBodySymbolContext.SourceSymbolContext.GetPossibleMethods(MethodName, TypeArguments);
 
-			var matching = methods.Where(
-				x =>
-					x.Parameters.Length == Arguments.Length &&
-					x.Parameters.Zip(Arguments, (p, a) => a.Type.IsSubtypeOf(p.Type)).All(x => x))
+			var matching =
+				methods
+				.Where(x => x.Parameters.Length == Arguments.Length)
+				.Select(x =>
+				{
+					Diagnostic? diagnostic = null;
+					if (TypeArguments.Length > 0)
+					{
+						var typeParameters = x.TypeParameters;
+						if (!SourceSymbolContextExtensions.HasValidTypeArguments(
+							TypeArguments,
+							typeParameters,
+							out var diagnosticFunc))
+						{
+							diagnostic = diagnosticFunc(new Location(_context.method_reference()));
+						}
+						var substituted = x.Substitute(
+							SourceSymbolContextExtensions.CreateTypeMap(TypeArguments, typeParameters));
+						
+						return (method: substituted, diagnostic);
+					}
+					return (method: x, diagnostic: null);
+				})
+				.Where(x => x.method.Parameters.Zip(Arguments, (p, a) => a.Type.IsSubtypeOf(p.Type)).All(x => x))
 				.ToList();
 
 			if (matching.Count == 1)
 			{
-				var target = matching[0];
+				var (target, diagnostic) = matching[0];
 
-				if (TypeArguments.Length > 0)
+				if (diagnostic != null)
 				{
-					var typeParameters = target.TypeParameters;
-					if (!SourceSymbolContextExtensions.HasValidTypeArguments(
-						TypeArguments,
-						typeParameters,
-						out var diagnostic))
-					{
-						_diagnostics.Add(diagnostic(new Location(_context.method_reference())));
-					};
-					target = target.Substitute(
-						SourceSymbolContextExtensions.CreateTypeMap(TypeArguments, typeParameters));
+					_diagnostics.Add(diagnostic);
 				}
 
 				var currentMethod = _methodBodySymbolContext.SourceSymbolContext.Scope;

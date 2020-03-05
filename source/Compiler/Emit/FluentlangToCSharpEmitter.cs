@@ -431,10 +431,26 @@ namespace FluentLang.Compiler.Emit
 			{
 				var method = sie.Method;
 				EmitMethodName(method, textWriter);
+				EmitTypeArguments(sie.TypeArguments, textWriter);
 				textWriter.Write("(");
 				EmitArguments(sie.Arguments, sie.Method.Parameters, textWriter);
 				EmitRequiredMethodKeyArguments(sie.Method, textWriter);
 				textWriter.Write(")");
+			}
+
+			private void EmitTypeArguments(ImmutableArray<IType> typeAguments, TextWriter textWriter)
+			{
+				if (typeAguments.Length > 0)
+				{
+					textWriter.Write("<");
+					for (var i = 0; i < typeAguments.Length; i++)
+					{
+						if (i != 0)
+							textWriter.Write(", ");
+						Emit(typeAguments[i], textWriter);
+					}
+					textWriter.Write(">");
+				}
 			}
 
 			private void EmitRequiredMethodKeyArguments(IMethod method, TextWriter textWriter)
@@ -605,7 +621,7 @@ namespace FluentLang.Compiler.Emit
 
 				void EmitPatch(IObjectPatch patch, TextWriter textWriter)
 				{
-					if (patch is IMethodPatch { Method: var method })
+					if (patch is IMethodPatch { Method: var method, TypeArguments: var typeArguments })
 					{
 						textWriter.Write(".With(");
 						EmitMethodKey(_keyGenerator.GenerateMethodKeyExcludingFirstParameter(method), textWriter);
@@ -622,6 +638,7 @@ namespace FluentLang.Compiler.Emit
 						}
 						textWriter.Write(") => ");
 						EmitMethodName(method, textWriter);
+						EmitTypeArguments(typeArguments, textWriter);
 
 						textWriter.Write("(");
 

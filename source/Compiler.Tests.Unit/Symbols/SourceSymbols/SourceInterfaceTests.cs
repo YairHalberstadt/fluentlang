@@ -159,7 +159,7 @@ interface I2 I1<{}, string>")
 			var assembly = CreateAssembly(@"
 interface I1<T1 : { M() : int; }, T2> { M(a : T2) : T1; }
 interface I2 I1<{ M() : int; M1() : bool; }, string>")
-				.VerifyDiagnostics();
+				.VerifyDiagnostics().VerifyEmit();
 
 			var i = AssertGetInterface(assembly, "I2");
 			var m = i.Methods.Single();

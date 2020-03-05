@@ -29,8 +29,9 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 		public IAssembly DeclaringAssembly { get; }
 		public ImmutableArray<IStatement> Statements { get; }
 		public IDeclarationStatement? InScopeAfter { get; }
-		protected ImmutableArray<IDeclaredLocal> DirectlyCapturedDeclaredLocals { get; }
-		protected ImmutableArray<IMethod> InvokedLocalMethods { get; }
+		public IMethod OriginalDefinition => this;
+		internal ImmutableArray<IDeclaredLocal> DirectlyCapturedDeclaredLocals { get; }
+		internal ImmutableArray<IMethod> InvokedLocalMethods { get; }
 		private IEnumerable<IDeclaredLocal> CalculateTransitivelyCapturedDeclaredLocals(HashSet<IMethod> visitedMethods)
 		{
 			visitedMethods.Add(this);

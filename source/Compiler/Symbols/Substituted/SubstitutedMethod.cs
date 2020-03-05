@@ -45,16 +45,18 @@ namespace FluentLang.Compiler.Symbols.Substituted
 
 		public IAssembly DeclaringAssembly => _original.DeclaringAssembly;
 
-		public ImmutableArray<IStatement> Statements => throw new InvalidOperationException();
+		public ImmutableArray<IStatement> Statements => _original.Statements;
 
-		public IDeclarationStatement? InScopeAfter => throw new InvalidOperationException();
+		public IDeclarationStatement? InScopeAfter => _original.InScopeAfter;
+
+		public IMethod OriginalDefinition => _original.OriginalDefinition;
 
 		public ImmutableArray<Diagnostic> AllDiagnostics => ImmutableArray<Diagnostic>.Empty;
 
 		ImmutableArray<IDeclaredLocal> IMethod.DirectlyCapturedDeclaredLocals
-			=> throw new InvalidOperationException();
+			=> _original.DirectlyCapturedDeclaredLocals;
 
-		ImmutableArray<IMethod> IMethod.InvokedLocalMethods => throw new InvalidOperationException();
+		ImmutableArray<IMethod> IMethod.InvokedLocalMethods => _original.InvokedLocalMethods;
 
 		ImmutableArray<MethodOrInterfaceMethod> IMethod.RequiredMethodKeys => _requiredMethodKeys.Value;
 

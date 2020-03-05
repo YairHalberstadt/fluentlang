@@ -75,6 +75,9 @@ namespace FluentLang.Compiler.Symbols.Source
 
 			private void AddMethodIfNecessary(ImmutableArray<IType> typeArguments, IMethod method)
 			{
+				if (method.OriginalDefinition == _method.OriginalDefinition)
+					return;
+
 				if (typeArguments.Any(
 					x => _method.TypeParameters.Contains(x)))
 				{
@@ -86,6 +89,17 @@ namespace FluentLang.Compiler.Symbols.Source
 					}
 					(_methods ??= new HashSet<MethodOrInterfaceMethod>())
 						.UnionWith(method.RequiredMethodKeys);
+				}
+
+				var tps = GetTypeParameters(method);
+				if (tps.Any(x => _method.TypeParameters.Contains(x)))
+				{
+					var requiredMethod = new MethodOrInterfaceMethod(method);
+					if (!_alreadyRequiredByLocalMethods?.Contains(requiredMethod) ?? true)
+					{
+						(_methods ??= new HashSet<MethodOrInterfaceMethod>())
+							.Add(requiredMethod);
+					}
 				}
 			}
 

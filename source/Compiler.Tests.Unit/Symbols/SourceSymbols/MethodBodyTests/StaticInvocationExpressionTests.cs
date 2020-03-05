@@ -115,7 +115,7 @@ M(param : int) : int {
 		public void MethodInvocationIsValidWhenItMatchesAllConstraints()
 		{
 			CreateAssembly(@"M<T1 : {}, T2 : { M() : int; }>() : T2 { return M<{}, T2>(); }")
-				.VerifyDiagnostics();
+				.VerifyDiagnostics().VerifyEmit();
 		}
 	}
 }
