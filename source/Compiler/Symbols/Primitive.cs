@@ -1,13 +1,21 @@
 ﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
+using FluentLang.Compiler.Symbols.Visitor;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace FluentLang.Compiler.Symbols
 {
 	public sealed class Primitive : IType, IEquatable<Primitive>
 	{
+		[return: MaybeNull]
+		T IVisitableSymbol.Visit<T>(ISymbolVisitor<T> visitor)
+			=> visitor.Visit(this);
+
 		public static Primitive Bool { get; } = new Primitive(new QualifiedName("bool"));
 		public static Primitive Int { get; } = new Primitive(new QualifiedName("int"));
 		public static Primitive Double { get; } = new Primitive(new QualifiedName("double"));
@@ -36,7 +44,7 @@ namespace FluentLang.Compiler.Symbols
 			return base.GetHashCode();
 		}
 
-		bool IType.IsEquivalentTo(IType other, System.Collections.Generic.Stack<(IType, IType)>? dependantEqualities)
+		bool IType.IsEquivalentTo(IType other, Stack<(IType, IType)>? dependantEqualities)
 		{
 			return ReferenceEquals(this, other);
 		}
@@ -58,6 +66,11 @@ namespace FluentLang.Compiler.Symbols
 
 		void ISymbol.EnsureAllLocalDiagnosticsCollected()
 		{
+		}
+
+		IType IType.Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
+		{
+			return this;
 		}
 	}
 }

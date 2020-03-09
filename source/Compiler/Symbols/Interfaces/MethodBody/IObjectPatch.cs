@@ -2,7 +2,6 @@
 {
 	public interface IObjectPatch : ISymbol
 	{
-		IMethod? Method { get; }
-		IExpression? MixedInExpression { get; }
+		
 	}
 }

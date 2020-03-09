@@ -44,7 +44,9 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 			return 
 				_context
 				.object_patch()
-				.Select(x => new ObjectPatch(x, _methodBodySymbolContext, _diagnostics))
+				.Select(x => x.expression() is { } expression 
+					? (IObjectPatch)new MixinPatch(expression, _methodBodySymbolContext, _diagnostics)
+					: new MethodPatch(x.method_reference(), _methodBodySymbolContext, _diagnostics))
 				.ToImmutableArray<IObjectPatch>();
 		}
 
@@ -81,7 +83,7 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 
 				var patchedMethods = _objectPatchingExpression.Patches.SelectMany((x, i) =>
 				{
-					if (x.Method is { } method)
+					if (x is IMethodPatch { Method: var method })
 					{
 						if (method.Parameters.Length == 0)
 						{
@@ -96,7 +98,7 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 							return new[] { new PatchedInterfaceMethod(method) };
 						}
 					}
-					else if (x.MixedInExpression is { } expression)
+					else if (x is IMixinPatch { Expression: var expression } )
 					{
 						if (expression.Type is IInterface @interface)
 						{
@@ -141,6 +143,8 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 
 			public bool IsExported => false;
 
+			public ImmutableArray<ITypeParameter> TypeParameters => ImmutableArray<ITypeParameter>.Empty;
+
 			public ImmutableArray<IInterfaceMethod> Methods => _methods.Value;
 
 			public ImmutableArray<Diagnostic> AllDiagnostics => ImmutableArray<Diagnostic>.Empty;
@@ -181,6 +185,8 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 				public QualifiedName? FullyQualifiedName => null;
 
 				public bool IsExported => false;
+
+				public ImmutableArray<ITypeParameter> TypeParameters => ImmutableArray<ITypeParameter>.Empty;
 
 				public ImmutableArray<IInterfaceMethod> Methods { get; }
 

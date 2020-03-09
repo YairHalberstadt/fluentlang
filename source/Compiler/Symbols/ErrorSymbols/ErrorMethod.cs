@@ -19,6 +19,8 @@ namespace FluentLang.Compiler.Symbols.ErrorSymbols
 
 		public QualifiedName FullyQualifiedName { get; }
 
+		public ImmutableArray<ITypeParameter> TypeParameters => ImmutableArray<ITypeParameter>.Empty;
+
 		public IType ReturnType => ErrorType.Instance;
 
 		public ImmutableArray<IParameter> Parameters { get; }
@@ -44,6 +46,9 @@ namespace FluentLang.Compiler.Symbols.ErrorSymbols
 		public bool IsExported => false;
 
 		public IAssembly DeclaringAssembly => throw Release.Fail("unreachable");
+
+		ImmutableArray<MethodOrInterfaceMethod> IMethod.RequiredMethodKeys =>
+			ImmutableArray<MethodOrInterfaceMethod>.Empty;
 
 		void ISymbol.EnsureAllLocalDiagnosticsCollected()
 		{

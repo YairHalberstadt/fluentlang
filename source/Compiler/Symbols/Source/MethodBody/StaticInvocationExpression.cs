@@ -16,6 +16,7 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 		private readonly MethodBodySymbolContext _methodBodySymbolContext;
 		private readonly Lazy<ImmutableArray<IExpression>> _arguments;
 		private readonly Lazy<IMethod> _method;
+		private readonly Lazy<ImmutableArray<IType>> _typeArguments;
 
 		public StaticInvocationExpression(
 			Static_invocation_expressionContext context,
@@ -25,9 +26,10 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 			_context = context;
 			_methodBodySymbolContext = methodBodySymbolContext;
 
-			MethodName = _context.qualified_name().GetQualifiedName();
+			MethodName = _context.method_reference().qualified_name().GetQualifiedName();
 			_arguments = new Lazy<ImmutableArray<IExpression>>(BindArguments);
 			_method = new Lazy<IMethod>(BindMethod);
+			_typeArguments = new Lazy<ImmutableArray<IType>>(BindTypeArguments);
 		}
 
 		private ImmutableArray<IExpression> BindArguments()
@@ -38,19 +40,52 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 				.BindArguments(_methodBodySymbolContext, _diagnostics);
 		}
 
+		private ImmutableArray<IType> BindTypeArguments()
+		{
+			return _context.method_reference().type_argument_list().BindTypeArgumentList(
+                _methodBodySymbolContext.SourceSymbolContext,
+                _diagnostics);
+		}
+
 		private IMethod BindMethod()
 		{
-			var methods = _methodBodySymbolContext.SourceSymbolContext.GetPossibleMethods(MethodName);
+			var methods = _methodBodySymbolContext.SourceSymbolContext.GetPossibleMethods(MethodName, TypeArguments);
 
-			var matching = methods.Where(
-				x =>
-					x.Parameters.Length == Arguments.Length &&
-					x.Parameters.Zip(Arguments, (p, a) => a.Type.IsSubtypeOf(p.Type)).All(x => x))
+			var matching =
+				methods
+				.Where(x => x.Parameters.Length == Arguments.Length)
+				.Select(x =>
+				{
+					Diagnostic? diagnostic = null;
+					if (TypeArguments.Length > 0)
+					{
+						var typeParameters = x.TypeParameters;
+						if (!SourceSymbolContextExtensions.HasValidTypeArguments(
+							TypeArguments,
+							typeParameters,
+							out var diagnosticFunc))
+						{
+							diagnostic = diagnosticFunc(new Location(_context.method_reference()));
+						}
+						var substituted = x.Substitute(
+							SourceSymbolContextExtensions.CreateTypeMap(TypeArguments, typeParameters));
+						
+						return (method: substituted, diagnostic);
+					}
+					return (method: x, diagnostic: null);
+				})
+				.Where(x => x.method.Parameters.Zip(Arguments, (p, a) => a.Type.IsSubtypeOf(p.Type)).All(x => x))
 				.ToList();
 
 			if (matching.Count == 1)
 			{
-				var target = matching[0];
+				var (target, diagnostic) = matching[0];
+
+				if (diagnostic != null)
+				{
+					_diagnostics.Add(diagnostic);
+				}
+
 				var currentMethod = _methodBodySymbolContext.SourceSymbolContext.Scope;
 				Release.Assert(currentMethod != null);
 				if (target.DeclaringMethod == currentMethod)
@@ -75,14 +110,14 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 			if (matching.Count == 0)
 			{
 				_diagnostics.Add(new Diagnostic(
-					new Location(_context.qualified_name()),
+					new Location(_context.method_reference()),
 					ErrorCode.MethodNotFound,
 					ImmutableArray.Create<object?>(MethodName, Arguments)));
 			}
 			else
 			{
 				_diagnostics.Add(new Diagnostic(
-					new Location(_context.qualified_name()),
+					new Location(_context.method_reference()),
 					ErrorCode.AmbigiousMethodReference,
 					ImmutableArray.Create<object?>(matching)));
 			}
@@ -97,6 +132,8 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 		public IMethod Method => _method.Value;
 
 		public IType Type => Method.ReturnType;
+
+		public ImmutableArray<IType> TypeArguments => _typeArguments.Value;
 
 		protected override void EnsureAllLocalDiagnosticsCollected()
 		{

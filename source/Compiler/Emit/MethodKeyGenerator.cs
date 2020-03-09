@@ -1,35 +1,80 @@
 ﻿using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using static FluentLang.Compiler.Emit.MethodKeyOrParamName;
 
 namespace FluentLang.Compiler.Emit
 {
 	public class MethodKeyGenerator
 	{
-		private readonly ConcurrentDictionary<IInterfaceMethod, string> _interfaceMethodCache = new ConcurrentDictionary<IInterfaceMethod, string>();
-		private readonly ConcurrentDictionary<IMethod, string> _methodExcludingFirstParameterCache = new ConcurrentDictionary<IMethod, string>();
-		private readonly ConcurrentDictionary<IInterface, string> _interfaceCache = new ConcurrentDictionary<IInterface, string>();
+		private readonly Dictionary<IInterfaceMethod, MethodKeyOrParamName> _interfaceMethodCache = new Dictionary<IInterfaceMethod, MethodKeyOrParamName>();
+		private readonly Dictionary<IMethod, MethodKeyOrParamName> _methodExcludingFirstParameterCache = new Dictionary<IMethod, MethodKeyOrParamName>();
+		private readonly Dictionary<IInterface, string> _interfaceCache = new Dictionary<IInterface, string>();
 
-		public string GenerateMethodKey(IInterfaceMethod method)
+		private int _paramIndex;
+
+		public IEnumerable<string> EnterMethodAndReturnMethodKeyParamNames(IMethod method)
+		{
+			var paramNames = new List<string>();
+			foreach (var requiredMethod in method.RequiredMethodKeys)
+			{
+				var paramName = "__p" + _paramIndex++; ;
+				if (requiredMethod.TryGetMethod(out var m))
+				{
+					_methodExcludingFirstParameterCache.Add(m, new ParamName(paramName));
+				}
+				else if (requiredMethod.TryGetInterfaceMethod(out var im))
+				{
+					_interfaceMethodCache.Add(im, new ParamName(paramName));
+				}
+				else
+				{
+					throw Release.Fail("RequiredMethodKey must be Method or InterfaceMethod");
+				}
+				paramNames.Add(paramName);
+			}
+
+			return paramNames;
+		}
+
+		public void ExitMethod(IMethod method)
+		{
+			foreach(var requiredMethod in method.RequiredMethodKeys)
+			{
+				if (requiredMethod.TryGetMethod(out var m))
+				{
+					var removed = _methodExcludingFirstParameterCache.Remove(m);
+					Release.Assert(removed);
+				}
+				else if (requiredMethod.TryGetInterfaceMethod(out var im))
+				{
+					var removed = _interfaceMethodCache.Remove(im);
+					Release.Assert(removed);
+				}
+			}
+			_paramIndex -= method.RequiredMethodKeys.Length;
+		}
+
+		public MethodKeyOrParamName GenerateMethodKey(IInterfaceMethod method)
 		{
 			return _interfaceMethodCache.GetOrAdd(
 				method,
-				method => GenerateMethodKey(method, new Stack<(IInterface @interface, int index)>()));
+				method => new MethodKey(
+					GenerateMethodKey(method, new Stack<(IInterface @interface, int index)>())));
 		}
 
-		public string GenerateMethodKeyExcludingFirstParameter(IMethod method)
+		public MethodKeyOrParamName GenerateMethodKeyExcludingFirstParameter(IMethod method)
 		{
 			return _methodExcludingFirstParameterCache.GetOrAdd(method, method =>
 			{
 				var parentInterfaces = new Stack<(IInterface @interface, int index)>();
 				return
-					method.Name
-					+ GenerateTypeKey(method.ReturnType, parentInterfaces)
-					+ string.Concat(method.Parameters.Skip(1).Select(x => GenerateTypeKey(x.Type, parentInterfaces)));
+					new MethodKey(
+						method.Name
+						+ GenerateTypeKey(method.ReturnType, parentInterfaces)
+						+ string.Concat(method.Parameters.Skip(1).Select(x => GenerateTypeKey(x.Type, parentInterfaces))));
 			});
 		}
 
@@ -76,6 +121,8 @@ namespace FluentLang.Compiler.Emit
 				return GenerateInterfaceKey(@interface, parentInterfaces);
 			if (type is IUnion union)
 				return GenerateUnionKey(union, parentInterfaces);
+			if (type is ITypeParameter typeParameter)
+				throw Release.Fail($"Cannot use TypeParameter in methodKey: {typeParameter}");
 			throw Release.Fail("this location is thought to be unreachable");
 		}
 

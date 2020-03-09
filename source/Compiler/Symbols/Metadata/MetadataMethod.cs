@@ -6,15 +6,21 @@ using FluentLang.Runtime.Metadata;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.Symbols.Metadata
 {
 	internal sealed class MetadataMethod : SymbolBase, IMethod
 	{
+		private readonly SourceSymbolContext _sourceSymbolContext;
+		private readonly SourceSymbolContext _sourceSymbolContextWithTypeParams;
+		private readonly Method_signature_metadataContext _methodSignature;
 		private readonly MethodSignatureAttribute _attribute;
+
+		private readonly Lazy<ImmutableArray<ITypeParameter>> _typeParameters;
 		private readonly Lazy<IType> _returnType;
 		private readonly Lazy<ImmutableArray<IParameter>> _parameters;
-		private readonly SourceSymbolContext _sourceSymbolContext;
+		private readonly Lazy<ImmutableArray<MethodOrInterfaceMethod>> _requiredMethodKeys;
 
 		public MetadataMethod(
 			IAssembly metadataAssembly,
@@ -23,36 +29,63 @@ namespace FluentLang.Compiler.Symbols.Metadata
 		{
 			DeclaringAssembly = metadataAssembly;
 			_attribute = attribute;
-			_sourceSymbolContext = new SourceSymbolContext(null, DeclaringAssembly, ImmutableArray<QualifiedName>.Empty, null);
-			FullyQualifiedName = QualifiedName.Parse(attribute.FullyQualifiedName);
+			_methodSignature = Utils.Parse(
+				attribute.Signature,
+				p => p.method_signature_metadata(),
+				_diagnostics);
+			_sourceSymbolContext = new SourceSymbolContext(null, DeclaringAssembly, ImmutableArray<QualifiedName>.Empty, null, () => ImmutableArray<ITypeParameter>.Empty);
+			_sourceSymbolContextWithTypeParams = _sourceSymbolContext.WithTypeParameters(() => TypeParameters);
+			FullyQualifiedName = _methodSignature.qualified_name().GetQualifiedName();
+			_typeParameters = new Lazy<ImmutableArray<ITypeParameter>>(GenerateTypeParameters);
 			_returnType = new Lazy<IType>(GenerateReturnType);
 			_parameters = new Lazy<ImmutableArray<IParameter>>(GenerateParameters);
+			_requiredMethodKeys = new Lazy<ImmutableArray<MethodOrInterfaceMethod>>(GenerateRequiredMethodKeys);
+		}
+
+		private ImmutableArray<ITypeParameter> GenerateTypeParameters()
+		{
+			return
+				_methodSignature
+				.type_parameter_list()
+				.BindTypeParameters(_sourceSymbolContext, true, _diagnostics);
 		}
 
 		private ImmutableArray<IParameter> GenerateParameters()
 		{
 			return
-				_attribute
-				.Parameters
-				.Select(x =>
-					new SourceParameter(
-						Utils.Parse(x, p => p.parameter_metadata(), _diagnostics).parameter(),
-						_sourceSymbolContext,
-						isExported: true,
-						_diagnostics))
-				.ToImmutableArray<IParameter>();
+				_methodSignature
+				.parameters()
+				.BindParameters(_sourceSymbolContextWithTypeParams, true, _diagnostics);
 		}
 
 		private IType GenerateReturnType()
 		{
-			var source = _attribute.ReturnType;
-			var typeContext = Utils.Parse(source, p => p.return_type_metadata(), _diagnostics).type();
-			return typeContext.BindType(_sourceSymbolContext, isExported: true, _diagnostics);
+			return
+				_methodSignature
+				.type_declaration()
+				.type()
+				.BindType(_sourceSymbolContextWithTypeParams, true, _diagnostics);
+		}
+
+		private ImmutableArray<MethodOrInterfaceMethod> GenerateRequiredMethodKeys()
+		{
+			return
+				_attribute
+				.RequireMethodKeySignatures
+				.Select(x => Utils.Parse(x, p => p.interface_method_metadata(), _diagnostics))
+				.Select( x => new MethodOrInterfaceMethod(new SourceInterfaceMethod(
+					x.method_signature(),
+					_sourceSymbolContextWithTypeParams,
+					true,
+					_diagnostics)))
+				.ToImmutableArray();
 		}
 
 		public bool IsExported => true;
 
 		public QualifiedName FullyQualifiedName { get; }
+
+		public ImmutableArray<ITypeParameter> TypeParameters => _typeParameters.Value;
 
 		public IType ReturnType => _returnType.Value;
 
@@ -83,12 +116,15 @@ namespace FluentLang.Compiler.Symbols.Metadata
 		ImmutableArray<IMethod> IMethod.InvokedLocalMethods
 			=> ImmutableArray<IMethod>.Empty;
 
+		ImmutableArray<MethodOrInterfaceMethod> IMethod.RequiredMethodKeys => _requiredMethodKeys.Value;
 		protected override void EnsureAllLocalDiagnosticsCollected()
 		{
 			// Touch all lazy fields to force binding;
 
+			_ = _typeParameters.Value;
 			_ = _parameters.Value;
 			_ = _returnType.Value;
+			_ = _requiredMethodKeys.Value;
 		}
 	}
 }

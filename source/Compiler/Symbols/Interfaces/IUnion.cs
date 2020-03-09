@@ -1,13 +1,19 @@
-﻿using System;
+﻿using FluentLang.Compiler.Helpers;
+using FluentLang.Compiler.Symbols.Substituted;
+using FluentLang.Compiler.Symbols.Visitor;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
 
 namespace FluentLang.Compiler.Symbols.Interfaces
 {
-	interface IUnion : IType
+	public interface IUnion : IType
 	{
+		[return: MaybeNull]
+		T IVisitableSymbol.Visit<T>(ISymbolVisitor<T> visitor)
+			=> visitor.Visit(this);
+
 		ImmutableArray<IType> Options { get; }
 
 		bool IType.IsEquivalentTo(IType other, Stack<(IType, IType)>? dependantEqualities)
@@ -19,7 +25,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 
 			if (other is IUnion union && Options.Length == union.Options.Length)
 			{
-				return 
+				return
 					Options
 					.Zip(union.Options, (a, b) => a.IsEquivalentTo(b, dependantEqualities))
 					.All(x => x);
@@ -37,5 +43,8 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 
 			return Options.All(x => x.IsSubtypeOf(other));
 		}
+
+		IType IType.Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
+			=> new SubstitutedUnion(this, substitutions);
 	}
 }

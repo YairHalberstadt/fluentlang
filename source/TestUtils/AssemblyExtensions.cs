@@ -1,11 +1,15 @@
 ﻿using FluentLang.Compiler.Compilation;
 using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Helpers;
+using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Metadata;
 using Microsoft.CodeAnalysis;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -133,14 +137,16 @@ Actual:
 				Assert.True(exportedMethods.TryGetValue(
 					metadataMethod.FullyQualifiedName,
 					out var exportedMethod));
-				Assert.True(metadataMethod.ReturnType.IsEquivalentTo(exportedMethod!.ReturnType));
+				Assert.Equal(metadataMethod.ReturnType, exportedMethod!.ReturnType, MetadataTypeEqualityComparer.Instance);
 				Assert.Equal(exportedMethod.Parameters.Length, metadataMethod.Parameters.Length);
 				foreach (var (exportedParam, metadataParam) in
 					exportedMethod.Parameters.Zip(metadataMethod.Parameters))
 				{
 					Assert.Equal(exportedParam.Name, metadataParam.Name);
-					Assert.True(metadataParam.Type.IsEquivalentTo(exportedParam.Type));
+					Assert.Equal(metadataParam.Type, exportedParam.Type, MetadataTypeEqualityComparer.Instance);
 				}
+
+				Assert.Equal(exportedMethod.RequiredMethodKeys.Length, metadataMethod.RequiredMethodKeys.Length);
 			}
 
 			var exportedInterfaces =
@@ -156,8 +162,95 @@ Actual:
 				Assert.True(exportedInterfaces.TryGetValue(
 					metadataInterface.FullyQualifiedName,
 					out var exportedInterface));
-				Assert.True(metadataInterface.IsEquivalentTo(exportedInterface!));
+				Assert.Equal(metadataInterface, exportedInterface!, MetadataTypeEqualityComparer.Instance);
 			}
+		}
+	}
+
+	public class MetadataTypeEqualityComparer : IEqualityComparer<IType>
+	{
+		private MetadataTypeEqualityComparer() { }
+		public static MetadataTypeEqualityComparer Instance = new MetadataTypeEqualityComparer();
+		public bool Equals(IType? x, IType? y)
+		{
+			if (ReferenceEquals(x, y))
+				return true;
+			if (x is null || y is null)
+				return false;
+			return Equals(x, y, new Stack<(IType, IType)>());
+		}
+
+		private bool Equals(IType x, IType y, Stack<(IType, IType)> dependantEqualities)
+		{
+			if (dependantEqualities.Contains((x, y)))
+				return true;
+			dependantEqualities.Push((x, y));
+			var result = EqualsInternal();
+			dependantEqualities.Pop();
+			return result;
+
+			bool EqualsInternal()
+			{
+				if (x is IInterface ix && y is IInterface iy)
+					return Equals(ix, iy, dependantEqualities);
+				if (x is IUnion ux && y is IUnion uy)
+					return Equals(ux, uy, dependantEqualities);
+				if (x is ITypeParameter tx && y is ITypeParameter ty)
+					return tx.Name == ty.Name;
+				if (x is Primitive px && y is Primitive py)
+					return px.Equals(py);
+				return false;
+			}
+		}
+
+
+		private bool Equals(IInterface a, IInterface b, Stack<(IType, IType)> dependantEqualities)
+		{
+			if (a.Methods.Length != b.Methods.Length)
+				return false;
+			foreach(var (am, bm) in a.Methods.Zip(b.Methods))
+			{
+				if (!Equals(am, bm, dependantEqualities))
+					return false;
+			}
+			return true;
+
+		}
+
+		private bool Equals(IUnion a, IUnion b, Stack<(IType, IType)> dependantEqualities)
+		{
+			if (a.Options.Length != b.Options.Length)
+				return false;
+			foreach (var (ao, bo) in a.Options.Zip(b.Options))
+			{
+				if (!Equals(ao, bo, dependantEqualities))
+					return false;
+			}
+			return true;
+		}
+
+		private bool Equals(IInterfaceMethod a, IInterfaceMethod b, Stack<(IType, IType)> dependantEqualities)
+		{
+			if (a.Name != b.Name)
+				return false;
+			if (!Equals(a.ReturnType, b.ReturnType, dependantEqualities))
+				return false;
+			if (a.Parameters.Length != b.Parameters.Length)
+				return false;
+			foreach (var (ap, bp) in a.Parameters.Zip(b.Parameters))
+			{
+				if (ap.Name != bp.Name)
+					return false;
+
+				if (!Equals(ap.Type, bp.Type, dependantEqualities))
+					return false;
+			}
+			return true;
+		}
+
+		public int GetHashCode([DisallowNull] IType obj)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

@@ -1,47 +1,86 @@
 ﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.ErrorSymbols;
 using FluentLang.Compiler.Symbols.Interfaces;
-using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-
 namespace FluentLang.Compiler.Symbols.Source
 {
 	internal static class SourceSymbolContextExtensions
 	{
-		public static IReadOnlyList<IInterface> GetPossibleInterfaces(this SourceSymbolContext context, QualifiedName name)
+		public static IType? GetTypeParameter(this SourceSymbolContext context, string name)
 		{
-			return GetPossibleTs<IInterface>(
-				context,
-				name,
-				(IAssembly x, QualifiedName n, out IInterface? i) => x.TryGetInterface(n, out i),
-				x => x.LocalInterfaces,
-				x => x.FullyQualifiedName);
+			{
+				if (context.CurrentLevelTypeParameters().FirstOrDefault(x => x.Name == name) is { } typeParameter)
+				{
+					return typeParameter;
+				}
+			}
+
+			var scope = context.Scope;
+			while (scope != null)
+			{
+				if (scope.TypeParameters.FirstOrDefault(x => x.Name == name) is { } typeParameter)
+				{
+					return typeParameter;
+				}
+				scope = scope.DeclaringMethod;
+			}
+
+			return null;
 		}
 
-		public static IReadOnlyList<IMethod> GetPossibleMethods(this SourceSymbolContext context, QualifiedName name)
+		public static IReadOnlyList<IType> GetPossibleTypes(
+			this SourceSymbolContext context,
+			QualifiedName name,
+			ImmutableArray<IType> typeArguments)
 		{
-			return GetPossibleTs<IMethod>(
+			if (name.Parent is null && typeArguments.Length == 0)
+			{
+				if (context.GetTypeParameter(name.Name) is { } typeParameter)
+				{
+					return new[] { typeParameter };
+				}
+			}
+
+			return GetPossibleTs(
 				context,
 				name,
+				typeArguments,
+				(IAssembly x, QualifiedName n, out IInterface? i) => x.TryGetInterface(n, out i),
+				x => x.LocalInterfaces,
+				x => x.FullyQualifiedName,
+				x => x.TypeParameters);
+		}
+
+		public static IReadOnlyList<IMethod> GetPossibleMethods(this SourceSymbolContext context, QualifiedName name, ImmutableArray<IType> typeArguments)
+		{
+			return GetPossibleTs(
+				context,
+				name,
+				typeArguments,
 				(IAssembly x, QualifiedName n, out IMethod? i) => x.TryGetMethod(n, out i),
 				x => x.LocalMethods,
-				x => x.FullyQualifiedName);
+				x => x.FullyQualifiedName,
+				x => x.TypeParameters);
 		}
 
 		private delegate bool TryGetT<T>(IAssembly assembly, QualifiedName qualifiedName, [NotNullWhen(true)] out T? t) where T : class;
 		private delegate ImmutableArray<T> GetLocalTs<T>(IMethod method);
 		private delegate QualifiedName? GetFullyQualifiedName<T>(T t);
+		private delegate ImmutableArray<ITypeParameter> GetTypeParameters<T>(T t);
 
 		private static IReadOnlyList<T> GetPossibleTs<T>(
 			SourceSymbolContext context,
 			QualifiedName name,
+			ImmutableArray<IType> typeArguments,
 			TryGetT<T> tryGetT,
 			GetLocalTs<T> getLocalTs,
-			GetFullyQualifiedName<T> getFullyQualifiedName) where T : class
+			GetFullyQualifiedName<T> getFullyQualifiedName,
+			GetTypeParameters<T> getTypeParameters) where T : class
 		{
 			List<T> possibleTs;
 
@@ -55,7 +94,11 @@ namespace FluentLang.Compiler.Symbols.Source
 				var scope = context.Scope;
 				while (scope != null)
 				{
-					possibleTs = getLocalTs(scope).Where(x => getFullyQualifiedName(x) == name).ToList();
+					possibleTs = getLocalTs(scope)
+						.Where(
+							x => getFullyQualifiedName(x) == name 
+							&& getTypeParameters(x).Length == typeArguments.Length)
+						.ToList();
 					if (possibleTs.Count > 0)
 						return possibleTs;
 
@@ -107,41 +150,88 @@ namespace FluentLang.Compiler.Symbols.Source
 				{
 					tryGetT(x, possibleName, out var t);
 					return t;
-				}).Where(x => x != null)!;
+				}).Where(x => x != null && getTypeParameters(x).Length == typeArguments.Length)!;
 			}
 		}
 
-		public static IInterface GetInterfaceOrError(
+		public static IType GetTypeOrError(
 			this SourceSymbolContext context,
 			QualifiedName name,
+			ImmutableArray<IType> typeArguments,
 			out Func<Location, Diagnostic>? diagnostic)
 		{
-			var possibleInterfaces = context.GetPossibleInterfaces(name);
-
-			if (possibleInterfaces.Count == 0)
-			{
-				diagnostic = l => new Diagnostic(l, ErrorCode.InterfaceNotFound, ImmutableArray.Create<object?>(name));
-				return ErrorInterface.Instance;
-			}
-
-
-			if (possibleInterfaces.Count > 1)
-			{
-				diagnostic = l => new Diagnostic(l, ErrorCode.AmbigiousInterfaceReference, ImmutableArray.Create<object?>(possibleInterfaces.Cast<object?>().Prepend(name).ToImmutableArray()));
-				return ErrorInterface.Instance;
-			}
-
 			diagnostic = default;
-			return possibleInterfaces[0];
+			var possibleTypes = context.GetPossibleTypes(name, typeArguments);
+
+			if (possibleTypes.Count == 0)
+			{
+				diagnostic = l => new Diagnostic(l, ErrorCode.TypeNotFound, ImmutableArray.Create<object?>(name));
+				return ErrorInterface.Instance;
+			}
+
+			if (possibleTypes.Count > 1)
+			{
+				diagnostic = l => new Diagnostic(l, ErrorCode.AmbigiousInterfaceReference, ImmutableArray.Create<object?>(possibleTypes.Cast<object?>().Prepend(name).ToImmutableArray()));
+				return ErrorInterface.Instance;
+			}
+
+			var type = possibleTypes[0];
+			if (typeArguments.Length > 0)
+			{
+				Release.Assert(type is IInterface);
+				var @interface = (IInterface)type;
+				var typeParameters = @interface.TypeParameters;
+				HasValidTypeArguments(typeArguments, typeParameters, out diagnostic);
+				type = type.Substitute(CreateTypeMap(typeArguments, typeParameters));
+			}
+
+			return type;
 		}
 
+		public static ImmutableArrayDictionary<ITypeParameter, IType> CreateTypeMap(
+			ImmutableArray<IType> typeArguments,
+			ImmutableArray<ITypeParameter> typeParameters)
+		{
+			return new ImmutableArrayDictionary<ITypeParameter, IType>(
+				typeParameters
+					.Zip(
+						typeArguments,
+						(a, b) => new KeyValuePair<ITypeParameter, IType>(a, b))
+					.ToImmutableArray());
+		}
+
+		public static bool HasValidTypeArguments(
+			ImmutableArray<IType> typeArguments,
+			ImmutableArray<ITypeParameter> typeParameters,
+			[NotNullWhenAttribute(false)] out Func<Location, Diagnostic>? diagnostic)
+		{
+			Release.Assert(typeArguments.Length == typeParameters.Length);
+			for (var i = 0; i < typeArguments.Length; i++)
+			{
+				var typeArgument = typeArguments[i];
+				var typeParameter = typeParameters[i];
+				if (typeParameter.ConstrainedTo is { } constrainedTo
+					&& !typeArgument.IsSubtypeOf(constrainedTo))
+				{
+					diagnostic = l => new Diagnostic(
+						l,
+						ErrorCode.TypeArgumentDoesntMatchConstraints,
+						ImmutableArray.Create<object?>(typeArgument, typeParameter));
+					return false;
+				}
+			}
+			diagnostic = default;
+			return true;
+		}
 
 		public static IMethod GetMethodOrError(
 			this SourceSymbolContext context,
 			QualifiedName name,
+			ImmutableArray<IType> typeArguments,
 			out Func<Location, Diagnostic>? diagnostic)
 		{
-			var possibleMethods = context.GetPossibleMethods(name);
+			diagnostic = null;
+			var possibleMethods = context.GetPossibleMethods(name, typeArguments);
 
 			if (possibleMethods.Count == 0)
 			{
@@ -159,9 +249,15 @@ namespace FluentLang.Compiler.Symbols.Source
 				return ErrorMethod.Instance;
 			}
 
-			diagnostic = default;
-			return possibleMethods[0];
+			var method = possibleMethods[0];
+			if (typeArguments.Length > 0)
+			{
+				var typeParameters = method.TypeParameters;
+				HasValidTypeArguments(typeArguments, typeParameters, out diagnostic);
+				method = method.Substitute(CreateTypeMap(typeArguments, typeParameters));
+			}
+
+			return method;
 		}
 	}
 }
-

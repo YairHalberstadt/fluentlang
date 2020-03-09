@@ -22,7 +22,7 @@ namespace FluentLang.TestUtils
 		{
 			_testOutputHelper = testOutputHelper;
 			_assemblyCompiler = new AssemblyCompiler(
-				new FluentlangToCSharpEmitter(new MethodKeyGenerator()),
+				new FluentlangToCSharpEmitter(),
 				new CSharpToAssemblyCompiler(GetLogger<CSharpToAssemblyCompiler>()));
 			_assemblyFactory = new AssemblyFactory(_assemblyCompiler);
 		}

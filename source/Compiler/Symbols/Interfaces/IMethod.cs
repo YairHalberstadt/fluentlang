@@ -1,7 +1,10 @@
-﻿using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
+﻿using FluentLang.Compiler.Helpers;
+using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
+using FluentLang.Compiler.Symbols.Substituted;
 using FluentLang.Compiler.Symbols.Visitor;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using static MoreLinq.Extensions.MaxByExtension;
 
@@ -9,6 +12,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 {
 	public interface IMethod : IVisitableSymbol
 	{
+		[return: MaybeNull]
 		T IVisitableSymbol.Visit<T>(ISymbolVisitor<T> visitor)
 			=> visitor.Visit(this);
 		public bool IsExported { get; }
@@ -16,6 +20,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 		public string Name => FullyQualifiedName.Name;
 		public QualifiedName? Namespace => FullyQualifiedName.Parent;
 		public IType ReturnType { get; }
+		public ImmutableArray<ITypeParameter> TypeParameters { get; }
 		public ImmutableArray<IParameter> Parameters { get; }
 		public ImmutableArray<IParameterLocal> ParameterLocals { get; }
 		public ImmutableArray<IInterface> LocalInterfaces { get; }
@@ -24,8 +29,9 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 		public IAssembly DeclaringAssembly { get; }
 		public ImmutableArray<IStatement> Statements { get; }
 		public IDeclarationStatement? InScopeAfter { get; }
-		protected ImmutableArray<IDeclaredLocal> DirectlyCapturedDeclaredLocals { get; }
-		protected ImmutableArray<IMethod> InvokedLocalMethods { get; }
+		public IMethod OriginalDefinition => this;
+		internal ImmutableArray<IDeclaredLocal> DirectlyCapturedDeclaredLocals { get; }
+		internal ImmutableArray<IMethod> InvokedLocalMethods { get; }
 		private IEnumerable<IDeclaredLocal> CalculateTransitivelyCapturedDeclaredLocals(HashSet<IMethod> visitedMethods)
 		{
 			visitedMethods.Add(this);
@@ -48,6 +54,10 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 					.MaxBy(x => x.OrdinalPositionInMethod)
 					.FirstOrDefault();
 		}
+
+		internal IMethod Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
+			=> new SubstitutedMethod(this, substitutions);
+
+		internal ImmutableArray<MethodOrInterfaceMethod> RequiredMethodKeys { get; }
 	}
 }
-

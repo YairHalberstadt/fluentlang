@@ -121,11 +121,9 @@ namespace FluentLang.Compiler.Symbols.Source
 				SourceSymbolContext sourceSymbolContext)
 			{
 				var name = new QualifiedName(interfaceDeclaration.UPPERCASE_IDENTIFIER().Symbol.Text, sourceSymbolContext.NameSpace);
-				var @interface = new SourceInterface(
-					interfaceDeclaration.anonymous_interface_declaration(),
+				var @interface = new SourceNamedInterface(
+					interfaceDeclaration,
 					sourceSymbolContext,
-					name,
-					isExported: interfaceDeclaration.EXPORT() is { },
 					_diagnostics);
 				if (!dictionary.TryAdd(name, @interface))
 				{
@@ -174,7 +172,7 @@ namespace FluentLang.Compiler.Symbols.Source
 
 			void BindNameSpace(QualifiedName? @namespace, ImmutableArray<QualifiedName> imports, Namespace_member_declarationContext[] context)
 			{
-				var sourceSymbolContext = new SourceSymbolContext(null, this, imports, @namespace);
+				var sourceSymbolContext = new SourceSymbolContext(null, this, imports, @namespace, () => ImmutableArray<ITypeParameter>.Empty);
 
 				foreach (var declaration in context)
 				{

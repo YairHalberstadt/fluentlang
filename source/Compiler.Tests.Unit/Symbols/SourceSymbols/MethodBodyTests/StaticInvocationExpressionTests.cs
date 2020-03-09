@@ -1,7 +1,6 @@
 ﻿using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
-using FluentLang.Compiler.Symbols.Source.MethodBody;
 using FluentLang.TestUtils;
 using System.Linq;
 using Xunit;
@@ -74,6 +73,49 @@ M(param : int) : int {
 				.VerifyDiagnostics(
 					new Diagnostic(new Location(new TextToken(@"returnM({});")), ErrorCode.ReturnTypeDoesNotMatch),
 					new Diagnostic(new Location(new TextToken(@"M")), ErrorCode.MethodNotFound));
+		}
+
+		[Fact]
+		public void MethodInvocationCanNotHaveTooFewTypeArguments()
+		{
+			CreateAssembly(@"M<T1, T2>() : int { return M<int>(); }")
+				.VerifyDiagnostics(
+					new Diagnostic(new Location(new TextToken(@"returnM<int>();")), ErrorCode.ReturnTypeDoesNotMatch),
+					new Diagnostic(new Location(new TextToken(@"M<int>")), ErrorCode.MethodNotFound));
+		}
+
+		[Fact]
+		public void MethodInvocationCanNotHaveNoTypeArgumentsWhenMethodHasTypeParameters()
+		{
+			CreateAssembly(@"M<T1, T2>() : int { return M(); }")
+				.VerifyDiagnostics(
+					new Diagnostic(new Location(new TextToken(@"returnM();")), ErrorCode.ReturnTypeDoesNotMatch),
+					new Diagnostic(new Location(new TextToken(@"M")), ErrorCode.MethodNotFound));
+		}
+
+		[Fact]
+		public void MethodInvocationCanNotHaveTooManyTypeArguments()
+		{
+			CreateAssembly(@"M<T1, T2>() : int { return M<int, {}, string>(); }")
+				.VerifyDiagnostics(
+					new Diagnostic(new Location(new TextToken(@"returnM<int,{},string>();")), ErrorCode.ReturnTypeDoesNotMatch),
+					new Diagnostic(new Location(new TextToken(@"M<int,{},string>")), ErrorCode.MethodNotFound));
+		}
+
+		[Fact]
+		public void MethodInvocationMustMatchAllConstraints()
+		{
+			CreateAssembly(@"M<T1 : {}, T2 : { M() : int; }>() : T2 { return M<{}, {}>(); }")
+				.VerifyDiagnostics(
+					new Diagnostic(new Location(new TextToken(@"returnM<{},{}>();")), ErrorCode.ReturnTypeDoesNotMatch),
+					new Diagnostic(new Location(new TextToken(@"M<{},{}>")), ErrorCode.TypeArgumentDoesntMatchConstraints));
+		}
+
+		[Fact]
+		public void MethodInvocationIsValidWhenItMatchesAllConstraints()
+		{
+			CreateAssembly(@"M<T1 : {}, T2 : { M() : int; }>() : T2 { return M<{}, T2>(); }")
+				.VerifyDiagnostics().VerifyEmit();
 		}
 	}
 }

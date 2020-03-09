@@ -5,7 +5,7 @@
 		SyntaxError,
 		DuplicateInterfaceDeclaration,
 		DuplicateMethodDeclaration,
-		InterfaceNotFound,
+		TypeNotFound,
 		CannotReferenceSelfAsAdditiveInterface,
 		InvalidParseTree,
 		MethodNotFound,
@@ -39,5 +39,10 @@
 		TooManyOptionsInUnion,
 		CannotMatchOnNonUnion,
 		MatchNotExhaustive,
+		CanOnlyCombineInterfaces,
+		TypeParametersShareNames,
+		CannotConstrainToPrimitive,
+		WrongNumberOfTypeArguments,
+		TypeArgumentDoesntMatchConstraints,
 	}
 }

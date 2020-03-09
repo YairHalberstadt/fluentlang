@@ -75,6 +75,18 @@ public interface IFluentLangParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitInterface_declaration([NotNull] FluentLangParser.Interface_declarationContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="FluentLangParser.type_parameter_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType_parameter_list([NotNull] FluentLangParser.Type_parameter_listContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="FluentLangParser.type_parameter"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType_parameter([NotNull] FluentLangParser.Type_parameterContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="FluentLangParser.anonymous_interface_declaration"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -86,6 +98,18 @@ public interface IFluentLangParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitSimple_anonymous_interface_declaration([NotNull] FluentLangParser.Simple_anonymous_interface_declarationContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="FluentLangParser.named_type_reference"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitNamed_type_reference([NotNull] FluentLangParser.Named_type_referenceContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="FluentLangParser.type_argument_list"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitType_argument_list([NotNull] FluentLangParser.Type_argument_listContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="FluentLangParser.interface_member_declaration"/>.
 	/// </summary>
@@ -260,11 +284,11 @@ public interface IFluentLangParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitObject_patch([NotNull] FluentLangParser.Object_patchContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="FluentLangParser.fully_qualified_method"/>.
+	/// Visit a parse tree produced by <see cref="FluentLangParser.method_reference"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitFully_qualified_method([NotNull] FluentLangParser.Fully_qualified_methodContext context);
+	Result VisitMethod_reference([NotNull] FluentLangParser.Method_referenceContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="FluentLangParser.operator"/>.
 	/// </summary>
@@ -302,28 +326,28 @@ public interface IFluentLangParserVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitMatch_expression_arm([NotNull] FluentLangParser.Match_expression_armContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="FluentLangParser.parameter_metadata"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitParameter_metadata([NotNull] FluentLangParser.Parameter_metadataContext context);
-	/// <summary>
-	/// Visit a parse tree produced by <see cref="FluentLangParser.return_type_metadata"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitReturn_type_metadata([NotNull] FluentLangParser.Return_type_metadataContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="FluentLangParser.anonymous_interface_declaration_metadata"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitAnonymous_interface_declaration_metadata([NotNull] FluentLangParser.Anonymous_interface_declaration_metadataContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="FluentLangParser.full_qualified_name_metadata"/>.
+	/// Visit a parse tree produced by <see cref="FluentLangParser.type_parameter_metadata"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
-	Result VisitFull_qualified_name_metadata([NotNull] FluentLangParser.Full_qualified_name_metadataContext context);
+	Result VisitType_parameter_metadata([NotNull] FluentLangParser.Type_parameter_metadataContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="FluentLangParser.method_signature_metadata"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMethod_signature_metadata([NotNull] FluentLangParser.Method_signature_metadataContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="FluentLangParser.interface_method_metadata"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitInterface_method_metadata([NotNull] FluentLangParser.Interface_method_metadataContext context);
 }
 } // namespace FluentLang.Compiler.Generated

@@ -1,8 +1,10 @@
 ﻿using FluentLang.Compiler.Diagnostics;
+using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
-using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
+using FluentLang.Compiler.Symbols.Visitor;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FluentLang.Compiler.Symbols.ErrorSymbols
 {
@@ -31,5 +33,13 @@ namespace FluentLang.Compiler.Symbols.ErrorSymbols
 		void ISymbol.EnsureAllLocalDiagnosticsCollected()
 		{
 		}
+
+		IType IType.Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
+		{
+			return this;
+		}
+
+		[return: MaybeNull]
+		public T Visit<T>(ISymbolVisitor<T> visitor) => default;
 	}
 }

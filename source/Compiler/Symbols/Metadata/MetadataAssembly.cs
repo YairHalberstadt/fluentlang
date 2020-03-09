@@ -9,6 +9,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using static FluentLang.Compiler.Generated.FluentLangParser;
 using Version = FluentLang.Compiler.Symbols.Interfaces.Version;
 
 namespace FluentLang.Compiler.Symbols.Metadata
@@ -101,19 +102,15 @@ namespace FluentLang.Compiler.Symbols.Metadata
 				scope: null,
 				assembly: this,
 				ImmutableArray<QualifiedName>.Empty,
-				nameSpace: null);
+				nameSpace: null,
+				() => ImmutableArray<ITypeParameter>.Empty);
 
 			return
 				_assembly
 				.GetAttributes<InterfaceAttribute>()
-				.Select(x => (IInterface)new SourceInterface(
-					Utils.Parse(
-						x.AnonymousInterfaceDeclaration,
-						p => p.anonymous_interface_declaration_metadata().anonymous_interface_declaration(),
-						_diagnostics),
+				.Select(x => (IInterface)new MetadataNamedInterface(
+					x,
 					context,
-					QualifiedName.Parse(x.FullyQualifiedName),
-					isExported: true,
 					_diagnostics))
 				.ToDictionary(x => x.FullyQualifiedName!);
 		}

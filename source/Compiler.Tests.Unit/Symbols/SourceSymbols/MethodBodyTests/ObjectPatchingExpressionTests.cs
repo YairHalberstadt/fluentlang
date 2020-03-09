@@ -24,7 +24,7 @@ M() : {} {
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			var patch = Assert.IsAssignableFrom<IObjectPatchingExpression>(returnStatement.Expression);
-			Assert.Equal(AssertGetMethod(assembly, "Patch"), patch.Patches.Single().Method);
+			Assert.Equal(AssertGetMethod(assembly, "Patch"), ((IMethodPatch)patch.Patches.Single()).Method);
 		}
 
 		[Fact]
@@ -84,7 +84,7 @@ interface I {
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
 			var patch = Assert.IsAssignableFrom<IObjectPatchingExpression>(returnStatement.Expression);
-			Assert.Equal(AssertGetMethod(assembly, "Patch"), patch.Patches.Single().Method);
+			Assert.Equal(AssertGetMethod(assembly, "Patch"), ((IMethodPatch)patch.Patches.Single()).Method);
 		}
 
 		[Fact]
@@ -143,7 +143,7 @@ interface Patched {
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Last());
 			var patch = Assert.IsAssignableFrom<IObjectPatchingExpression>(returnStatement.Expression);
-			var local = Assert.IsAssignableFrom<ILocalReferenceExpression>(patch.Patches.Single().MixedInExpression);
+			var local = Assert.IsAssignableFrom<ILocalReferenceExpression>(((IMixinPatch)patch.Patches.Single()).Expression);
 			Assert.True(local.Type.IsEquivalentTo(patch.Type));
 			Assert.True(patch.Type.IsEquivalentTo(m.ReturnType));
 		}
@@ -168,9 +168,9 @@ interface Patched {
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Last());
 			var patch = Assert.IsAssignableFrom<IObjectPatchingExpression>(returnStatement.Expression);
-			var local1 = Assert.IsAssignableFrom<ILocalReferenceExpression>(patch.Patches.First().MixedInExpression);
+			var local1 = Assert.IsAssignableFrom<ILocalReferenceExpression>(((IMixinPatch)patch.Patches.First()).Expression);
 			Assert.Equal("temp1", local1.Local.Identifier);
-			var local2 = Assert.IsAssignableFrom<ILocalReferenceExpression>(patch.Patches.Last().MixedInExpression);
+			var local2 = Assert.IsAssignableFrom<ILocalReferenceExpression>(((IMixinPatch)patch.Patches.Last()).Expression);
 			Assert.Equal("temp2", local2.Local.Identifier);
 			Assert.True(patch.Type.IsEquivalentTo(m.ReturnType));
 		}
@@ -194,9 +194,9 @@ interface Patched {
 			var m = AssertGetMethod(assembly, "M");
 			var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Last());
 			var patch = Assert.IsAssignableFrom<IObjectPatchingExpression>(returnStatement.Expression);
-			var local1 = Assert.IsAssignableFrom<ILocalReferenceExpression>(patch.Patches.First().MixedInExpression);
+			var local1 = Assert.IsAssignableFrom<ILocalReferenceExpression>(((IMixinPatch)patch.Patches.First()).Expression);
 			Assert.Equal("temp", local1.Local.Identifier);
-			Assert.Equal(AssertGetMethod(assembly, "Patch2"), patch.Patches.Last().Method);
+			Assert.Equal(AssertGetMethod(assembly, "Patch2"), ((IMethodPatch)patch.Patches.Last()).Method);
 			Assert.True(patch.Type.IsEquivalentTo(m.ReturnType));
 		}
 

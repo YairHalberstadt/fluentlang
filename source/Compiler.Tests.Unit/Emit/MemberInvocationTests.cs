@@ -61,6 +61,71 @@ namespace N { M(a : {}) : int { return 42; } }")
 				.VerifyEmit(expectedResult: 42);
 		}
 
+		[Fact]
+		public void RequiredMethodKeys1()
+		{
+			CreateAssembly(@"
+Main() : int { return M<int>(42).GetT(); }
+export M<T>(t : T) : { GetT() : T; } {
+	return {} + GetT;
+	GetT(a : {}) : T { return t; }
+}")
+	.VerifyDiagnostics()
+	.VerifyEmit(expectedResult: 42);
+		}
+
+		[Fact]
+		public void RequiredMethodKeys2()
+		{
+			CreateAssembly(@"
+Main() : int { return M1<int>(42); }
+export M1<T>(t: T) : T {
+	_ = M2<T>(t).GetT();
+	_ = M2<int>(42).GetT();
+	return M2<T>(t).GetT();
+}
+export M2<T>(t : T) : { GetT() : T; } {
+	return {} + GetT;
+	GetT(a : {}) : T { return t; }
+}")
+	.VerifyDiagnostics()
+	.VerifyEmit(expectedResult: 42);
+		}
+
+		[Fact]
+		public void RequiredMethodKeys3()
+		{
+			CreateAssembly(@"
+Main() : int { return M<int>(42).GetT(); }
+export M<T>(t : T) : { GetT() : T; } {
+	return {} + GetT;
+	GetT(a : {}) : T {
+		return GetTInternal<T>(t, t);
+		GetTInternal<T1>(b : T, c : T1) : T1 { return c; }
+	}
+}")
+	.VerifyDiagnostics()
+	.VerifyEmit(expectedResult: 42);
+		}
+
+		[Fact]
+		public void RequiredMethodKeys4()
+		{
+			CreateAssembly(@"
+export Main() : int { 
+	
+	return M<int>({} + M);
+	M(a : {}) : int {
+		return 42;
+	}
+}
+export M<T>(a : { M() : T; }) : T {
+	return a.M();
+}")
+	.VerifyDiagnostics()
+	.VerifyEmit(expectedResult: 42);
+		}
+
 		public MemberInvocationTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
 		{
 		}

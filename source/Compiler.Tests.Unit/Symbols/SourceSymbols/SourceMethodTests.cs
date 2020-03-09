@@ -1,5 +1,6 @@
 ﻿using FluentLang.Compiler.Diagnostics;
 using FluentLang.TestUtils;
+using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -135,6 +136,117 @@ M(a : I) : I { return {}; }").VerifyDiagnostics().VerifyEmit();
 			CreateAssembly(@"
 interface I {}
 M(a : I) : I { return {}; }").VerifyDiagnostics().VerifyEmit();
+		}
+
+		[Fact]
+		public void CanUseTypeParametersInMethodBodyAndSignature()
+		{
+			var assembly = CreateAssembly(@"
+M<T>(a : { M(): T; }) : T {
+	let result: T = a.M(); 
+	return result;
+}").VerifyDiagnostics().VerifyEmit();
+
+			var m = AssertGetMethod(assembly, "M");
+			var tp = m.TypeParameters.SingleOrDefault();
+			Assert.Equal(tp, m.ReturnType);
+		}
+
+		[Fact]
+		public void TypeParametersAreVisibleInLocalMethodsAndInterfaces()
+		{
+			CreateAssembly(@"
+M<T>() : int {
+	interface I { M() : T; }
+    M(a : I): T {
+		let result: T = a.M(); 
+		return result;
+	}
+	return 42;
+}").VerifyDiagnostics().VerifyEmit();
+		}
+
+		[Fact]
+		public void LocalMethodsAndInterfacesCanDeclareTheirOwnTypeParameters()
+		{
+			CreateAssembly(@"
+M<T>() : int {
+	interface I<T1> { M(a : T1) : T; }
+    M<T1>(a : { M(a : T1) : T; }, b: T1): T {
+		let result: T = a.M(b); 
+		return result;
+	}
+	return 42;
+}").VerifyDiagnostics().VerifyEmit();
+		}
+
+		[Fact]
+		public void LocalInterfaceCannotHideTypeParameters()
+		{
+			CreateAssembly(@"
+M<T>() : int {
+	interface I<T> { }
+	return 42;
+}").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@"T")), ErrorCode.TypeParametersShareNames));
+		}
+
+		[Fact]
+		public void LocalMethodCannotHideTypeParameters()
+		{
+			CreateAssembly(@"
+M<T>() : int {
+	M<T>() : int { return 42; }
+	return 42;
+}").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@"T")), ErrorCode.TypeParametersShareNames));
+		}
+
+		[Fact]
+		public void TypeParameterCanSubtypeTypeParameters()
+		{
+			CreateAssembly(@"
+M<T>() : int {
+	M<T1 : T>(a : T1) : T { return a; }
+	return 42;
+}").VerifyDiagnostics().VerifyEmit();
+		}
+
+		[Fact]
+		public void TypeParameterCanSubtypeUnion()
+		{
+			CreateAssembly(@"
+M<T : int | string>(a : T) : int | string {
+	return a;
+}").VerifyDiagnostics().VerifyEmit();
+		}
+
+		[Fact]
+		public void TypeParameterCanSubtypeInterface()
+		{
+			CreateAssembly(@"
+M<T : {}>(a : T) : {} {
+	return a;
+}").VerifyDiagnostics().VerifyEmit();
+		}
+
+		[Fact]
+		public void TypeParameterCannotBeConstrainedToPrimitive()
+		{
+			CreateAssembly(@"
+M<T : int>(a : T) : int {
+	return a;
+}").VerifyDiagnostics(
+				new Diagnostic(new Location(new TextToken(@":int")), ErrorCode.CannotConstrainToPrimitive));
+		}
+
+		[Fact]
+		public void CanHaveMultipleTypeParametersWithConstraints()
+		{
+			CreateAssembly(@"
+M<T1 : {}, T2 : int | string>(a : T1) : {} {
+	return a;
+}").VerifyDiagnostics().VerifyEmit();
 		}
 	}
 }
