@@ -173,50 +173,67 @@ Actual:
 		public static MetadataTypeEqualityComparer Instance = new MetadataTypeEqualityComparer();
 		public bool Equals(IType? x, IType? y)
 		{
-			if (x is IInterface ix && y is IInterface iy)
-				return Equals(ix, iy);
-			if (x is IUnion ux && y is IUnion uy)
-				return Equals(ux, uy);
-			if (x is ITypeParameter tx && y is ITypeParameter ty)
-				return tx.Name == ty.Name;
-			if (x is Primitive px && y is Primitive py)
-				return px.Equals(py);
-			if (x is null && y is null)
+			if (ReferenceEquals(x, y))
 				return true;
-			return false;
+			if (x is null || y is null)
+				return false;
+			return Equals(x, y, new Stack<(IType, IType)>());
+		}
+
+		private bool Equals(IType x, IType y, Stack<(IType, IType)> dependantEqualities)
+		{
+			if (dependantEqualities.Contains((x, y)))
+				return true;
+			dependantEqualities.Push((x, y));
+			var result = EqualsInternal();
+			dependantEqualities.Pop();
+			return result;
+
+			bool EqualsInternal()
+			{
+				if (x is IInterface ix && y is IInterface iy)
+					return Equals(ix, iy, dependantEqualities);
+				if (x is IUnion ux && y is IUnion uy)
+					return Equals(ux, uy, dependantEqualities);
+				if (x is ITypeParameter tx && y is ITypeParameter ty)
+					return tx.Name == ty.Name;
+				if (x is Primitive px && y is Primitive py)
+					return px.Equals(py);
+				return false;
+			}
 		}
 
 
-		private bool Equals(IInterface a, IInterface b)
+		private bool Equals(IInterface a, IInterface b, Stack<(IType, IType)> dependantEqualities)
 		{
 			if (a.Methods.Length != b.Methods.Length)
 				return false;
 			foreach(var (am, bm) in a.Methods.Zip(b.Methods))
 			{
-				if (!Equals(am, bm))
+				if (!Equals(am, bm, dependantEqualities))
 					return false;
 			}
 			return true;
 
 		}
 
-		private bool Equals(IUnion a, IUnion b)
+		private bool Equals(IUnion a, IUnion b, Stack<(IType, IType)> dependantEqualities)
 		{
 			if (a.Options.Length != b.Options.Length)
 				return false;
 			foreach (var (ao, bo) in a.Options.Zip(b.Options))
 			{
-				if (!Equals(ao, bo))
+				if (!Equals(ao, bo, dependantEqualities))
 					return false;
 			}
 			return true;
 		}
 
-		private bool Equals(IInterfaceMethod a, IInterfaceMethod b)
+		private bool Equals(IInterfaceMethod a, IInterfaceMethod b, Stack<(IType, IType)> dependantEqualities)
 		{
 			if (a.Name != b.Name)
 				return false;
-			if (!Equals(a.ReturnType, b.ReturnType))
+			if (!Equals(a.ReturnType, b.ReturnType, dependantEqualities))
 				return false;
 			if (a.Parameters.Length != b.Parameters.Length)
 				return false;
@@ -225,7 +242,7 @@ Actual:
 				if (ap.Name != bp.Name)
 					return false;
 
-				if (!Equals(ap.Type, bp.Type))
+				if (!Equals(ap.Type, bp.Type, dependantEqualities))
 					return false;
 			}
 			return true;
