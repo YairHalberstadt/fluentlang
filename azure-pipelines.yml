@@ -14,7 +14,7 @@ variables:
 
 steps:
 - task: DotNetCoreInstaller@0
-  displayName: 'Install .net core 3.1 (preview)'
+  displayName: 'Install .net core 3.1'
   inputs:
     version: '3.1.102'
 
