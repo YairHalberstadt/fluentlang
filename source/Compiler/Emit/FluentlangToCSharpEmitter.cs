@@ -720,20 +720,64 @@ namespace FluentLang.Compiler.Emit
 				{
 					textWriter.Write("[MethodSignature(\"");
 					textWriter.Write(method.FullyQualifiedName.ToString());
-					textWriter.Write("\",\"");
+					EmitTypeParameterList(method.TypeParameters, textWriter);
+					EmitParameterList(method.Parameters, textWriter);
+					textWriter.Write(":");
 					Emit(method.ReturnType, textWriter);
-					textWriter.Write("\", new string[]{");
-					for (var i = 0; i < method.Parameters.Length; i++)
+					textWriter.Write("\", new string[]{ ");
+					for(var i = 0; i < method.RequiredMethodKeys.Length; i++)
 					{
 						if (i != 0)
-							textWriter.Write(",");
+							textWriter.Write(", ");
 						textWriter.Write("\"");
-						Emit(method.Parameters[i], textWriter);
+						EmitRequiredMethodKeySignature(method.RequiredMethodKeys[i], textWriter);
 						textWriter.Write("\"");
 					}
-					textWriter.Write("},");
-					Emit(method.TypeParameters, textWriter);
-					textWriter.Write(")]");
+					textWriter.Write("})]");
+				}
+
+				private static void EmitRequiredMethodKeySignature(MethodOrInterfaceMethod methodOrInterfaceMethod, TextWriter textWriter)
+				{
+					if (methodOrInterfaceMethod.TryGetInterfaceMethod(out var interfaceMethod))
+					{
+						Emit(interfaceMethod, textWriter);
+					}
+					else if (methodOrInterfaceMethod.TryGetMethod(out var method))
+					{
+						textWriter.Write(method.Name);
+						EmitParameterList(method.Parameters.Skip(1), textWriter);
+						textWriter.Write(":");
+						Emit(method.ReturnType, textWriter);
+					}
+				}
+
+				private static void EmitParameterList(IEnumerable<IParameter> parameters, TextWriter textWriter)
+                {
+					textWriter.Write("(");
+					var isFirst = true;
+					foreach (var parameter in parameters)
+					{
+						if (!isFirst)
+							textWriter.Write(", ");
+						isFirst = false;
+						Emit(parameter, textWriter);
+					}
+					textWriter.Write(")");
+				}
+
+				private static void EmitTypeParameterList(ImmutableArray<ITypeParameter> typeParameters, TextWriter textWriter)
+				{
+					if (typeParameters.Length > 0)
+					{
+						textWriter.Write("<");
+						for (var i = 0; i < typeParameters.Length; i++)
+						{
+							if (i != 0)
+								textWriter.Write(", ");
+							EmitTypeParameter(typeParameters[i], textWriter);
+						}
+						textWriter.Write(">");
+					}
 				}
 
 				public static void EmitInterfaceAttribute(IInterface @interface, TextWriter textWriter)
@@ -815,6 +859,7 @@ namespace FluentLang.Compiler.Emit
 						foreach (var method in @interface.Methods)
 						{
 							Emit(method, textWriter);
+							textWriter.Write("; ");
 						}
 						textWriter.Write("}");
 					}
@@ -823,16 +868,9 @@ namespace FluentLang.Compiler.Emit
 				private static void Emit(IInterfaceMethod method, TextWriter textWriter)
 				{
 					textWriter.Write(method.Name);
-					textWriter.Write("(");
-					for (var i = 0; i < method.Parameters.Length; i++)
-					{
-						if (i != 0)
-							textWriter.Write(",");
-						Emit(method.Parameters[i], textWriter);
-					}
-					textWriter.Write("):");
+					EmitParameterList(method.Parameters, textWriter);
+					textWriter.Write(":");
 					Emit(method.ReturnType, textWriter);
-					textWriter.Write("; ");
 				}
 
 				private static void Emit(Primitive primitive, TextWriter textWriter)

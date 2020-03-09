@@ -123,7 +123,7 @@ interface I<T, T> { }").VerifyDiagnostics(
 			CreateAssembly(@"
 interface I1<T1, T2> { M(a : T2) : T1; }
 interface I2 I1<int>")
-				.VerifyDiagnostics(new Diagnostic(new Location(new TextToken(@"I1<int>")), ErrorCode.InterfaceNotFound));
+				.VerifyDiagnostics(new Diagnostic(new Location(new TextToken(@"I1<int>")), ErrorCode.TypeNotFound));
 		}
 
 		[Fact]
@@ -132,7 +132,7 @@ interface I2 I1<int>")
 			CreateAssembly(@"
 interface I1<T1, T2> { M(a : T2) : T1; }
 interface I2 I1")
-				.VerifyDiagnostics(new Diagnostic(new Location(new TextToken(@"I1")), ErrorCode.InterfaceNotFound));
+				.VerifyDiagnostics(new Diagnostic(new Location(new TextToken(@"I1")), ErrorCode.TypeNotFound));
 		}
 
 		[Fact]
@@ -141,7 +141,7 @@ interface I2 I1")
 			CreateAssembly(@"
 interface I1<T1, T2> { M(a : T2) : T1; }
 interface I2 I1<int, string, {}>")
-				.VerifyDiagnostics(new Diagnostic(new Location(new TextToken(@"I1<int,string,{}>")), ErrorCode.InterfaceNotFound));
+				.VerifyDiagnostics(new Diagnostic(new Location(new TextToken(@"I1<int,string,{}>")), ErrorCode.TypeNotFound));
 		}
 
 		[Fact]

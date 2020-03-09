@@ -524,26 +524,6 @@ public interface IFluentLangParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitMatch_expression_arm([NotNull] FluentLangParser.Match_expression_armContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="FluentLangParser.parameter_metadata"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterParameter_metadata([NotNull] FluentLangParser.Parameter_metadataContext context);
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="FluentLangParser.parameter_metadata"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitParameter_metadata([NotNull] FluentLangParser.Parameter_metadataContext context);
-	/// <summary>
-	/// Enter a parse tree produced by <see cref="FluentLangParser.return_type_metadata"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterReturn_type_metadata([NotNull] FluentLangParser.Return_type_metadataContext context);
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="FluentLangParser.return_type_metadata"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitReturn_type_metadata([NotNull] FluentLangParser.Return_type_metadataContext context);
-	/// <summary>
 	/// Enter a parse tree produced by <see cref="FluentLangParser.anonymous_interface_declaration_metadata"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -564,14 +544,24 @@ public interface IFluentLangParserListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitType_parameter_metadata([NotNull] FluentLangParser.Type_parameter_metadataContext context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="FluentLangParser.full_qualified_name_metadata"/>.
+	/// Enter a parse tree produced by <see cref="FluentLangParser.method_signature_metadata"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void EnterFull_qualified_name_metadata([NotNull] FluentLangParser.Full_qualified_name_metadataContext context);
+	void EnterMethod_signature_metadata([NotNull] FluentLangParser.Method_signature_metadataContext context);
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="FluentLangParser.full_qualified_name_metadata"/>.
+	/// Exit a parse tree produced by <see cref="FluentLangParser.method_signature_metadata"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	void ExitFull_qualified_name_metadata([NotNull] FluentLangParser.Full_qualified_name_metadataContext context);
+	void ExitMethod_signature_metadata([NotNull] FluentLangParser.Method_signature_metadataContext context);
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="FluentLangParser.interface_method_metadata"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterInterface_method_metadata([NotNull] FluentLangParser.Interface_method_metadataContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="FluentLangParser.interface_method_metadata"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitInterface_method_metadata([NotNull] FluentLangParser.Interface_method_metadataContext context);
 }
 } // namespace FluentLang.Compiler.Generated

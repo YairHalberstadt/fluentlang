@@ -5,7 +5,7 @@
 		SyntaxError,
 		DuplicateInterfaceDeclaration,
 		DuplicateMethodDeclaration,
-		InterfaceNotFound,
+		TypeNotFound,
 		CannotReferenceSelfAsAdditiveInterface,
 		InvalidParseTree,
 		MethodNotFound,

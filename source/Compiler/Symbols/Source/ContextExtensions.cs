@@ -125,14 +125,13 @@ namespace FluentLang.Compiler.Symbols.Source
 		}
 
 		public static ImmutableArray<IParameter> BindParameters(
-			this Method_signatureContext context,
+			this ParametersContext context,
 			SourceSymbolContext sourceSymbolContext,
 			bool isExported,
 			DiagnosticBag diagnostics)
 		{
 			var parameters =
 				context
-				.parameters()
 				.parameter()
 				.Select(x => new SourceParameter(x, sourceSymbolContext, isExported, diagnostics))
 				.ToImmutableArray<IParameter>();
@@ -142,7 +141,7 @@ namespace FluentLang.Compiler.Symbols.Source
 				if (parameters.Take(index).FirstOrDefault(x => x.Name == param.Name) is { } sameName)
 				{
 					diagnostics.Add(new Diagnostic(
-						new Location(context.parameters().parameter(index)),
+						new Location(context.parameter(index)),
 						ErrorCode.ParametersShareNames,
 						ImmutableArray.Create<object?>(param, sameName)));
 				}

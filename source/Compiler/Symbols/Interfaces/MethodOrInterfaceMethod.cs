@@ -1,7 +1,6 @@
 ﻿using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 internal struct MethodOrInterfaceMethod : IEquatable<MethodOrInterfaceMethod>

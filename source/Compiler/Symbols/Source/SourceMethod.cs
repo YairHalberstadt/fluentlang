@@ -77,6 +77,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			return
 				_context
 				.method_signature()
+				.parameters()
 				.BindParameters(_parentSourceSymbolContextWithTypeParameters, IsExported, _diagnostics);
 		}
 

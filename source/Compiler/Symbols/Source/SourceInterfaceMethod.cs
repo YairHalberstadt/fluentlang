@@ -9,14 +9,14 @@ namespace FluentLang.Compiler.Symbols.Source
 {
 	internal sealed class SourceInterfaceMethod : SymbolBase, IInterfaceMethod
 	{
-		private readonly Interface_member_declarationContext _context;
+		private readonly Method_signatureContext _context;
 		private readonly SourceSymbolContext _sourceSymbolContext;
 		private readonly bool _isExported;
 		private readonly Lazy<IType> _returnType;
 		private readonly Lazy<ImmutableArray<IParameter>> _parameters;
 
 		public SourceInterfaceMethod(
-			Interface_member_declarationContext context,
+			Method_signatureContext context,
 			SourceSymbolContext sourceSymbolContext,
 			bool isExported,
 			DiagnosticBag diagnostics) : base(diagnostics)
@@ -24,7 +24,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			_context = context;
 			_sourceSymbolContext = sourceSymbolContext;
 			_isExported = isExported;
-			Name = context.method_signature().UPPERCASE_IDENTIFIER().Symbol.Text;
+			Name = context.UPPERCASE_IDENTIFIER().Symbol.Text;
 
 			_returnType = new Lazy<IType>(BindReturnType);
 			_parameters = new Lazy<ImmutableArray<IParameter>>(BindParameters);
@@ -32,14 +32,14 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		private IType BindReturnType()
 		{
-			return _context.method_signature().BindReturnType(_sourceSymbolContext, _isExported, _diagnostics);
+			return _context.BindReturnType(_sourceSymbolContext, _isExported, _diagnostics);
 		}
 
 		private ImmutableArray<IParameter> BindParameters()
 		{
 			return
 				_context
-				.method_signature()
+				.parameters()
 				.BindParameters(_sourceSymbolContext, _isExported, _diagnostics);
 		}
 

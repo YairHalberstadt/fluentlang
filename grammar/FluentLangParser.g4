@@ -195,14 +195,6 @@ match_expression_arm
  *********************************************************************************** 
  */
 
- parameter_metadata
-    : parameter EOF
-    ;
-
-return_type_metadata
-    : type EOF
-    ;
-
 anonymous_interface_declaration_metadata
     : anonymous_interface_declaration EOF
     ;
@@ -211,6 +203,10 @@ type_parameter_metadata
     : type_parameter EOF
     ;
 
-full_qualified_name_metadata
-    : qualified_name
+method_signature_metadata
+    : qualified_name type_parameter_list OPEN_PARENS parameters CLOSE_PARENS type_declaration EOF
+    ;
+
+interface_method_metadata
+    : method_signature EOF
     ;

@@ -5,17 +5,13 @@ namespace FluentLang.Runtime.Metadata
 	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
 	public class MethodSignatureAttribute : Attribute
 	{
-		public MethodSignatureAttribute(string fullyQualifiedName, string returnType, string[] parameters, string[] typeParameters)
+		public MethodSignatureAttribute(string signature, string[] requireMethodKeySignatures)
 		{
-			FullyQualifiedName = fullyQualifiedName;
-			ReturnType = returnType;
-			Parameters = parameters;
-			TypeParameters = typeParameters;
+			Signature = signature;
+			RequireMethodKeySignatures = requireMethodKeySignatures;
 		}
 
-		public string FullyQualifiedName { get; }
-		public string ReturnType { get; }
-		public string[] TypeParameters { get; }
-		public string[] Parameters { get; }
+		public string Signature { get; }
+		public string[] RequireMethodKeySignatures { get; }
 	}
 }

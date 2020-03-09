@@ -66,7 +66,7 @@ namespace N { M(a : {}) : int { return 42; } }")
 		{
 			CreateAssembly(@"
 Main() : int { return M<int>(42).GetT(); }
-M<T>(t : T) : { GetT() : T; } {
+export M<T>(t : T) : { GetT() : T; } {
 	return {} + GetT;
 	GetT(a : {}) : T { return t; }
 }")
@@ -79,12 +79,12 @@ M<T>(t : T) : { GetT() : T; } {
 		{
 			CreateAssembly(@"
 Main() : int { return M1<int>(42); }
-M1<T>(t: T) : T {
+export M1<T>(t: T) : T {
 	_ = M2<T>(t).GetT();
 	_ = M2<int>(42).GetT();
 	return M2<T>(t).GetT();
 }
-M2<T>(t : T) : { GetT() : T; } {
+export M2<T>(t : T) : { GetT() : T; } {
 	return {} + GetT;
 	GetT(a : {}) : T { return t; }
 }")
@@ -97,7 +97,7 @@ M2<T>(t : T) : { GetT() : T; } {
 		{
 			CreateAssembly(@"
 Main() : int { return M<int>(42).GetT(); }
-M<T>(t : T) : { GetT() : T; } {
+export M<T>(t : T) : { GetT() : T; } {
 	return {} + GetT;
 	GetT(a : {}) : T {
 		return GetTInternal<T>(t, t);
@@ -112,14 +112,14 @@ M<T>(t : T) : { GetT() : T; } {
 		public void RequiredMethodKeys4()
 		{
 			CreateAssembly(@"
-Main() : int { 
+export Main() : int { 
 	
 	return M<int>({} + M);
 	M(a : {}) : int {
 		return 42;
 	}
 }
-M<T>(a : { M() : T; }) : T {
+export M<T>(a : { M() : T; }) : T {
 	return a.M();
 }")
 	.VerifyDiagnostics()

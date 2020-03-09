@@ -165,7 +165,7 @@ namespace FluentLang.Compiler.Symbols.Source
 
 			if (possibleTypes.Count == 0)
 			{
-				diagnostic = l => new Diagnostic(l, ErrorCode.InterfaceNotFound, ImmutableArray.Create<object?>(name));
+				diagnostic = l => new Diagnostic(l, ErrorCode.TypeNotFound, ImmutableArray.Create<object?>(name));
 				return ErrorInterface.Instance;
 			}
 

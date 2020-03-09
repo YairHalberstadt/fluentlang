@@ -255,7 +255,7 @@ namespace A.B {
 }
 
 M() : I { return {}; }").VerifyDiagnostics(
-				new Diagnostic(new Location(new TextToken(@"I")), ErrorCode.InterfaceNotFound));
+				new Diagnostic(new Location(new TextToken(@"I")), ErrorCode.TypeNotFound));
 			Assert.True(assembly.Methods.Single().ReturnType is IErrorSymbol);
 		}
 
