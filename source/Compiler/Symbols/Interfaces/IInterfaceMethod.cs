@@ -32,8 +32,8 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 			return Parameters.SequenceEqual(otherMethod.Parameters, (x, y) => x.Type.IsEquivalentTo(y.Type, dependantEqualities));
 		}
 
-		internal IInterfaceMethod Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
-			=> new SubstitutedInterfaceMethod(this, substitutions);
+		internal IInterfaceMethod Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions, Dictionary<IType, IType> substituted)
+			=> new SubstitutedInterfaceMethod(this, substitutions, substituted);
 	}
 }
 

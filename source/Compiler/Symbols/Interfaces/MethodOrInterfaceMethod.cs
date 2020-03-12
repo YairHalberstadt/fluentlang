@@ -1,6 +1,7 @@
 ﻿using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 internal struct MethodOrInterfaceMethod : IEquatable<MethodOrInterfaceMethod>
@@ -30,15 +31,15 @@ internal struct MethodOrInterfaceMethod : IEquatable<MethodOrInterfaceMethod>
 		return interfaceMethod != null;
 	}
 
-	public MethodOrInterfaceMethod SubstituteTypeParameters(ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
+	public MethodOrInterfaceMethod SubstituteTypeParameters(ImmutableArrayDictionary<ITypeParameter, IType> substitutions, Dictionary<IType, IType> substituted)
 	{
 		if (_method != null)
 		{
-			return new MethodOrInterfaceMethod(_method.Substitute(substitutions));
+			return new MethodOrInterfaceMethod(_method.Substitute(substitutions, substituted));
 		}
 		if (_interfaceMethod != null)
 		{
-			return new MethodOrInterfaceMethod(_interfaceMethod.Substitute(substitutions));
+			return new MethodOrInterfaceMethod(_interfaceMethod.Substitute(substitutions, substituted));
 		}
 		throw Release.Fail("Do not use default constructor for " + nameof(MethodOrInterfaceMethod));
 	}

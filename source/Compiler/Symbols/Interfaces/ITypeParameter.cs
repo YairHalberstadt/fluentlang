@@ -25,7 +25,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 			return IsEquivalentTo(other) || (ConstrainedTo?.IsSubtypeOf(other) ?? false);
 		}
 
-		IType IType.Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
+		IType IType.Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions, Dictionary<IType, IType> substituted)
 		{
 			return substitutions.TryGetValue(this, out var substitution)
 				? substitution

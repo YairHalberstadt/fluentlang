@@ -12,10 +12,12 @@ namespace FluentLang.Compiler.Symbols.Substituted
 	{
 		private readonly Lazy<ImmutableArray<IType>> _options;
 
-		public SubstitutedUnion(IUnion original, ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
+		public SubstitutedUnion(IUnion original, ImmutableArrayDictionary<ITypeParameter, IType> substitutions, Dictionary<IType, IType> substituted)
 		{
+			substituted.Add(original, this);
+			substituted.Add(this, this);
 			_options = new Lazy<ImmutableArray<IType>>(
-				() => original.Options.Select(x => x.Substitute(substitutions)).ToImmutableArray());
+				() => original.Options.Select(x => x.Substitute(substitutions, substituted)).ToImmutableArray());
 		}
 
 		public ImmutableArray<IType> Options => _options.Value;

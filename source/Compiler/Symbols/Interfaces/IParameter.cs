@@ -14,8 +14,8 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 		public string Name { get; }
 		public IType Type { get; }
 
-		internal IParameter Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
-			=> new SubstitutedParameter(this, substitutions);
+		internal IParameter Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions, Dictionary<IType, IType> substituted)
+			=> new SubstitutedParameter(this, substitutions, substituted);
 	}
 }
 

@@ -34,7 +34,7 @@ namespace FluentLang.Compiler.Symbols.ErrorSymbols
 		{
 		}
 
-		IType IType.Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
+		IType IType.Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions, Dictionary<IType, IType> substituted)
 		{
 			return this;
 		}

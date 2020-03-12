@@ -44,7 +44,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 			return Options.All(x => x.IsSubtypeOf(other));
 		}
 
-		IType IType.Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
-			=> new SubstitutedUnion(this, substitutions);
+		IType IType.Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions, Dictionary<IType, IType> substituted)
+			=> substituted.TryGetValue(this, out var substitution) ? substitution : new SubstitutedUnion(this, substitutions, substituted);
 	}
 }

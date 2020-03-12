@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using FluentLang.Compiler.Diagnostics;
@@ -68,7 +69,8 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 							diagnostic = diagnosticFunc(new Location(_context.method_reference()));
 						}
 						var substituted = x.Substitute(
-							SourceSymbolContextExtensions.CreateTypeMap(TypeArguments, typeParameters));
+							SourceSymbolContextExtensions.CreateTypeMap(TypeArguments, typeParameters),
+							new Dictionary<IType, IType>());
 						
 						return (method: substituted, diagnostic);
 					}

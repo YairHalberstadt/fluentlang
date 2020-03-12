@@ -14,11 +14,13 @@ namespace FluentLang.Compiler.Symbols.Substituted
 
 		private readonly Lazy<ImmutableArray<IInterfaceMethod>> _methods;
 
-		public SubstitutedInterface(IInterface original, ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
+		public SubstitutedInterface(IInterface original, ImmutableArrayDictionary<ITypeParameter, IType> substitutions, Dictionary<IType, IType> substituted)
 		{
+			substituted.Add(original, this);
+			substituted.Add(this, this);
 			_original = original;
 			_methods = new Lazy<ImmutableArray<IInterfaceMethod>>(
-				() => original.Methods.Select(x => x.Substitute(substitutions)).ToImmutableArray());
+				() => original.Methods.Select(x => x.Substitute(substitutions, substituted)).ToImmutableArray());
 		}
 
 		public bool IsExported => _original.IsExported;

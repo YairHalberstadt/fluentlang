@@ -12,6 +12,6 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 
 		public bool IsSubtypeOf(IType other);
 
-		internal IType Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions);
+		internal IType Substitute(ImmutableArrayDictionary<ITypeParameter, IType> substitutions, Dictionary<IType, IType> substituted);
 	}
 }

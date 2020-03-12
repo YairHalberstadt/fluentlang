@@ -3,6 +3,7 @@ using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -15,14 +16,14 @@ namespace FluentLang.Compiler.Symbols.Substituted
 		private readonly Lazy<ImmutableArray<IParameter>> _parameters;
 		private readonly Lazy<ImmutableArray<MethodOrInterfaceMethod>> _requiredMethodKeys;
 
-		public SubstitutedMethod(IMethod original, ImmutableArrayDictionary<ITypeParameter, IType> substitutions)
+		public SubstitutedMethod(IMethod original, ImmutableArrayDictionary<ITypeParameter, IType> substitutions, Dictionary<IType, IType> substituted)
 		{
 			_original = original;
-			_returnType = new Lazy<IType>(_original.ReturnType.Substitute(substitutions));
+			_returnType = new Lazy<IType>(_original.ReturnType.Substitute(substitutions, substituted));
 			_parameters = new Lazy<ImmutableArray<IParameter>>(
-				() => _original.Parameters.Select(x => x.Substitute(substitutions)).ToImmutableArray());
+				() => _original.Parameters.Select(x => x.Substitute(substitutions, substituted)).ToImmutableArray());
 			_requiredMethodKeys = new Lazy<ImmutableArray<MethodOrInterfaceMethod>>(
-				() => _original.RequiredMethodKeys.Select(x => x.SubstituteTypeParameters(substitutions)).ToImmutableArray());
+				() => _original.RequiredMethodKeys.Select(x => x.SubstituteTypeParameters(substitutions, substituted)).ToImmutableArray());
 		}
 
 		public bool IsExported => _original.IsExported;

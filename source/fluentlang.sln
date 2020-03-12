@@ -26,7 +26,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "flc.Tests.Unit", "flc.Tests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "flc.Tests.Integration", "flc.Tests.Integration\flc.Tests.Integration.csproj", "{0F0F06F5-1844-4C09-AC59-35060692BCE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtils", "TestUtils\TestUtils.csproj", "{9DCA566A-BFE9-4953-A0F5-5CECBC5BA2C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestUtils", "TestUtils\TestUtils.csproj", "{9DCA566A-BFE9-4953-A0F5-5CECBC5BA2C7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{46A1F6D7-4FF3-40D8-93D5-1140C0D0FAF6}"
 EndProject
