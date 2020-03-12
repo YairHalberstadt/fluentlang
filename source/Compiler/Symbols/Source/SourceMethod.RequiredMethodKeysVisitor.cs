@@ -35,7 +35,7 @@ namespace FluentLang.Compiler.Symbols.Source
 				}
 
 				VisitMany(method.LocalMethods);
-				return base.Visit(method);
+				return VisitMany(method.Statements);
 			}
 
 			[return: MaybeNull]
@@ -134,6 +134,24 @@ namespace FluentLang.Compiler.Symbols.Source
 			private class GetTypeParametersInSignatureVisitor : BaseSymbolVisitor<object>
 			{
 				public List<ITypeParameter>? TypeParameters;
+				public HashSet<IType> _visited = new HashSet<IType>();
+
+				[return: MaybeNull]
+				protected override object DefaultVisit(IVisitableSymbol symbol)
+				{
+					if (symbol is IType type)
+					{
+						if (_visited.Contains(type))
+						{
+							return default;
+						}
+						else
+						{
+							_visited.Add(type);
+						}
+					}
+					return base.DefaultVisit(symbol);
+				}
 
 				[return: MaybeNull]
 				public override object Visit(ITypeParameter typeParameter)

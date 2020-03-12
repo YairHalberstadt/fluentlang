@@ -122,7 +122,7 @@ namespace FluentLang.Compiler.Emit
 			if (type is IUnion union)
 				return GenerateUnionKey(union, parentInterfaces);
 			if (type is ITypeParameter typeParameter)
-				throw Release.Fail($"Cannot use TypeParameter in methodKey: {typeParameter}");
+				throw Release.Fail($"Cannot use TypeParameter in methodKey: {typeParameter.Name}");
 			throw Release.Fail("this location is thought to be unreachable");
 		}
 
