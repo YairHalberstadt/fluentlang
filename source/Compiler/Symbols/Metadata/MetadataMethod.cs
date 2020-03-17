@@ -113,7 +113,7 @@ namespace FluentLang.Compiler.Symbols.Metadata
 		ImmutableArray<IDeclaredLocal> IMethod.DirectlyCapturedDeclaredLocals
 			=> ImmutableArray<IDeclaredLocal>.Empty;
 
-		ImmutableArray<IMethod> IMethod.InvokedLocalMethods
+		ImmutableArray<IMethod> IMethod.UsedLocalMethods
 			=> ImmutableArray<IMethod>.Empty;
 
 		ImmutableArray<MethodOrInterfaceMethod> IMethod.RequiredMethodKeys => _requiredMethodKeys.Value;

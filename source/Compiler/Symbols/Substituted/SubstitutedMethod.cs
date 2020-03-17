@@ -57,7 +57,7 @@ namespace FluentLang.Compiler.Symbols.Substituted
 		ImmutableArray<IDeclaredLocal> IMethod.DirectlyCapturedDeclaredLocals
 			=> _original.DirectlyCapturedDeclaredLocals;
 
-		ImmutableArray<IMethod> IMethod.InvokedLocalMethods => _original.InvokedLocalMethods;
+		ImmutableArray<IMethod> IMethod.UsedLocalMethods => _original.UsedLocalMethods;
 
 		ImmutableArray<MethodOrInterfaceMethod> IMethod.RequiredMethodKeys => _requiredMethodKeys.Value;
 

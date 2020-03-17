@@ -43,6 +43,9 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 				out var diagnostic);
 			if (diagnostic != null)
 				_diagnostics.Add(diagnostic(new Location(_context)));
+
+			_methodBodySymbolContext.WarnIfUseOfMethodWhichCapturesUnassignedLocals(method, _diagnostics, _context);
+
 			return method;
 		}
 

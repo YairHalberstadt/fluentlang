@@ -41,7 +41,7 @@ namespace FluentLang.Compiler.Symbols.ErrorSymbols
 
 		ImmutableArray<IDeclaredLocal> IMethod.DirectlyCapturedDeclaredLocals => throw Release.Fail("unreachable");
 
-		ImmutableArray<IMethod> IMethod.InvokedLocalMethods => throw Release.Fail("unreachable");
+		ImmutableArray<IMethod> IMethod.UsedLocalMethods => throw Release.Fail("unreachable");
 
 		public bool IsExported => false;
 

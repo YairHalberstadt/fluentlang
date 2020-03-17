@@ -88,23 +88,7 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 					_diagnostics.Add(diagnostic);
 				}
 
-				var currentMethod = _methodBodySymbolContext.SourceSymbolContext.Scope;
-				Release.Assert(currentMethod != null);
-				if (target.DeclaringMethod == currentMethod)
-				{
-					if (target.InScopeAfter is { } declarationStatement)
-					{
-						var currentStatement = _methodBodySymbolContext.CurrentStatement;
-						Release.Assert(currentStatement != null);
-						if (declarationStatement.OrdinalPositionInMethod >= currentStatement.OrdinalPositionInMethod)
-						{
-							_diagnostics.Add(new Diagnostic(
-								new Location(_context),
-								ErrorCode.UseOfMethodWhichCapturesUnassignedLocals,
-								ImmutableArray.Create<object?>(target)));
-						}
-					}
-				}
+				_methodBodySymbolContext.WarnIfUseOfMethodWhichCapturesUnassignedLocals(target, _diagnostics, _context.method_reference());
 				return target;
 			}
 				

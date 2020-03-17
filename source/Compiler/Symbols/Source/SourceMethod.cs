@@ -23,7 +23,7 @@ namespace FluentLang.Compiler.Symbols.Source
 		private readonly Lazy<(ImmutableArray<IStatement> statements, MethodBodySymbolContext contextWithDeclaredLocals)> _bindStatementsResult;
 		private readonly Lazy<ImmutableArray<IParameterLocal>> _parameterLocals;
 		private readonly Lazy<ImmutableArray<IDeclaredLocal>> _directlyCapturedDeclaredLocals;
-		private readonly Lazy<ImmutableArray<IMethod>> _invokedLocalMethods;
+		private readonly Lazy<ImmutableArray<IMethod>> _usedLocalMethods;
 		private readonly Lazy<IDeclarationStatement?> _inScopeAfter;
 
 		private readonly SourceSymbolContext _parentSourceSymbolContextWithTypeParameters;
@@ -53,7 +53,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			_bindStatementsResult = new Lazy<(ImmutableArray<IStatement> statements, MethodBodySymbolContext contextWithDeclaredLocals)>(BindStatements);
 			_parameterLocals = new Lazy<ImmutableArray<IParameterLocal>>(BindParameterLocals);
 			_directlyCapturedDeclaredLocals = new Lazy<ImmutableArray<IDeclaredLocal>>(CalculateDirectlyCapturedDeclaredLocals);
-			_invokedLocalMethods = new Lazy<ImmutableArray<IMethod>>(CalculateInvokedLocalMethods);
+			_usedLocalMethods = new Lazy<ImmutableArray<IMethod>>(CalculateUsedLocalMethods);
 			_inScopeAfter = new Lazy<IDeclarationStatement?>(((IMethod)this).CalculateInScopeAfter);
 			_requiredMethodKeys = new Lazy<ImmutableArray<MethodOrInterfaceMethod>>(CalculateRequiredMethodKeys);
 		}
@@ -235,16 +235,20 @@ namespace FluentLang.Compiler.Symbols.Source
 				.ToImmutableArray();
 		}
 
-		private ImmutableArray<IMethod> CalculateInvokedLocalMethods()
+		private ImmutableArray<IMethod> CalculateUsedLocalMethods()
 		{
 			return
 				Statements
 				.SelectMany(x => x.DescendantNodes())
-				.OfType<IStaticInvocationExpression>()
-				.Select(x => x.Method)
-				.Where(x => x.DeclaringMethod != null)
+				.Select(x => x switch
+				{
+					IStaticInvocationExpression ie => ie.Method,
+					IMethodPatch mp => mp.Method,
+					_ => null,
+				})
+				.Where(x => x?.DeclaringMethod != null)
 				.Distinct()
-				.ToImmutableArray();
+				.ToImmutableArray()!;
 		}
 
 		private ImmutableArray<MethodOrInterfaceMethod> CalculateRequiredMethodKeys()
@@ -280,7 +284,7 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		ImmutableArray<IDeclaredLocal> IMethod.DirectlyCapturedDeclaredLocals => _directlyCapturedDeclaredLocals.Value;
 
-		ImmutableArray<IMethod> IMethod.InvokedLocalMethods => _invokedLocalMethods.Value;
+		ImmutableArray<IMethod> IMethod.UsedLocalMethods => _usedLocalMethods.Value;
 
 		ImmutableArray<MethodOrInterfaceMethod> IMethod.RequiredMethodKeys => _requiredMethodKeys.Value;
 
@@ -295,7 +299,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			_ = _bindStatementsResult.Value;
 			_ = _parameterLocals.Value;
 			_ = _inScopeAfter.Value;
-			_ = _invokedLocalMethods.Value;
+			_ = _usedLocalMethods.Value;
 			_ = _directlyCapturedDeclaredLocals.Value;
 			_ = _typeParameters.Value;
 			CheckStatementsForDiagnostics();

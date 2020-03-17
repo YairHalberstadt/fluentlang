@@ -31,13 +31,13 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 		public IDeclarationStatement? InScopeAfter { get; }
 		public IMethod OriginalDefinition => this;
 		internal ImmutableArray<IDeclaredLocal> DirectlyCapturedDeclaredLocals { get; }
-		internal ImmutableArray<IMethod> InvokedLocalMethods { get; }
+		internal ImmutableArray<IMethod> UsedLocalMethods { get; }
 		private IEnumerable<IDeclaredLocal> CalculateTransitivelyCapturedDeclaredLocals(HashSet<IMethod> visitedMethods)
 		{
 			visitedMethods.Add(this);
 			return
 				DirectlyCapturedDeclaredLocals
-				.Concat(InvokedLocalMethods
+				.Concat(UsedLocalMethods
 					.Where(x => !visitedMethods.Contains(x))
 					.SelectMany(x => x.CalculateTransitivelyCapturedDeclaredLocals(visitedMethods)));
 		}

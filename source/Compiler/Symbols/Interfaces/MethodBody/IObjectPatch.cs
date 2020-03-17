@@ -1,6 +1,8 @@
-﻿namespace FluentLang.Compiler.Symbols.Interfaces.MethodBody
+﻿using FluentLang.Compiler.Symbols.Visitor;
+
+namespace FluentLang.Compiler.Symbols.Interfaces.MethodBody
 {
-	public interface IObjectPatch : ISymbol
+	public interface IObjectPatch : IVisitableSymbol
 	{
 		
 	}

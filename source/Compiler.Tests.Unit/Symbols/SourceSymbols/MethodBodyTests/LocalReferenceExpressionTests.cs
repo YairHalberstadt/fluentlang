@@ -201,7 +201,22 @@ M() : {} {
 	return x; 
 }")
 				.VerifyDiagnostics(
-					new Diagnostic(new Location(new TextToken(@"Local()")), ErrorCode.UseOfMethodWhichCapturesUnassignedLocals));
+					new Diagnostic(new Location(new TextToken(@"Local")), ErrorCode.UseOfMethodWhichCapturesUnassignedLocals));
+		}
+
+		[Fact]
+		public void ErrorWhenLocalMethodUsedInPatchBeforeLatestStatementWhereCapturedLocalDeclared()
+		{
+			CreateAssembly(@"
+M() : {} { 
+	Local(a : {}) : int { return x + y; }
+	let x = 5;
+	_ = {} + Local;
+	let y = 10;
+	return {}; 
+}")
+				.VerifyDiagnostics(
+					new Diagnostic(new Location(new TextToken(@"Local")), ErrorCode.UseOfMethodWhichCapturesUnassignedLocals));
 		}
 
 		[Fact]
@@ -216,7 +231,7 @@ M() : {} {
 	return {}; 
 }")
 				.VerifyDiagnostics(
-					new Diagnostic(new Location(new TextToken(@"Local()")), ErrorCode.UseOfMethodWhichCapturesUnassignedLocals));
+					new Diagnostic(new Location(new TextToken(@"Local")), ErrorCode.UseOfMethodWhichCapturesUnassignedLocals));
 		}
 
 		[Fact]
@@ -229,7 +244,7 @@ M() : {} {
 	return x; 
 }")
 				.VerifyDiagnostics(
-					new Diagnostic(new Location(new TextToken(@"Local()")), ErrorCode.UseOfMethodWhichCapturesUnassignedLocals));
+					new Diagnostic(new Location(new TextToken(@"Local")), ErrorCode.UseOfMethodWhichCapturesUnassignedLocals));
 		}
 
 		[Fact]
@@ -254,7 +269,7 @@ M() : {} {
 	return x; 
 }")
 				.VerifyDiagnostics(
-					new Diagnostic(new Location(new TextToken(@"Local()")), ErrorCode.UseOfMethodWhichCapturesUnassignedLocals));
+					new Diagnostic(new Location(new TextToken(@"Local")), ErrorCode.UseOfMethodWhichCapturesUnassignedLocals));
 		}
 
 		[Fact]
@@ -268,7 +283,7 @@ M() : {} {
 	return x; 
 }")
 				.VerifyDiagnostics(
-					new Diagnostic(new Location(new TextToken(@"Local2()")), ErrorCode.UseOfMethodWhichCapturesUnassignedLocals));
+					new Diagnostic(new Location(new TextToken(@"Local2")), ErrorCode.UseOfMethodWhichCapturesUnassignedLocals));
 		}
 
 

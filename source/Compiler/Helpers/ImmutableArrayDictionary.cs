@@ -48,7 +48,9 @@ namespace FluentLang.Compiler.Helpers
 			return enumerable.GetEnumerator();
 		}
 
+#pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member because of nullability attributes.
 		public bool TryGetValue(TKey key, [MaybeNullWhen(false)]out TValue value)
+#pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member because of nullability attributes.
 		{
 			foreach (var (k, v) in _entries)
 			{

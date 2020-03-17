@@ -7,6 +7,8 @@ namespace FluentLang.Compiler.Symbols.Visitor
 	public interface ISymbolVisitor<T>
 	{
 		[return: MaybeNull] T Visit(IBinaryOperatorExpression binaryOperatorExpression);
+		[return: MaybeNull] T Visit(IMixinPatch mixinPatch);
+		[return: MaybeNull] T Visit(IMethodPatch methodPatch);
 		[return: MaybeNull] T Visit(IStaticInvocationExpression staticInvocationExpression);
 		[return: MaybeNull] T Visit(IParameter parameter);
 		[return: MaybeNull] T Visit(ITypeParameter typeParameter);

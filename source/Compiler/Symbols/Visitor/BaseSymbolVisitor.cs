@@ -73,9 +73,7 @@ namespace FluentLang.Compiler.Symbols.Visitor
 		public virtual T Visit(IObjectPatchingExpression objectPatchingExpression)
 		{
 			return VisitMany(
-				objectPatchingExpression.Patches
-					.OfType<IMixinPatch>()
-					.Select(p => p.Expression)
+				objectPatchingExpression.Patches.AsEnumerable<IVisitableSymbol>()
 					.Prepend(objectPatchingExpression.Expression));
 		}
 
@@ -163,6 +161,18 @@ namespace FluentLang.Compiler.Symbols.Visitor
 
 		[return: MaybeNull]
 		public virtual T Visit(ITypeParameter typeParameter)
+		{
+			return default;
+		}
+
+		[return: MaybeNull]
+		public T Visit(IMixinPatch mixinPatch)
+		{
+			return DefaultVisit(mixinPatch.Expression);
+		}
+
+		[return: MaybeNull]
+		public T Visit(IMethodPatch methodPatch)
 		{
 			return default;
 		}
