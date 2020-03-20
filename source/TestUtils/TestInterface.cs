@@ -13,6 +13,8 @@ namespace FluentLang.TestUtils
 
 		public ImmutableArray<ITypeParameter> TypeParameters => ImmutableArray<ITypeParameter>.Empty;
 
+		public ImmutableArray<IType> TypeArguments => ImmutableArray<IType>.Empty;
+
 		public ImmutableArray<IInterfaceMethod> Methods { get; set; } = ImmutableArray<IInterfaceMethod>.Empty;
 
 		public ImmutableArray<Diagnostic> AllDiagnostics { get; set; } = ImmutableArray<Diagnostic>.Empty;

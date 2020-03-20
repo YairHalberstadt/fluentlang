@@ -37,6 +37,7 @@ namespace FluentLang.Compiler.Symbols.Metadata
 		public bool IsExported => _anonymousSourceInterface.IsExported;
 		public QualifiedName? FullyQualifiedName { get; }
 		public ImmutableArray<ITypeParameter> TypeParameters => _typeParameters.Value;
+		public ImmutableArray<IType> TypeArguments => ImmutableArray<IType>.Empty;
 		public ImmutableArray<IInterfaceMethod> Methods => _anonymousSourceInterface.Methods;
 
 		private ImmutableArray<ITypeParameter> GenerateTypeParameters()

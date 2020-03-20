@@ -17,6 +17,8 @@ namespace FluentLang.Compiler.Symbols.ErrorSymbols
 
 		public ImmutableArray<ITypeParameter> TypeParameters => ImmutableArray<ITypeParameter>.Empty;
 
+		public ImmutableArray<IType> TypeArguments => ImmutableArray<IType>.Empty;
+
 		public ImmutableArray<IInterfaceMethod> Methods => ImmutableArray<IInterfaceMethod>.Empty;
 
 		public ImmutableArray<Diagnostic> AllDiagnostics => ImmutableArray<Diagnostic>.Empty;

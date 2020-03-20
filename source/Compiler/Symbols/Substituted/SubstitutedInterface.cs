@@ -15,6 +15,7 @@ namespace FluentLang.Compiler.Symbols.Substituted
 		private readonly IInterface _original;
 
 		private readonly Lazy<ImmutableArray<IInterfaceMethod>> _methods;
+		private readonly Lazy<ImmutableArray<IType>> _typeArguments;
 
 		public SubstitutedInterface(IInterface original, ImmutableArrayDictionary<ITypeParameter, IType> substitutions, Dictionary<IType, IType> substituted)
 		{
@@ -23,6 +24,8 @@ namespace FluentLang.Compiler.Symbols.Substituted
 			_original = original;
 			_methods = new Lazy<ImmutableArray<IInterfaceMethod>>(
 				() => original.Methods.Select(x => x.Substitute(substitutions, substituted)).ToImmutableArray());
+			_typeArguments = new Lazy<ImmutableArray<IType>>(
+				() => original.TypeArguments.Select(x => x.Substitute(substitutions, substituted)).ToImmutableArray());
 		}
 
 		public bool IsExported => _original.IsExported;
@@ -32,6 +35,8 @@ namespace FluentLang.Compiler.Symbols.Substituted
 		public ImmutableArray<IInterfaceMethod> Methods => _methods.Value;
 
 		public ImmutableArray<ITypeParameter> TypeParameters => ImmutableArray<ITypeParameter>.Empty;
+
+		public ImmutableArray<IType> TypeArguments => _typeArguments.Value;
 
 		public ImmutableArray<Diagnostic> AllDiagnostics => ImmutableArray<Diagnostic>.Empty;
 

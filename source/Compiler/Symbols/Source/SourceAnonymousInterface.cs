@@ -32,6 +32,7 @@ namespace FluentLang.Compiler.Symbols.Source
 		public bool IsExported { get; }
 		public QualifiedName? FullyQualifiedName => null;
 		public ImmutableArray<ITypeParameter> TypeParameters => ImmutableArray<ITypeParameter>.Empty;
+		public ImmutableArray<IType> TypeArguments => ImmutableArray<IType>.Empty;
 		public ImmutableArray<IInterfaceMethod> Methods => _methods.Value;
 
 		private ImmutableArray<IInterfaceMethod> GenerateMethods()

@@ -145,6 +145,8 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 
 			public ImmutableArray<ITypeParameter> TypeParameters => ImmutableArray<ITypeParameter>.Empty;
 
+			public ImmutableArray<IType> TypeArguments => ImmutableArray<IType>.Empty;
+
 			public ImmutableArray<IInterfaceMethod> Methods => _methods.Value;
 
 			public ImmutableArray<Diagnostic> AllDiagnostics => ImmutableArray<Diagnostic>.Empty;
@@ -187,6 +189,8 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 				public bool IsExported => false;
 
 				public ImmutableArray<ITypeParameter> TypeParameters => ImmutableArray<ITypeParameter>.Empty;
+
+				public ImmutableArray<IType> TypeArguments => ImmutableArray<IType>.Empty;
 
 				public ImmutableArray<IInterfaceMethod> Methods { get; }
 

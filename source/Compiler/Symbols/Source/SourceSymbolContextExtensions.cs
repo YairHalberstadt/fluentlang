@@ -182,7 +182,7 @@ namespace FluentLang.Compiler.Symbols.Source
 				var @interface = (IInterface)type;
 				var typeParameters = @interface.TypeParameters;
 				HasValidTypeArguments(typeArguments, typeParameters, out diagnostic);
-				type = type.Substitute(CreateTypeMap(typeArguments, typeParameters), new Dictionary<IType, IType>());
+				type = @interface.Construct(typeArguments);
 			}
 
 			return type;

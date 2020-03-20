@@ -438,16 +438,16 @@ namespace FluentLang.Compiler.Emit
 				textWriter.Write(")");
 			}
 
-			private void EmitTypeArguments(ImmutableArray<IType> typeAguments, TextWriter textWriter)
+			private void EmitTypeArguments(ImmutableArray<IType> typeArguments, TextWriter textWriter)
 			{
-				if (typeAguments.Length > 0)
+				if (typeArguments.Length > 0)
 				{
 					textWriter.Write("<");
-					for (var i = 0; i < typeAguments.Length; i++)
+					for (var i = 0; i < typeArguments.Length; i++)
 					{
 						if (i != 0)
 							textWriter.Write(", ");
-						Emit(typeAguments[i], textWriter);
+						Emit(typeArguments[i], textWriter);
 					}
 					textWriter.Write(">");
 				}
@@ -852,6 +852,7 @@ namespace FluentLang.Compiler.Emit
 					if (!isDeclaration && @interface.FullyQualifiedName is { } name && @interface.IsExported)
 					{
 						textWriter.Write(name.ToString());
+						EmitTypeArguments(@interface.TypeArguments, textWriter);
 					}
 					else
 					{
@@ -862,6 +863,21 @@ namespace FluentLang.Compiler.Emit
 							textWriter.Write("; ");
 						}
 						textWriter.Write("}");
+					}
+				}
+
+				private static void EmitTypeArguments(ImmutableArray<IType> typeArguments, TextWriter textWriter)
+				{
+					if (typeArguments.Length > 0)
+					{
+						textWriter.Write("<");
+						for (var i = 0; i < typeArguments.Length; i++)
+						{
+							if (i != 0)
+								textWriter.Write(", ");
+							Emit(typeArguments[i], textWriter);
+						}
+						textWriter.Write(">");
 					}
 				}
 
