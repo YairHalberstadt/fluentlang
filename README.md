@@ -16,7 +16,7 @@ IDE: Open in VS 2019 > version 4. Everything should work as normal.
 
 This language is primarily a research language. It is as far as I know completely novel in its design, and is intended as a project to research how feasible the design is in practice.
 
-As such the language prioritizes simplicity of implementation and definition, over features and ease of use. As such it may be a bit awkward to use in practice, and lacks many noble and worthy features, such as generics, downcasting and much more.
+As such the language prioritizes simplicity of implementation and definition, over features and ease of use. As such it may be a bit awkward to use in practice.
 
 At the same time I do try to keep in mind what syntax sugar and extra features I might want to add, and how they interact with the current design, when designing the language.
 
@@ -140,6 +140,57 @@ CreateCounter() : Counter
 }
 ```
 
+### Generics
+
+There are two forms of generics in fluentlang:
+
+**Generic Named Interfaces**
+When an interface is declared it may specify some type parameters. Then when it is used, type arguments must be supplied for all type parameters, making the interface concrete.
+
+E.g:
+
+```
+interface Factory<T>
+{
+    Create() : T;
+}
+
+M(intFactory : Factory<int>) : int { return intFactory.Create(); }
+```
+
+**Generic Methods**
+A method (but not an interface method) may be generic.
+
+E.g.
+
+```
+interface Factory<T>
+{
+    Create() : T;
+}
+
+CreateViaFactory<T>(factory : Factory<T>) : T { return factory.Create(); }
+```
+
+### Unions
+
+It is possible to specify that a type must match at least one of a number of options via union types:
+
+E.g. `int | { M1() : int; } | { M2() : bool; }`
+
+It is then possible to match on the type to specify different behaviour based on which of the options it is. 
+
+E.g.
+
+```
+Main() : int {
+	let u : int | {} = 42;
+	return u match { x : int => x; {} => 41; }; // returns 42
+}
+```
+
+For more information see https://github.com/YairHalberstadt/fluentlang/issues/6
+
 ### Immutability
 
 Pure FluentLang is purely immutable. There is no way to change any existing variable. As a result pure FluentLang is also referentially transparent.
@@ -176,15 +227,15 @@ Create compiler.exe
 
 Design and implement unions. See #6, #8.
 
+Design and implement generics. See #9, #10.
+
 ### In progress
 
-Design and implement generics. See #9, #10.
+Implement Standard Libraries. This will be mixed C# Libraries with FluentLang Metadata and FluentLang libraries.
 
 ### ToDo
 
 Create Blazor WebIDE. This may have to wait till client side blazor stabilizes, and possibly till .Net 5 provides some missing APIs.
-
-Implement Standard Libraries. This will be mixed C# Libraries with FluentLang Metadata and FluentLang libraries.
 
 Look into more efficient incremental compilation.
 
@@ -192,12 +243,11 @@ Look into more efficient incremental compilation.
 
 Projects which should be possible for someone else to do with us stepping on each others toes:
 
-1. Look into a more efficient method for implementing capturing
-2. Look into more efficient incremental compilation. Can we avoid recompiling everything whenever a single file in a single dependency changes?
-3. Report syntax errors when ANTLR automatically recover from them.
-4. Improve syntax error recovery. Currently we discard the entire file if it contains a syntax error. Thats a really bad strategy for an IDE.
-5. Look into APIs for code completion, syntax highlighting, etc.
-6. Come up with design proposals for: Discrimated Unions, Generics, error handling (exceptions?, result types?)
-    - Design proposals should be created as issues on this repository with the heading "Proposal:". E.g. "Proposal: design for Discriminated Unions".
-7. [Improve diagnostic messages](https://github.com/YairHalberstadt/fluentlang/issues/7)
-8. Create Blazor WebIDE - this is a big task, but completely seperate from the main development, and so perfect for anyone who knows web development well.
+1. Look into more efficient incremental compilation. Can we avoid recompiling everything whenever a single file in a single dependency changes?
+2. Report syntax errors when ANTLR automatically recover from them.
+3. Improve syntax error recovery. Currently we discard the entire file if it contains a syntax error. Thats a really bad strategy for an IDE.
+4. Look into APIs for code completion, syntax highlighting, etc.
+5. Come up with design proposals for: Generic interface methods, method subtyping, error handling (exceptions?, result types?)
+    - Design proposals should be created as issues on this repository with the heading "Proposal:". E.g. "Proposal: design for Method Subtyping".
+6. [Improve diagnostic messages](https://github.com/YairHalberstadt/fluentlang/issues/7)
+7. Create Blazor WebIDE - this is a big task, but completely seperate from the main development, and so perfect for anyone who knows web development well.
