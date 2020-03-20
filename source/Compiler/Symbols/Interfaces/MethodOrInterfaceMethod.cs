@@ -2,21 +2,36 @@
 using FluentLang.Compiler.Symbols.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
+[DebuggerDisplay("{_method is null ? _interfaceMethod.Name : _method.FullyQualifiedName}")]
 internal struct MethodOrInterfaceMethod : IEquatable<MethodOrInterfaceMethod>
 {
 	private readonly IMethod? _method;
+	private readonly ImmutableArray<ITypeParameter> _typeArguments;
 	private readonly IInterfaceMethod? _interfaceMethod;
 
-	public MethodOrInterfaceMethod(IMethod method) : this()
+	public MethodOrInterfaceMethod(IMethod method, ImmutableArray<IType> typeArguments) : this()
 	{
 		_method = method;
+		_typeArguments = typeArguments.All(x => x is ITypeParameter) 
+			? typeArguments.Cast<ITypeParameter>().ToImmutableArray()
+			: ImmutableArray<ITypeParameter>.Empty;
+	}
+
+	private MethodOrInterfaceMethod(IMethod method, ImmutableArray<ITypeParameter> typeArguments) : this()
+	{
+		_method = method;
+		_typeArguments = typeArguments;
 	}
 
 	public MethodOrInterfaceMethod(IInterfaceMethod interfaceMethod) : this()
 	{
 		_interfaceMethod = interfaceMethod;
+		_typeArguments = ImmutableArray<ITypeParameter>.Empty;
 	}
 
 	public bool TryGetMethod([MaybeNullWhen(false)] out IMethod method)
@@ -35,7 +50,10 @@ internal struct MethodOrInterfaceMethod : IEquatable<MethodOrInterfaceMethod>
 	{
 		if (_method != null)
 		{
-			return new MethodOrInterfaceMethod(_method.Substitute(substitutions, substituted));
+			var typeArguments = _typeArguments.Select(x => substitutions.TryGetValue(x, out var tp) ? tp as ITypeParameter : x).ToImmutableArray();
+			if (typeArguments.Any(x => x is null))
+				typeArguments = ImmutableArray<ITypeParameter>.Empty!;
+			return new MethodOrInterfaceMethod(_method.Substitute(substitutions, substituted), typeArguments!);
 		}
 		if (_interfaceMethod != null)
 		{
@@ -60,5 +78,15 @@ internal struct MethodOrInterfaceMethod : IEquatable<MethodOrInterfaceMethod>
 	public override int GetHashCode()
 	{
 		return HashCode.Combine(_method, _interfaceMethod);
+	}
+
+	public bool IsEquivalentTo(IMethod method)
+	{
+		Release.Assert(_method != null && _method.OriginalDefinition == method.OriginalDefinition);
+
+		if (_typeArguments.Length != method.TypeParameters.Length)
+			return false;
+
+		return _typeArguments.Zip(method.TypeParameters, (a, b) => a == b).All(x => x);
 	}
 }

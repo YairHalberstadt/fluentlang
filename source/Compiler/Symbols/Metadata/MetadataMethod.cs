@@ -5,11 +5,13 @@ using FluentLang.Compiler.Symbols.Source;
 using FluentLang.Runtime.Metadata;
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.Symbols.Metadata
 {
+	[DebuggerDisplay("{FullyQualifiedName}")]
 	internal sealed class MetadataMethod : SymbolBase, IMethod
 	{
 		private readonly SourceSymbolContext _sourceSymbolContext;
@@ -117,6 +119,9 @@ namespace FluentLang.Compiler.Symbols.Metadata
 			=> ImmutableArray<IMethod>.Empty;
 
 		ImmutableArray<MethodOrInterfaceMethod> IMethod.RequiredMethodKeys => _requiredMethodKeys.Value;
+
+		ImmutableArray<MethodOrInterfaceMethod> IMethod.DirectlyRequiredMethodKeys => _requiredMethodKeys.Value;
+
 		protected override void EnsureAllLocalDiagnosticsCollected()
 		{
 			// Touch all lazy fields to force binding;

@@ -3,10 +3,12 @@ using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 namespace FluentLang.Compiler.Symbols.ErrorSymbols
 {
+	[DebuggerDisplay("{FullyQualifiedName}")]
 	internal class ErrorMethod : IMethod, IErrorSymbol
 	{
 		public static ErrorMethod Instance { get; } = new ErrorMethod(new QualifiedName("<Error Method>"), 0);
@@ -48,6 +50,9 @@ namespace FluentLang.Compiler.Symbols.ErrorSymbols
 		public IAssembly DeclaringAssembly => throw Release.Fail("unreachable");
 
 		ImmutableArray<MethodOrInterfaceMethod> IMethod.RequiredMethodKeys =>
+			ImmutableArray<MethodOrInterfaceMethod>.Empty;
+
+		ImmutableArray<MethodOrInterfaceMethod> IMethod.DirectlyRequiredMethodKeys =>
 			ImmutableArray<MethodOrInterfaceMethod>.Empty;
 
 		void ISymbol.EnsureAllLocalDiagnosticsCollected()

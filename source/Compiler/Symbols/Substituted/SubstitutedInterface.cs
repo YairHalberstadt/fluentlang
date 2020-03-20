@@ -4,10 +4,12 @@ using FluentLang.Compiler.Symbols.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 namespace FluentLang.Compiler.Symbols.Substituted
 {
+	[DebuggerDisplay("{FullyQualifiedName}")]
 	internal class SubstitutedInterface : IInterface
 	{
 		private readonly IInterface _original;

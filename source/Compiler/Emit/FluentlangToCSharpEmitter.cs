@@ -13,7 +13,7 @@ using Version = FluentLang.Compiler.Symbols.Interfaces.Version;
 
 namespace FluentLang.Compiler.Emit
 {
-	public class FluentlangToCSharpEmitter
+	public partial class FluentlangToCSharpEmitter
 	{
 		public void Emit(IAssembly assembly, TextWriter textWriter)
 		{
@@ -456,7 +456,7 @@ namespace FluentLang.Compiler.Emit
 			private void EmitRequiredMethodKeyArguments(IMethod method, TextWriter textWriter)
 			{
 				var isFirst = true;
-				foreach (var requiredMethod in method.RequiredMethodKeys)
+				foreach (var requiredMethod in _keyGenerator.GetRequiredMethodKeys(method))
 				{
 					if (!isFirst || !method.Parameters.IsEmpty)
 					{
@@ -885,7 +885,7 @@ namespace FluentLang.Compiler.Emit
 					{
 						if (any)
 						{
-							textWriter.WriteLine("|");
+							textWriter.Write("|");
 						}
 						any = true;
 						Emit(option, textWriter);

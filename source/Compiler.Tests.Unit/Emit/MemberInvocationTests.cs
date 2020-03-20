@@ -126,6 +126,25 @@ export M<T>(a : { M() : T; }) : T {
 	.VerifyEmit(expectedResult: 42);
 		}
 
+		[Fact]
+		public void RequiredMethodKeys5()
+		{
+			CreateAssembly(@"
+export Main() : int { 
+	return M<int>().M1(0, 0);
+}
+export M<T>() : { M1(b : T, c : int) : int; } {
+	return M<int>();
+	M<T1>() : { M1(b : T, c : T1) : int; } {
+		return {} + M1<T, T1>;
+	}
+}
+
+M1<T1, T2>(a: {}, b : T1, c : T2) : int { return 42; }")
+	.VerifyDiagnostics()
+	.VerifyEmit(expectedResult: 42);
+		}
+
 		public MemberInvocationTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
 		{
 		}

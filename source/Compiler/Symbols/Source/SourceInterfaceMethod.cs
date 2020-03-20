@@ -2,11 +2,12 @@
 using FluentLang.Compiler.Symbols.Interfaces;
 using System;
 using System.Collections.Immutable;
-using System.Linq;
+using System.Diagnostics;
 using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.Symbols.Source
 {
+	[DebuggerDisplay("{Name}")]
 	internal sealed class SourceInterfaceMethod : SymbolBase, IInterfaceMethod
 	{
 		private readonly Method_signatureContext _context;

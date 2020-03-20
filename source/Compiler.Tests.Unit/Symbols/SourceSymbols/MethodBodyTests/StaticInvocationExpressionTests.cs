@@ -114,7 +114,12 @@ M(param : int) : int {
 		[Fact]
 		public void MethodInvocationIsValidWhenItMatchesAllConstraints()
 		{
-			CreateAssembly(@"M<T1 : {}, T2 : { M() : int; }>() : T2 { return M<{}, T2>(); }")
+			CreateAssembly(@"
+M<T : { M() : int; }>() : {} {
+	_ = M1<{}, T>();
+	return {};
+}
+M1<T1 : {}, T2 : { M() : int; }>() : {} { return {}; }")
 				.VerifyDiagnostics().VerifyEmit();
 		}
 	}

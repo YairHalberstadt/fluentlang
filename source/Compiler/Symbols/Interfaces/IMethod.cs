@@ -59,5 +59,6 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 			=> new SubstitutedMethod(this, substitutions, substituted);
 
 		internal ImmutableArray<MethodOrInterfaceMethod> RequiredMethodKeys { get; }
+		internal ImmutableArray<MethodOrInterfaceMethod> DirectlyRequiredMethodKeys { get; }
 	}
 }

@@ -11,13 +11,13 @@ namespace FluentLang.Compiler.Symbols.Source
 {
 	internal sealed partial class SourceMethod
 	{
-		private class RequiredMethodKeysVisitor : BaseSymbolVisitor<object>
+		private class DirectlyRequiredMethodKeysVisitor : BaseSymbolVisitor<object>
 		{
 			public HashSet<MethodOrInterfaceMethod>? _methods;
 			private readonly IMethod _method;
 			private HashSet<MethodOrInterfaceMethod>? _alreadyRequiredByLocalMethods;
 
-			public RequiredMethodKeysVisitor(IMethod method)
+			public DirectlyRequiredMethodKeysVisitor(IMethod method)
 			{
 				_method = method;
 			}
@@ -28,7 +28,7 @@ namespace FluentLang.Compiler.Symbols.Source
 				if (method != _method)
 				{
 					(_alreadyRequiredByLocalMethods ??= new HashSet<MethodOrInterfaceMethod>())
-						.UnionWith(method.RequiredMethodKeys);
+						.UnionWith(method.DirectlyRequiredMethodKeys);
 					// no need to remove them afterwards as they must contain Type Parameters
 					// defined in the local method,
 					// so cannot appear outside it.
@@ -48,7 +48,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			[return: MaybeNull]
 			public override object Visit(IStaticInvocationExpression staticInvocationExpression)
 			{
-				AddMethodIfNecessary(staticInvocationExpression.TypeArguments, staticInvocationExpression.Method);
+				AddMethodIfNecessary(staticInvocationExpression.Method, staticInvocationExpression.TypeArguments);
 
 				return base.Visit(staticInvocationExpression);
 			}
@@ -65,36 +65,20 @@ namespace FluentLang.Compiler.Symbols.Source
 							AddInterfaceMethodIfNecessary(method);
 						}
 					}
-					else if (patch is IMethodPatch { TypeArguments: var typeArguments, Method: var method})
+					else if (patch is IMethodPatch { Method: var method, TypeArguments: var typeArguments })
 					{
-						AddMethodIfNecessary(typeArguments, method);
+						AddMethodIfNecessary(method, typeArguments);
 					}
 				}
 				return base.Visit(objectPatchingExpression);
 			}
 
-			private void AddMethodIfNecessary(ImmutableArray<IType> typeArguments, IMethod method)
+			private void AddMethodIfNecessary(IMethod method, ImmutableArray<IType> typeArguments)
 			{
-				if (method.OriginalDefinition == _method.OriginalDefinition)
-					return;
-
-				if (typeArguments.Any(
-					x => _method.TypeParameters.Contains(x)))
-				{
-					var requiredMethods = method.RequiredMethodKeys.AsEnumerable();
-					if (_alreadyRequiredByLocalMethods != null)
-					{
-						requiredMethods = requiredMethods
-							.Where(x => !_alreadyRequiredByLocalMethods.Contains(x));
-					}
-					(_methods ??= new HashSet<MethodOrInterfaceMethod>())
-						.UnionWith(method.RequiredMethodKeys);
-				}
-
 				var tps = GetTypeParameters(method);
 				if (tps.Any(x => _method.TypeParameters.Contains(x)))
 				{
-					var requiredMethod = new MethodOrInterfaceMethod(method);
+					var requiredMethod = new MethodOrInterfaceMethod(method, typeArguments);
 					if (!_alreadyRequiredByLocalMethods?.Contains(requiredMethod) ?? true)
 					{
 						(_methods ??= new HashSet<MethodOrInterfaceMethod>())

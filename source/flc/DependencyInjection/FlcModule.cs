@@ -70,10 +70,6 @@ namespace FluentLang.flc.DependencyInjection
 				.As<IProjectLoader>()
 				.InstancePerMatchingLifetimeScope(Tag.Create<SolutionInfo>());
 
-			builder.RegisterType<MethodKeyGenerator>()
-				.AsSelf()
-				.SingleInstance();
-
 			builder.RegisterType<FluentlangToCSharpEmitter>()
 				.AsSelf()
 				.SingleInstance();

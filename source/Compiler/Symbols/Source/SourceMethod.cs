@@ -5,12 +5,15 @@ using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.Compiler.Symbols.Source.MethodBody;
 using FluentLang.Compiler.Symbols.Visitor;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.Symbols.Source
 {
+	[DebuggerDisplay("{FullyQualifiedName}")]
 	internal sealed partial class SourceMethod : SymbolBase, IMethod
 	{
 		private readonly Method_declarationContext _context;
@@ -29,6 +32,7 @@ namespace FluentLang.Compiler.Symbols.Source
 		private readonly SourceSymbolContext _parentSourceSymbolContextWithTypeParameters;
 		private readonly Lazy<MethodBodySymbolContext> _methodBodySymbolContext;
 		private readonly Lazy<ImmutableArray<MethodOrInterfaceMethod>> _requiredMethodKeys;
+		private readonly Lazy<ImmutableArray<MethodOrInterfaceMethod>> _directlyRequiredMethodKeys;
 
 		public SourceMethod(
 			Method_declarationContext context,
@@ -56,6 +60,7 @@ namespace FluentLang.Compiler.Symbols.Source
 			_usedLocalMethods = new Lazy<ImmutableArray<IMethod>>(CalculateUsedLocalMethods);
 			_inScopeAfter = new Lazy<IDeclarationStatement?>(((IMethod)this).CalculateInScopeAfter);
 			_requiredMethodKeys = new Lazy<ImmutableArray<MethodOrInterfaceMethod>>(CalculateRequiredMethodKeys);
+			_directlyRequiredMethodKeys = new Lazy<ImmutableArray<MethodOrInterfaceMethod>>(CalculateDirectlyRequiredMethodKeys);
 		}
 
 		private IType BindReturnType()
@@ -253,9 +258,52 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		private ImmutableArray<MethodOrInterfaceMethod> CalculateRequiredMethodKeys()
 		{
-			var visitor = new RequiredMethodKeysVisitor(this);
+			if (((IMethod)this).DirectlyRequiredMethodKeys.IsEmpty)
+				return ImmutableArray<MethodOrInterfaceMethod>.Empty;
+
+			var builder = ImmutableArray.CreateBuilder<MethodOrInterfaceMethod>();
+			CalculateRequiredMethodKeys(this, new Dictionary<IMethod, IMethod>(), builder, _diagnostics);
+			return builder.ToImmutable();
+
+			void CalculateRequiredMethodKeys(
+				IMethod method,
+				Dictionary<IMethod, IMethod> methodStack,
+				ImmutableArray<MethodOrInterfaceMethod>.Builder results,
+				DiagnosticBag diagnostics)
+			{
+				if (methodStack.TryGetValue(method.OriginalDefinition, out var previous))
+				{
+					return;
+				}
+
+				methodStack.Add(method.OriginalDefinition, method);
+				foreach(var requiredMethod in method.DirectlyRequiredMethodKeys)
+				{
+					results.Add(requiredMethod);
+					if(requiredMethod.TryGetMethod(out var childMethod))
+					{
+						if (childMethod.OriginalDefinition == this && !requiredMethod.IsEquivalentTo(this))
+						{
+							diagnostics.Add(new Diagnostic(
+								new Location(_context),
+								ErrorCode.RecursiveFunctionCallWithDifferentTypeArguments,
+								methodStack.Select(x => x.Key).Append(method).ToImmutableArray<object?>()));
+						}
+						CalculateRequiredMethodKeys(childMethod, methodStack, results, diagnostics);
+					}
+				}
+				methodStack.Remove(method.OriginalDefinition);
+			}
+		}
+
+		private ImmutableArray<MethodOrInterfaceMethod> CalculateDirectlyRequiredMethodKeys()
+		{
+			if (TypeParameters.IsEmpty)
+				return ImmutableArray<MethodOrInterfaceMethod>.Empty;
+
+			var visitor = new DirectlyRequiredMethodKeysVisitor(this);
 			visitor.Visit(this);
-			return visitor._methods?.ToImmutableArray()  ?? ImmutableArray<MethodOrInterfaceMethod>.Empty;
+			return visitor._methods?.ToImmutableArray() ?? ImmutableArray<MethodOrInterfaceMethod>.Empty;
 		}
 
 		public bool IsExported => _context.EXPORT() is { };
@@ -288,6 +336,8 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		ImmutableArray<MethodOrInterfaceMethod> IMethod.RequiredMethodKeys => _requiredMethodKeys.Value;
 
+		ImmutableArray<MethodOrInterfaceMethod> IMethod.DirectlyRequiredMethodKeys => _directlyRequiredMethodKeys.Value;
+
 		protected override void EnsureAllLocalDiagnosticsCollected()
 		{
 			// Touch all lazy fields to force binding;
@@ -302,6 +352,8 @@ namespace FluentLang.Compiler.Symbols.Source
 			_ = _usedLocalMethods.Value;
 			_ = _directlyCapturedDeclaredLocals.Value;
 			_ = _typeParameters.Value;
+			_ = _directlyRequiredMethodKeys.Value;
+			_ = _requiredMethodKeys.Value;
 			CheckStatementsForDiagnostics();
 		}
 	}
