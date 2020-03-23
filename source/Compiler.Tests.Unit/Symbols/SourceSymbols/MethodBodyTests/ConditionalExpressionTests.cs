@@ -68,5 +68,19 @@ M1(param : {}) : bool { return true; }")
 			var exp = Assert.IsAssignableFrom<IConditionalExpression>(statement.Expression);
 			Assert.Equal(EmptyInterface.Instance, exp.Type);
 		}
+
+		[Fact]
+		public void TestConditionalEmitTrue()
+		{
+			CreateAssembly(@"Main() : int { return if (true) 0 else 1; }")
+					.VerifyDiagnostics().VerifyEmit(expectedResult: 0);
+		}
+
+		[Fact]
+		public void TestConditionalEmitFalse()
+		{
+			CreateAssembly(@"Main() : int { return if (false) 0 else 1; }")
+					.VerifyDiagnostics().VerifyEmit(expectedResult: 1);
+		}
 	}
 }

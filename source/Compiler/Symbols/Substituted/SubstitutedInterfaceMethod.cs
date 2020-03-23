@@ -32,6 +32,8 @@ namespace FluentLang.Compiler.Symbols.Substituted
 
 		public ImmutableArray<Diagnostic> AllDiagnostics => ImmutableArray<Diagnostic>.Empty;
 
+		public IInterfaceMethod OriginalDefinition => _original.OriginalDefinition;
+
 		void ISymbol.EnsureAllLocalDiagnosticsCollected() { }
 	}
 }

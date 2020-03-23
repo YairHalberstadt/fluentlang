@@ -282,7 +282,7 @@ namespace FluentLang.Compiler.Symbols.Source
 					results.Add(requiredMethod);
 					if(requiredMethod.TryGetMethod(out var childMethod))
 					{
-						if (childMethod.OriginalDefinition == this && !requiredMethod.IsEquivalentTo(this))
+						if (childMethod.OriginalDefinition == this && !requiredMethod.IsEquivalentToOriginal())
 						{
 							diagnostics.Add(new Diagnostic(
 								new Location(_context),

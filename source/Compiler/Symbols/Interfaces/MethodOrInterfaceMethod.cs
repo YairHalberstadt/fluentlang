@@ -80,13 +80,14 @@ internal struct MethodOrInterfaceMethod : IEquatable<MethodOrInterfaceMethod>
 		return HashCode.Combine(_method, _interfaceMethod);
 	}
 
-	public bool IsEquivalentTo(IMethod method)
+	public bool IsEquivalentToOriginal()
 	{
-		Release.Assert(_method != null && _method.OriginalDefinition == method.OriginalDefinition);
+		Release.Assert(_method != null);
 
-		if (_typeArguments.Length != method.TypeParameters.Length)
+		var originalTypeParameters = _method.OriginalDefinition.TypeParameters;
+		if (_typeArguments.Length != originalTypeParameters.Length)
 			return false;
 
-		return _typeArguments.Zip(method.TypeParameters, (a, b) => a == b).All(x => x);
+		return _typeArguments.Zip(originalTypeParameters, (a, b) => a == b).All(x => x);
 	}
 }

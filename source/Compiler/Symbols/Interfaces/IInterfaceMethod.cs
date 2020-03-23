@@ -17,6 +17,7 @@ namespace FluentLang.Compiler.Symbols.Interfaces
 		public string Name { get; }
 		public IType ReturnType { get; }
 		public ImmutableArray<IParameter> Parameters { get; }
+		public IInterfaceMethod OriginalDefinition => this;
 
 		internal bool IsEquivalentTo(IInterfaceMethod otherMethod, Stack<(IType, IType)>? dependantEqualities)
 		{

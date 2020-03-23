@@ -2,7 +2,6 @@
 using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace FluentLang.Compiler.Emit
@@ -11,33 +10,27 @@ namespace FluentLang.Compiler.Emit
 	{
 		private class MethodKeyGenerator
 		{
-			private readonly Dictionary<IInterfaceMethod, MethodKeyOrParamName> _interfaceMethodCache = new Dictionary<IInterfaceMethod, MethodKeyOrParamName>();
-			private readonly Dictionary<IMethod, MethodKeyOrParamName> _methodExcludingFirstParameterCache = new Dictionary<IMethod, MethodKeyOrParamName>();
+			private readonly Dictionary<IInterfaceMethod, List<(IInterfaceMethod method, string paramName)>> _interfaceMethodParamNames = new Dictionary<IInterfaceMethod, List<(IInterfaceMethod, string)>>();
+			private readonly Dictionary<IMethod, List<(IMethod method, string paramName)>> _methodParamNames = new Dictionary<IMethod, List<(IMethod, string)>>();
+			private readonly Dictionary<IInterfaceMethod, MethodKeyOrParamName.MethodKey> _interfaceMethodCache = new Dictionary<IInterfaceMethod, MethodKeyOrParamName.MethodKey>();
+			private readonly Dictionary<IMethod, MethodKeyOrParamName.MethodKey> _methodExcludingFirstParameterCache = new Dictionary<IMethod, MethodKeyOrParamName.MethodKey>();
 			private readonly Dictionary<IInterface, string> _interfaceCache = new Dictionary<IInterface, string>();
 
 			private int _paramIndex;
 
-			private readonly HashSet<IMethod> _methods = new HashSet<IMethod>();
-
-			public ImmutableArray<MethodOrInterfaceMethod> GetRequiredMethodKeys(IMethod method) => _methods.Contains(method.OriginalDefinition)
-				? method.OriginalDefinition.RequiredMethodKeys
-				: method.RequiredMethodKeys;
-
 			public IEnumerable<string> EnterMethodAndReturnMethodKeyParamNames(IMethod method)
 			{
-				_methods.Add(method);
-
 				var paramNames = new List<string>();
 				foreach (var requiredMethod in method.RequiredMethodKeys)
 				{
 					var paramName = "__p" + _paramIndex++; ;
 					if (requiredMethod.TryGetMethod(out var m))
 					{
-						_methodExcludingFirstParameterCache.Add(m, new MethodKeyOrParamName.ParamName(paramName));
+						_methodParamNames.GetOrAdd(m.OriginalDefinition, x => new List<(IMethod, string)>(1)).Add((m, paramName));
 					}
 					else if (requiredMethod.TryGetInterfaceMethod(out var im))
 					{
-						_interfaceMethodCache.Add(im, new MethodKeyOrParamName.ParamName(paramName));
+						_interfaceMethodParamNames.GetOrAdd(im.OriginalDefinition, x => new List<(IInterfaceMethod, string)>(1)).Add((im, paramName));
 					}
 					else
 					{
@@ -51,19 +44,17 @@ namespace FluentLang.Compiler.Emit
 
 			public void ExitMethod(IMethod method)
 			{
-				_methods.Remove(method);
-
 				foreach (var requiredMethod in method.RequiredMethodKeys)
 				{
 					if (requiredMethod.TryGetMethod(out var m))
 					{
-						var removed = _methodExcludingFirstParameterCache.Remove(m);
-						Release.Assert(removed);
+						var list = _methodParamNames[m.OriginalDefinition];
+						list.RemoveAt(list.Count - 1);
 					}
 					else if (requiredMethod.TryGetInterfaceMethod(out var im))
 					{
-						var removed = _interfaceMethodCache.Remove(im);
-						Release.Assert(removed);
+						var list = _interfaceMethodParamNames[im.OriginalDefinition];
+						list.RemoveAt(list.Count - 1);
 					}
 				}
 				_paramIndex -= method.RequiredMethodKeys.Length;
@@ -71,14 +62,27 @@ namespace FluentLang.Compiler.Emit
 
 			public MethodKeyOrParamName GenerateMethodKey(IInterfaceMethod method)
 			{
+				if (_interfaceMethodParamNames.TryGetValue(method.OriginalDefinition, out var list))
+				{
+					var (_, paramKey) = list.FirstOrDefault(x => x.method == method || x.method.IsEquivalentTo(method, null));
+					if (paramKey != null)
+						return new MethodKeyOrParamName.ParamName(paramKey);
+				}
+
 				return _interfaceMethodCache.GetOrAdd(
 					method,
-					method => new MethodKeyOrParamName.MethodKey(
-						GenerateMethodKey(method, new Stack<(IInterface @interface, int index)>())));
+					method => new MethodKeyOrParamName.MethodKey(GenerateMethodKey(method, new Stack<(IInterface @interface, int index)>())));
 			}
 
 			public MethodKeyOrParamName GenerateMethodKeyExcludingFirstParameter(IMethod method)
 			{
+				if (_methodParamNames.TryGetValue(method.OriginalDefinition, out var list))
+				{
+					var (_, paramKey) = list.FirstOrDefault(x => AreEquivalent(x.method, method));
+					if (paramKey != null)
+						return new MethodKeyOrParamName.ParamName(paramKey);
+				}
+
 				return _methodExcludingFirstParameterCache.GetOrAdd(method, method =>
 				{
 					var parentInterfaces = new Stack<(IInterface @interface, int index)>();
@@ -88,6 +92,15 @@ namespace FluentLang.Compiler.Emit
 							+ GenerateTypeKey(method.ReturnType, parentInterfaces)
 							+ string.Concat(method.Parameters.Skip(1).Select(x => GenerateTypeKey(x.Type, parentInterfaces))));
 				});
+
+				static bool AreEquivalent(IMethod a, IMethod b)
+				{
+					Release.Assert(a.OriginalDefinition == b.OriginalDefinition);
+					if (!a.ReturnType.IsEquivalentTo(b.ReturnType))
+						return false;
+
+					return a.Parameters.Zip(b.Parameters, (a, b) => a.Type.IsEquivalentTo(b.Type)).All(x => x);
+				}
 			}
 
 			private string GenerateInterfaceKey(IInterface @interface, Stack<(IInterface @interface, int index)> parentInterfaces)

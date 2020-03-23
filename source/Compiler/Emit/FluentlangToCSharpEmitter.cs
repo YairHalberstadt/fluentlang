@@ -363,7 +363,7 @@ namespace FluentLang.Compiler.Emit
 				textWriter.Write(" ? ");
 				Emit(ce.IfTrue, ce.Type, textWriter);
 				textWriter.Write(" : ");
-				Emit(ce.IfTrue, ce.Type, textWriter);
+				Emit(ce.IfFalse, ce.Type, textWriter);
 			}
 
 			private void Emit(IMemberInvocationExpression mie, TextWriter textWriter)
@@ -401,7 +401,7 @@ namespace FluentLang.Compiler.Emit
 			private void EmitArguments(IEnumerable<IExpression> arguments, IEnumerable<IParameter> parameters, TextWriter textWriter)
 			{
 				var isFirst = true;
-				foreach (var (argument, parameter) in arguments.Zip(parameters, (a, b) => (a, b)))
+				foreach (var (argument, parameter) in arguments.Zip(parameters, (a,b) => (a,b)))
 				{
 					if (isFirst)
 					{
@@ -456,7 +456,7 @@ namespace FluentLang.Compiler.Emit
 			private void EmitRequiredMethodKeyArguments(IMethod method, TextWriter textWriter)
 			{
 				var isFirst = true;
-				foreach (var requiredMethod in _keyGenerator.GetRequiredMethodKeys(method))
+				foreach (var requiredMethod in method.RequiredMethodKeys)
 				{
 					if (!isFirst || !method.Parameters.IsEmpty)
 					{
