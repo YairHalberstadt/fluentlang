@@ -30,11 +30,11 @@ A type is either an interface or a primitive.
 
 #### Interfaces
 
-An interface is a collection of methods, which may or may not be named. All interfaces are structurally typed. An interface a is equavelent to an interface b, if for every method a defines, b defines an equavelent method, and vice versa. Two methods are equavelent if every parameter and the return type are equavelent. 
+An interface is a collection of methods, which may or may not be named. All interfaces are structurally typed. An interface a is equivalent to an interface b, if for every method a defines, b defines an equivalent method, and vice versa. Two methods are equivalent if every parameter type and the return type are equivalent. 
 
 An interface a is a subtype of another interface b, if for every method in b, a defines an equivalent method.
 
-If an interface a being equavelent to an interface b would not break this definition, they are considered equavelent, even if it is not required for them to be equivalent to avoid breaking the definition. For example:
+If an interface a being equivalent to an interface b would not break this definition, they are considered equivalent, even if it is not required for them to be equivalent to avoid breaking the definition. For example:
 
 ```
 interface a
@@ -48,7 +48,7 @@ interface b
 }
 ```
 
-Here a and b are equavelent.
+Here a and b are equivalent.
 
 Every object has an implicit interface it implements, and is a subtype of any interface this interface is a subtype of.
 
