@@ -18,6 +18,9 @@ OP_EQ:                    '==';
 OP_NE:                    '!=';
 OP_LE:                    '<=';
 OP_GE:                    '>=';
+OP_AND:                   '&&';
+OP_OR:                    '||';
+LOGICAL_OR:               '|';
 ASSIGNMENT:               '=';
 OPEN_BRACE:               '{';
 CLOSE_BRACE:              '}';
@@ -28,7 +31,6 @@ COMMA:                    ',';
 COLON:                    ':';
 SEMICOLON:                ';';
 DISCARD:                  '_';
-LOGICAL_OR:               '|';
 RIGHT_ARROW:              '=>';
 
 //baseTypes

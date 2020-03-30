@@ -710,6 +710,8 @@ namespace FluentLang.Compiler.Emit
 					Operator.NotEqual => "!=",
 					Operator.Plus => "+",
 					Operator.Remainder => "%",
+					Operator.Or => "||",
+					Operator.And => "&&",
 					_ => throw new InvalidEnumArgumentException(nameof(@operator), (int)@operator, typeof(Operator)),
 				});
 			}

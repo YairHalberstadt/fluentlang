@@ -56,35 +56,40 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 				OP_NE => Operator.NotEqual,
 				OP_LE => Operator.LessThanOrEqualTo,
 				OP_GE => Operator.GreaterThanOrEqualTo,
+				OP_AND => Operator.And,
+				OP_OR => Operator.Or,
 				var type => throw new InvalidOperationException($"Unexpected operator: {type}")
 			};
 		}
 
 		private static bool OperatorIsDefinedOnType(Operator op, Primitive primitive)
 		{
-			if (op.Equals(Operator.Equal)
-				|| op.Equals(Operator.GreaterThan)
-				|| op.Equals(Operator.GreaterThanOrEqualTo)
-				|| op.Equals(Operator.LessThan)
-				|| op.Equals(Operator.LessThanOrEqualTo)
-				|| op.Equals(Operator.NotEqual))
-				return true;
-
-			if (op.Equals(Operator.Plus))
-				return primitive.Equals(Primitive.String)
-					|| primitive.Equals(Primitive.Double)
-					|| primitive.Equals(Primitive.Int);
-
-			if (op.Equals(Operator.Minus)
-				|| op.Equals(Operator.Multiply)
-				|| op.Equals(Operator.Divide))
-				return primitive.Equals(Primitive.Double)
-					|| primitive.Equals(Primitive.Int);
-
-			if (op.Equals(Operator.Remainder))
-				return primitive.Equals(Primitive.Int);
-
-			throw Release.Fail($"unexpected operator: {op}");
+			switch (op)
+			{
+				case Operator.Equal:
+				case Operator.GreaterThan:
+				case Operator.GreaterThanOrEqualTo:
+				case Operator.LessThan:
+				case Operator.LessThanOrEqualTo:
+				case Operator.NotEqual:
+					return true;
+				case Operator.Plus:
+					return primitive.Equals(Primitive.String)
+						|| primitive.Equals(Primitive.Double)
+						|| primitive.Equals(Primitive.Int);
+				case Operator.Minus:
+				case Operator.Multiply:
+				case Operator.Divide:
+					return primitive.Equals(Primitive.Double)
+						|| primitive.Equals(Primitive.Int);
+				case Operator.Remainder:
+					return primitive.Equals(Primitive.Int);
+				case Operator.Or:
+				case Operator.And:
+					return primitive.Equals(Primitive.Bool);
+				default:
+					throw Release.Fail($"unexpected operator: {op}");
+			}
 		}
 
 		private static bool OperatorAlwaysReturnsBoolean(Operator op)

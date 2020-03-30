@@ -163,6 +163,8 @@ operator
     | OP_NE
     | OP_LE
     | OP_GE
+    | OP_OR
+    | OP_AND
     ;
 
 prefix_unary_operator

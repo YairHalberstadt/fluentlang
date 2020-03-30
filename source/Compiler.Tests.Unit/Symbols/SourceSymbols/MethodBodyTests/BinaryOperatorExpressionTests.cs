@@ -3,9 +3,8 @@ using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.TestUtils;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+
 using Xunit;
 using Xunit.Abstractions;
 
@@ -486,6 +485,166 @@ M(a : {{}}, b : {{}}) : bool {{ return a {OperatorSymbol(op)} b; }}")
 			{
 				CreateAssembly($@"
 M(a : int, b : double) : bool {{ return a {OperatorSymbol(op)} b; }}")
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
+			}
+		}
+
+		public class AndTests : TestBase
+		{
+			public AndTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+			{
+			}
+
+			[Theory]
+			[InlineData(true, true)]
+			[InlineData(true, false)]
+			[InlineData(false, true)]
+			[InlineData(false, false)]
+			public void CanAndBool(bool a, bool b)
+			{
+				var assembly = CreateAssembly($@"
+Main() : int {{ return if(M({a.ToString().ToLower()}, {b.ToString().ToLower()}) 1 else 0; }}
+M(a : bool, b : bool) : bool {{ return a && b; }}")
+					.VerifyDiagnostics().VerifyEmit(expectedResult: a && b ? 1 : 0);
+
+				var m = AssertGetMethod(assembly, "M");
+				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
+				var binaryOperatorExpression = Assert.IsAssignableFrom<IBinaryOperatorExpression>(returnStatement.Expression);
+				Assert.Equal(Operator.And, binaryOperatorExpression.Operator);
+				Assert.Equal(Primitive.Bool, binaryOperatorExpression.Type);
+			}
+
+			[Fact]
+			public void CantAndInt()
+			{
+				CreateAssembly(@"
+M(a : int, b : int) : int { return a && b; }")
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
+			}
+
+			[Fact]
+			public void CantAndDouble()
+			{
+				CreateAssembly(@"
+M(a : double, b : double) : double { return a && b; }")
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
+			}
+
+			[Fact]
+			public void CantAndChar()
+			{
+				CreateAssembly(@"
+M(a : char, b : char) : char { return a && b; }")
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
+			}
+
+			[Fact]
+			public void CantAndString()
+			{
+				CreateAssembly(@"
+M(a : string, b : string) : string { return a && b; }")
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
+			}
+
+			[Fact]
+			public void CantAndInterface()
+			{
+				CreateAssembly(@"
+M(a : {}, b : {}) : {} { return a && b; }")
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
+			}
+
+			[Fact]
+			public void CantAndTwoDifferentTypes()
+			{
+				CreateAssembly(@"
+M(a : int, b : double) : int { return a && b; }")
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
+			}
+		}
+
+		public class OrTests : TestBase
+		{
+			public OrTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+			{
+			}
+
+			[Theory]
+			[InlineData(true, true)]
+			[InlineData(true, false)]
+			[InlineData(false, true)]
+			[InlineData(false, false)]
+			public void CanOrBool(bool a, bool b)
+			{
+				var assembly = CreateAssembly($@"
+Main() : int {{ return if(M({a.ToString().ToLower()}, {b.ToString().ToLower()}) 1 else 0; }}
+M(a : bool, b : bool) : bool {{ return a || b; }}")
+					.VerifyDiagnostics().VerifyEmit(expectedResult: a || b ? 1 : 0);
+
+				var m = AssertGetMethod(assembly, "M");
+				var returnStatement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
+				var binaryOperatorExpression = Assert.IsAssignableFrom<IBinaryOperatorExpression>(returnStatement.Expression);
+				Assert.Equal(Operator.Or, binaryOperatorExpression.Operator);
+				Assert.Equal(Primitive.Bool, binaryOperatorExpression.Type);
+			}
+
+			[Fact]
+			public void CantOrInt()
+			{
+				CreateAssembly(@"
+M(a : int, b : int) : int { return a || b; }")
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
+			}
+
+			[Fact]
+			public void CantOrDouble()
+			{
+				CreateAssembly(@"
+M(a : double, b : double) : double { return a || b; }")
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
+			}
+
+			[Fact]
+			public void CantOrChar()
+			{
+				CreateAssembly(@"
+M(a : char, b : char) : char { return a || b; }")
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
+			}
+
+			[Fact]
+			public void CantOrString()
+			{
+				CreateAssembly(@"
+M(a : string, b : string) : string { return a || b; }")
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
+			}
+
+			[Fact]
+			public void CantOrInterface()
+			{
+				CreateAssembly(@"
+M(a : {}, b : {}) : {} { return a || b; }")
+					.VerifyDiagnostics(
+						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
+			}
+
+			[Fact]
+			public void CantOrTwoDifferentTypes()
+			{
+				CreateAssembly(@"
+M(a : int, b : double) : int { return a || b; }")
 					.VerifyDiagnostics(
 						new Diagnostic(new Location(new TextToken(@"a")), ErrorCode.InvalidArgument));
 			}
