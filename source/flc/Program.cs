@@ -25,6 +25,10 @@ namespace FluentLang.flc
 				{
 					Argument = new Argument<LogLevel>(defaultValue: () => LogLevel.Information)
 				},
+				new Option("--test")
+				{
+					Argument = new Argument<bool>(defaultValue: () => true)
+				},
 			};
 
 			var runCommand = new Command("run")
@@ -44,13 +48,19 @@ namespace FluentLang.flc
 			};
 
 			buildCommand.Handler = CommandHandler.Create(
-				(FileInfo solutionFile, FileInfo outputDirectory, bool outputCSharp, LogLevel verbosity) =>
+				async (FileInfo solutionFile, FileInfo outputDirectory, bool outputCSharp, LogLevel verbosity, bool test) =>
 				{
 					var builder = new ContainerBuilder();
 					builder.RegisterModule(new FlcModule(verbosity));
 					using var container = builder.Build();
 					var compiler = container.Resolve<FluentLangCompiler>();
-					return compiler.Build(solutionFile.FullName, outputDirectory.FullName, outputCSharp, default).AsTask();
+					var success = await compiler.Build(
+						solutionFile.FullName,
+						outputDirectory.FullName,
+						outputCSharp,
+						test,
+						cancellationToken: default);
+					return success ? 0 : 1;
 				});
 
 			runCommand.Handler = CommandHandler.Create(

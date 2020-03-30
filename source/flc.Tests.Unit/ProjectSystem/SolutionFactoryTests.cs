@@ -31,6 +31,7 @@ namespace FluentLang.Compiler.Tests.Unit.ProjectSystem
       ""IncludedFilesAndFolders"": [
         ""./""
       ],
+      ""IsTest"": true,
       ""References"": [
         {
           ""Type"": ""Assembly"",
@@ -53,7 +54,8 @@ namespace FluentLang.Compiler.Tests.Unit.ProjectSystem
 						new Version(0, 0),
 						ImmutableArray.Create("./"),
 						ImmutableArray.Create("bin/"),
-						ImmutableArray<Reference>.Empty),
+						ImmutableArray<Reference>.Empty,
+						isTest: false),
 					new ProjectInfo(
 						"Project2",
 						new Version(1, 2, "alpha"),
@@ -61,7 +63,8 @@ namespace FluentLang.Compiler.Tests.Unit.ProjectSystem
 						ImmutableArray<string>.Empty,
 						ImmutableArray.Create(
 							new Reference(Reference.ReferenceType.Assembly, "assembly", "1.2.3"),
-							new Reference(Reference.ReferenceType.Project, "Project1")))),
+							new Reference(Reference.ReferenceType.Project, "Project1")),
+						isTest: true)),
 				default,
 				default);
 		[Fact]

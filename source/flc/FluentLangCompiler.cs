@@ -5,6 +5,7 @@ using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.flc.DependencyLoading;
 using FluentLang.flc.ProjectSystem;
+using FluentLang.flc.Testing;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -43,7 +44,7 @@ namespace FluentLang.flc
 			_diagnosticFormatter = diagnosticFormatter;
 		}
 
-		public async ValueTask Build(string solutionFilePath, string outputDirectory, bool outputCSharp, CancellationToken cancellationToken = default)
+		public async ValueTask<bool> Build(string solutionFilePath, string outputDirectory, bool outputCSharp, bool test, CancellationToken cancellationToken = default)
 		{
 			_logger.LogDebug("Loading solution from {0}", solutionFilePath);
 			var solution = await _solutionFactory.ParseFromFileAsync(solutionFilePath).ConfigureAwait(false);
@@ -67,18 +68,43 @@ namespace FluentLang.flc
 					cancellationToken);
 
 				_logger.LogDebug("Compiling projects");
+				var assemblies = new List<Assembly>();
 				foreach (var project in projects)
 				{
-					if (!await TryCompileProject(
+					var assembly = await TryCompileProject(
 						outputDirectory,
 						outputCSharp,
 						assemblyLoadContext,
 						project,
-						cancellationToken))
+						cancellationToken);
+					if (assembly is null)
 					{
-						return;
+						return false;
 					}
+					assemblies.Add(assembly);
+
 				}
+
+				if (test)
+				{
+					_logger.LogDebug("Running tests");
+					TestResult? testResults = null;
+					foreach(var (project, assembly) in buildOrder.Zip(assemblies))
+					{
+						if (project.IsTest)
+						{
+							var results = TestRunner.RunTests(assembly);
+							testResults = testResults is null ? results : results.Merge(testResults);
+						}
+					}
+
+					_logger.LogInformation(testResults?.GetMessage() ?? "No tests found to run");
+
+					if (testResults is TestResult.Failure)
+						return false;
+				}
+
+				return true;
 			}
 			finally
 			{
@@ -86,7 +112,7 @@ namespace FluentLang.flc
 			}
 		}
 
-		private async ValueTask<bool> TryCompileProject(
+		private async ValueTask<Assembly?> TryCompileProject(
 			string outputDirectory,
 			bool outputCSharp,
 			AssemblyLoadContext assemblyLoadContext,
@@ -99,9 +125,9 @@ namespace FluentLang.flc
 				out _);
 
 			if (!ValidateCompilationResult(compilationResult, project))
-				return false;
+				return null;
 
-			assemblyLoadContext.LoadFromStream(assemblyBytes.ToStream());
+			var assembly = assemblyLoadContext.LoadFromStream(assemblyBytes.ToStream());
 
 			await WriteOutput(
 				outputDirectory,
@@ -110,7 +136,7 @@ namespace FluentLang.flc
 				csharpBytes,
 				cancellationToken);
 
-			return true;
+			return assembly;
 		}
 
 		public async ValueTask<object?> Run(string solutionFilePath, string projectName, CancellationToken cancellationToken = default)
