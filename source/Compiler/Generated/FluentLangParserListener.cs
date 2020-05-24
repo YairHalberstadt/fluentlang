@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Generated from ../grammar/FluentLangParser.g4 by ANTLR 4.7.2
+// Generated from C:\git\fluentlang\build-script\..\grammar\FluentLangParser.g4 by ANTLR 4.7.2
 
 // Unreachable code detected
 #pragma warning disable 0162
@@ -361,6 +361,18 @@ public interface IFluentLangParserListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitPrefix_unary_operator_expression([NotNull] FluentLangParser.Prefix_unary_operator_expressionContext context);
+	/// <summary>
+	/// Enter a parse tree produced by the <c>piped_static_invocation_expression</c>
+	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterPiped_static_invocation_expression([NotNull] FluentLangParser.Piped_static_invocation_expressionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by the <c>piped_static_invocation_expression</c>
+	/// labeled alternative in <see cref="FluentLangParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitPiped_static_invocation_expression([NotNull] FluentLangParser.Piped_static_invocation_expressionContext context);
 	/// <summary>
 	/// Enter a parse tree produced by the <c>member_invocation_expression</c>
 	/// labeled alternative in <see cref="FluentLangParser.expression"/>.

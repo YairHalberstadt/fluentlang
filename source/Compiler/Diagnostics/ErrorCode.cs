@@ -45,5 +45,6 @@
 		WrongNumberOfTypeArguments,
 		TypeArgumentDoesntMatchConstraints,
 		RecursiveFunctionCallWithDifferentTypeArguments,
+		PipedStaticInvocationExpressionCannotHaveQualifiedName,
 	}
 }

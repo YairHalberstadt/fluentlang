@@ -32,6 +32,7 @@ COLON:                    ':';
 SEMICOLON:                ';';
 DISCARD:                  '_';
 RIGHT_ARROW:              '=>';
+DOT_DOT:                  '..';
 
 //baseTypes
 BOOL:                     'bool';

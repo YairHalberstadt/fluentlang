@@ -13,4 +13,9 @@ namespace FluentLang.Compiler.Symbols.Interfaces.MethodBody
 		QualifiedName MethodName { get; }
 		ImmutableArray<IType> TypeArguments { get; }
 	}
+
+	public interface IPipedStaticInvocationExpression : IStaticInvocationExpression
+	{
+		new string MethodName { get; }
+	}
 }
