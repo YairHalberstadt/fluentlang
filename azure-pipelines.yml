@@ -18,6 +18,13 @@ steps:
   inputs:
     version: '3.1.200-preview-014977'
 
+- task: PowerShell@2
+  displayName: Generate Parser
+  inputs:
+    targetType: filePath
+    filePath: build-script/generate-parser.ps1
+    failOnStderr: true
+
 - script: dotnet build source/fluentlang.sln --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
 - task: DotNetCoreCLI@2
