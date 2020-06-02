@@ -1,9 +1,9 @@
 ﻿using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.ErrorSymbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.Compiler.Symbols.Source.MethodBody;
+using FluentLang.Shared;
 using System.Collections.Immutable;
 using System.Linq;
 using static FluentLang.Compiler.Generated.FluentLangParser;

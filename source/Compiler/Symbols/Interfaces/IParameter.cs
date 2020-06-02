@@ -1,6 +1,6 @@
-﻿using FluentLang.Compiler.Helpers;
-using FluentLang.Compiler.Symbols.Substituted;
+﻿using FluentLang.Compiler.Symbols.Substituted;
 using FluentLang.Compiler.Symbols.Visitor;
+using FluentLang.Shared;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 

@@ -74,6 +74,9 @@ namespace FluentLang.flc.DependencyInjection
 				.AsSelf()
 				.SingleInstance();
 
+			builder.RegisterInstance(LocalSystemDllsMetadataReferenceProvider.Instance)
+				.As<IMetadataReferenceProvider>();
+
 			builder.RegisterType<CSharpToAssemblyCompiler>()
 				.AsSelf()
 				.SingleInstance();

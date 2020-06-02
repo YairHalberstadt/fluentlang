@@ -1,4 +1,4 @@
-﻿using FluentLang.Compiler.Helpers;
+﻿using FluentLang.Shared;
 using Microsoft.Extensions.Logging;
 using NuGet.Common;
 using NuGet.Packaging.Core;

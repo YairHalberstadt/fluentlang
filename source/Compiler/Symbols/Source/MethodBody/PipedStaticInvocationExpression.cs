@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.Linq;
-using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Helpers;
+﻿using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
+using System;
+using System.Collections.Immutable;
+using System.Linq;
 using static FluentLang.Compiler.Generated.FluentLangParser;
 
 namespace FluentLang.Compiler.Symbols.Source.MethodBody

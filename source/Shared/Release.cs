@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace FluentLang.Compiler.Helpers
+namespace FluentLang.Shared
 {
 	public static class Release
 	{

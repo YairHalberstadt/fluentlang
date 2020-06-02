@@ -1,6 +1,5 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using FluentLang.Compiler.Helpers;
 using System;
 
 namespace FluentLang.Compiler.Diagnostics

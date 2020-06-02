@@ -9,8 +9,8 @@ using System.Threading;
 using System.Linq;
 using System.IO;
 using FluentLang.Compiler.Symbols;
-using FluentLang.flc.Utils;
 using System.Collections.Immutable;
+using FluentLang.Shared;
 
 namespace FluentLang.flc.DependencyLoading
 {

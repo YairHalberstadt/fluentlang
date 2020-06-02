@@ -81,7 +81,7 @@ M2() : {} | string { return {}; }").VerifyDiagnostics().VerifyEmit();
 		public void UnionIsSubtypeOfInterfaceIfAllOptionsAreSubtypeOfInterface()
 		{
 			var assembly = CreateAssembly(@"
-M1(a: { M() : int; }) : { M() : int; } | { M(): int; M1(): string } { return a; }
+M1(a: { M() : int; }) : { M() : int; } | { M(): int; M1(): string; } { return a; }
 M2(a: { M() : int; }) : { M() : int; } { return a; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
@@ -107,7 +107,7 @@ M2(a: { M() : int; }) : { M() : int; } { return a; }").VerifyDiagnostics().Verif
 		public void UnionIsSubtypeOfUnionIfAllOptionsAreSubtypeOfAnyOption()
 		{
 			var assembly = CreateAssembly(@"
-M1() : int | { M(): int; M1(): string } { return 42; }
+M1() : int | { M(): int; M1(): string; } { return 42; }
 M2() : { M() : int; } | int { return 42; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);
@@ -120,7 +120,7 @@ M2() : { M() : int; } | int { return 42; }").VerifyDiagnostics().VerifyEmit();
 		public void UnionIsNotSubtypeOfUnionIfAnyOptionsAreNotSubtypeOfAnyOption()
 		{
 			var assembly = CreateAssembly(@"
-M1() : int | { M(): int; M1(): string } { return 42; }
+M1() : int | { M(): int; M1(): string; } { return 42; }
 M2() : { M() : int; } | string { return """"; }").VerifyDiagnostics().VerifyEmit();
 
 			var u1 = Assert.IsAssignableFrom<IUnion>(AssertGetMethod(assembly, "M1").ReturnType);

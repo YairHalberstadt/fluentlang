@@ -1,6 +1,6 @@
 ﻿using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
+using FluentLang.Shared;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;

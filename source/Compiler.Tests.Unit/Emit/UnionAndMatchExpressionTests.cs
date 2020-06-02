@@ -94,7 +94,7 @@ M2(a : {}) : int { return 42; }")
 Main() : int {
 	
 	let u : { M1(): int; } | { M2(): int; } = {} + M1, M2;
-	return u match { { M1(): int; } => 42; { M2(): int; } => 41; }
+	return u match { { M1(): int; } => 42; { M2(): int; } => 41; };
 }
 
 M1(a : {}) : int { return 42; }
@@ -110,7 +110,7 @@ M2(a : {}) : int { return 42; }")
 Main() : int {
 	
 	let u : { M1(): int; } | { M2(): int; } = {} + M1, M2;
-	return u match { { M2(): int; } => 42; { M1(): int; } => 41; }
+	return u match { { M2(): int; } => 42; { M1(): int; } => 41; };
 }
 
 M1(a : {}) : int { return 42; }
@@ -127,7 +127,7 @@ Main() : int {
 	
 	let u1 : { M1(): int; } | { M2(): int; } = {} + M1, M2;
 	let u2 : { M1(): int; } | { M2(): int; } | int = u1;
-	return u2 match { { M2(): int; } => 42; { M1(): int; } => 41; int => 40; }
+	return u2 match { { M2(): int; } => 42; { M1(): int; } => 41; int => 40; };
 }
 
 M1(a : {}) : int { return 42; }
@@ -143,7 +143,7 @@ M2(a : {}) : int { return 42; }")
 Main() : int {
 	
 	let u : { M1(): int; } | { M2(): int; } = {} + M1, M2;
-	return u match { x : { M2(): int; } => x.M2(); x : { M1(): int; } => x.M1(); }
+	return u match { x : { M2(): int; } => x.M2(); x : { M1(): int; } => x.M1(); };
 }
 
 M1(a : {}) : int { return 42; }

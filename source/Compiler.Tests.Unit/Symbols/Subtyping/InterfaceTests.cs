@@ -157,8 +157,8 @@ interface I2 { M(parameter1 : int) : bool; }").VerifyDiagnostics().VerifyEmit();
 			var assembly = CreateAssembly(@"
 interface Empty {}
 interface AdditiveEmpty Empty + {}
-interface I1 { M(param1 : AdditiveEmpty()) : Empty; }
-interface I2 { M(param1 : Empty()) : AdditiveEmpty; }").VerifyDiagnostics().VerifyEmit();
+interface I1 { M(param1 : AdditiveEmpty) : Empty; }
+interface I2 { M(param1 : Empty) : AdditiveEmpty; }").VerifyDiagnostics().VerifyEmit();
 			Assert.True(assembly.TryGetInterface(QualifiedName("I1"), out var i1));
 			Assert.True(assembly.TryGetInterface(QualifiedName("I2"), out var i2));
 			Debug.Assert(i1 != null);

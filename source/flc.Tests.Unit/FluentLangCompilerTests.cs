@@ -1,8 +1,8 @@
 ﻿using Autofac;
-using FluentLang.Compiler.Helpers;
 using FluentLang.flc;
 using FluentLang.flc.DependencyInjection;
 using FluentLang.flc.DependencyLoading;
+using FluentLang.Shared;
 using FluentLang.TestUtils;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -350,7 +350,7 @@ public static class Project_AssemblyLevelMethods
 					},
 					{
 						"a.fl",
-						@"Main() : int { return 41; };"
+						@"Main() : int { return 41; }"
 					},
 					{
 						"b.fl",
@@ -499,7 +499,7 @@ public static class Project_AssemblyLevelMethods
 					},
 					{
 						"a.fl",
-						@"export M(): bool { return true; };"
+						@"export M(): bool { return true; }"
 					},
 					{
 						"b.fl",

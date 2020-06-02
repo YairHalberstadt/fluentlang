@@ -106,7 +106,8 @@ M() : {} {
 	_ : {} = {};
 	return {};
 }").VerifyDiagnostics(
-				new Diagnostic(new Location(new TextToken(@":")), ErrorCode.SyntaxError));
+				new Diagnostic(new Location(new TextToken(@":")), ErrorCode.SyntaxError),
+				new Diagnostic(new Location(new TextToken(@"=")), ErrorCode.SyntaxError));
 		}
 
 		[Fact]

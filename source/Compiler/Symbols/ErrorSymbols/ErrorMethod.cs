@@ -1,7 +1,7 @@
 ﻿using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
+using FluentLang.Shared;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;

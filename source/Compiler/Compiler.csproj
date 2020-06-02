@@ -17,11 +17,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Helpers\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Runtime\Runtime.csproj" />
+    <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 
 </Project>

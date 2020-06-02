@@ -1,12 +1,11 @@
 ﻿using FluentLang.Compiler.Compilation;
 using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Metadata;
+using FluentLang.Shared;
 using Microsoft.CodeAnalysis;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -208,7 +207,7 @@ Actual:
 		{
 			if (a.Methods.Length != b.Methods.Length)
 				return false;
-			foreach(var (am, bm) in a.Methods.Zip(b.Methods))
+			foreach (var (am, bm) in a.Methods.Zip(b.Methods))
 			{
 				if (!Equals(am, bm, dependantEqualities))
 					return false;

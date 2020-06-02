@@ -1,11 +1,11 @@
 ﻿using Dependable.Abstractions;
 using FluentLang.Compiler.Compilation;
 using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.flc.DependencyLoading;
 using FluentLang.flc.ProjectSystem;
 using FluentLang.flc.Testing;
+using FluentLang.Shared;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

@@ -19,7 +19,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			[Fact]
 			public void LiteralTrue()
 			{
-				var assembly = CreateAssembly(@"M() : bool { return true }")
+				var assembly = CreateAssembly(@"M() : bool { return true; }")
 					.VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -31,7 +31,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			[Fact]
 			public void LiteralFalse()
 			{
-				var assembly = CreateAssembly(@"M() : bool { return false }")
+				var assembly = CreateAssembly(@"M() : bool { return false; }")
 					.VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -61,7 +61,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			[InlineData(int.MaxValue)]
 			public void CorrectlyParsesIntLiterals(int val)
 			{
-				var assembly = CreateAssembly($"M() : int {{ return {val} }}")
+				var assembly = CreateAssembly($"M() : int {{ return {val}; }}")
 					.VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -73,7 +73,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			[Fact]
 			public void IntegerLiteralsCantBeOutOfSigned32BitRange()
 			{
-				CreateAssembly($"M() : int {{ return {(long)int.MaxValue + 1} }}")
+				CreateAssembly($"M() : int {{ return {(long)int.MaxValue + 1}; }}")
 					.VerifyDiagnostics(
 						new Diagnostic(new Location(new TextToken(@"2147483648")), ErrorCode.IntegerLiteralOutOfRange));
 			}
@@ -93,7 +93,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			[InlineData(double.PositiveInfinity, "200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.0")]
 			public void CorrectlyParsesDoubleLiteral(double val, string literal)
 			{
-				var assembly = CreateAssembly($"M() : double {{ return {literal} }}")
+				var assembly = CreateAssembly($"M() : double {{ return {literal}; }}")
 					.VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -117,7 +117,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			[InlineData(char.MaxValue)]
 			public void CorrectlyParsesSimpleCharLiterals(char val)
 			{
-				var assembly = CreateAssembly($"M() : char {{ return '{val}' }}")
+				var assembly = CreateAssembly($"M() : char {{ return '{val}'; }}")
 					.VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -133,7 +133,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			[InlineData(@"\t",'\t')]
 			public void CorrectlyParsesEscapedCharLiterals(string escapeString, char expected)
 			{
-				var assembly = CreateAssembly($"M() : char {{ return '{escapeString}' }}")
+				var assembly = CreateAssembly($"M() : char {{ return '{escapeString}'; }}")
 					.VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -149,7 +149,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			[InlineData(@"\uffff", '\uffff')]
 			public void CorrectlyParsesUnicodeEscapedCharLiterals(string escapeString, char expected)
 			{
-				var assembly = CreateAssembly($"M() : char {{ return '{escapeString}' }}")
+				var assembly = CreateAssembly($"M() : char {{ return '{escapeString}'; }}")
 					.VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -161,7 +161,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			[Fact]
 			public void ErrorOnEmptyLiteral()
 			{
-				CreateAssembly(@"M() : char { return '' }")
+				CreateAssembly(@"M() : char { return ''; }")
 					.VerifyDiagnostics(
 						new Diagnostic(new Location(new TextToken(@"}")), ErrorCode.SyntaxError));
 			}
@@ -169,7 +169,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			[Fact]
 			public void ErrorOnEmptyEscapeSequence()
 			{
-				CreateAssembly(@"M() : char { return '\' }")
+				CreateAssembly(@"M() : char { return '\'; }")
 					.VerifyDiagnostics(
 						new Diagnostic(new Location(new TextToken(@"}")), ErrorCode.SyntaxError));
 			}
@@ -177,53 +177,48 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			[Fact]
 			public void ErrorOnInvalidEscapeSequence()
 			{
-				CreateAssembly(@"M() : char { return '\z' }")
+				CreateAssembly(@"M() : char { return '\z'; }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError),
-						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError));
+						new Diagnostic(new Location(new TextToken(@"}")), ErrorCode.SyntaxError));
 			}
 
 			[Fact]
 			public void ErrorOnInvalidUnicodeEscapeSequence1()
 			{
-				CreateAssembly(@"M() : char { return '\uaaa' }")
+				CreateAssembly(@"M() : char { return '\uaaa'; }")
 					.VerifyDiagnostics(new Diagnostic(new Location(new TextToken(@"}")), ErrorCode.SyntaxError));
 			}
 
 			[Fact]
 			public void ErrorOnInvalidUnicodeEscapeSequence2()
 			{
-				CreateAssembly(@"M() : char { return '\u000g' }")
+				CreateAssembly(@"M() : char { return '\u000g'; }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError),
-						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError));
+						new Diagnostic(new Location(new TextToken(@"}")), ErrorCode.SyntaxError));
 			}
 
 			[Fact]
 			public void ErrorOnTooLongUnicodeEscapeSequence()
 			{
-				CreateAssembly(@"M() : char { return '\u00000' }")
+				CreateAssembly(@"M() : char { return '\u00000'; }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError),
-						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError));
+						new Diagnostic(new Location(new TextToken(@"}")), ErrorCode.SyntaxError));
 			}
 
 			[Fact]
 			public void ErrorOnTooManyChars()
 			{
-				CreateAssembly(@"M() : char { return 'aa' }")
+				CreateAssembly(@"M() : char { return 'aa'; }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError),
-						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError));
+						new Diagnostic(new Location(new TextToken(@"}")), ErrorCode.SyntaxError));
 			}
 
 			[Fact]
 			public void ErrorOnTooManyCharsAFterEscapeSequence()
 			{
-				CreateAssembly(@"M() : char { return '\na' }")
+				CreateAssembly(@"M() : char { return '\na'; }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError),
-						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError));
+						new Diagnostic(new Location(new TextToken(@"}")), ErrorCode.SyntaxError));
 			}
 		}
 
@@ -240,7 +235,7 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			[InlineData(@"{;?>!@#", "{;?>!@#")]
 			public void CanParseStringsCorrectly(string literal, string expected)
 			{
-				var assembly = CreateAssembly($"M() : string {{ return \"{literal}\" }}")
+				var assembly = CreateAssembly($"M() : string {{ return \"{literal}\"; }}")
 					.VerifyDiagnostics().VerifyEmit();
 				var m = AssertGetMethod(assembly, "M");
 				var statement = Assert.IsAssignableFrom<IReturnStatement>(m.Statements.Single());
@@ -252,25 +247,23 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			[Fact]
 			public void ErrorOnStringWithInvalidEscapeSequence0()
 			{
-				CreateAssembly(@"M() : string { return ""a\"" }")
+				CreateAssembly(@"M() : string { return ""a\""; }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError),
 						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError));
 			}
 
 			[Fact]
 			public void ErrorOnStringWithInvalidEscapeSequence1()
 			{
-				CreateAssembly(@"M() : string { return ""a\z"" }")
+				CreateAssembly(@"M() : string { return ""a\z""; }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError),
 						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError));
 			}
 
 			[Fact]
 			public void ErrorOnStringWithInvalidEscapeSequence2()
 			{
-				CreateAssembly(@"M() : string { return ""a\u000"" }")
+				CreateAssembly(@"M() : string { return ""a\u000""; }")
 					.VerifyDiagnostics(
 						new Diagnostic(new Location(new TextToken(@"}")), ErrorCode.SyntaxError));
 			}
@@ -278,9 +271,8 @@ namespace FluentLang.Compiler.Tests.Unit.Symbols.SourceSymbols.MethodBodyTests
 			[Fact]
 			public void ErrorOnStringWithInvalidEscapeSequence3()
 			{
-				CreateAssembly(@"M() : string { return ""\u000g"" }")
+				CreateAssembly(@"M() : string { return ""\u000g""; }")
 					.VerifyDiagnostics(
-						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError),
 						new Diagnostic(new Location(new TextToken(@"<EOF>")), ErrorCode.SyntaxError));
 			}
 		}

@@ -504,7 +504,7 @@ M(a : int, b : double) : bool {{ return a {OperatorSymbol(op)} b; }}")
 			public void CanAndBool(bool a, bool b)
 			{
 				var assembly = CreateAssembly($@"
-Main() : int {{ return if(M({a.ToString().ToLower()}, {b.ToString().ToLower()}) 1 else 0; }}
+Main() : int {{ return if(M({a.ToString().ToLower()}, {b.ToString().ToLower()})) 1 else 0; }}
 M(a : bool, b : bool) : bool {{ return a && b; }}")
 					.VerifyDiagnostics().VerifyEmit(expectedResult: a && b ? 1 : 0);
 
@@ -584,7 +584,7 @@ M(a : int, b : double) : int { return a && b; }")
 			public void CanOrBool(bool a, bool b)
 			{
 				var assembly = CreateAssembly($@"
-Main() : int {{ return if(M({a.ToString().ToLower()}, {b.ToString().ToLower()}) 1 else 0; }}
+Main() : int {{ return if(M({a.ToString().ToLower()}, {b.ToString().ToLower()})) 1 else 0; }}
 M(a : bool, b : bool) : bool {{ return a || b; }}")
 					.VerifyDiagnostics().VerifyEmit(expectedResult: a || b ? 1 : 0);
 

@@ -1,5 +1,4 @@
-﻿using FluentLang.Compiler.Helpers;
-using FluentLang.flc.Utils;
+﻿using FluentLang.Shared;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

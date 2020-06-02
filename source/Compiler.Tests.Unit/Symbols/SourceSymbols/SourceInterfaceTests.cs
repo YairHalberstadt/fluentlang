@@ -30,7 +30,7 @@ interface I2 {}").VerifyDiagnostics().VerifyEmit();
 		public void ExportedInterfaceCannotReferenceNonExported()
 		{
 			CreateAssembly(@"
-export interface I1 { M() : I2 }
+export interface I1 { M() : I2; }
 interface I2 {}").VerifyDiagnostics(
 				new Diagnostic(new Location(new TextToken(@"I2")), ErrorCode.CannotUseUnexportedInterfaceFromExportedMember));
 		}
@@ -39,7 +39,7 @@ interface I2 {}").VerifyDiagnostics(
 		public void ExportedInterfaceCanReferenceExported()
 		{
 			CreateAssembly(@"
-export interface I1 { M() : I2 }
+export interface I1 { M() : I2; }
 export interface I2 {}").VerifyDiagnostics().VerifyEmit();
 		}
 
@@ -47,7 +47,7 @@ export interface I2 {}").VerifyDiagnostics().VerifyEmit();
 		public void NonExportedInterfaceCanReferenceExported()
 		{
 			CreateAssembly(@"
-interface I1 { M() : I2 }
+interface I1 { M() : I2; }
 export interface I2 {}").VerifyDiagnostics().VerifyEmit();
 		}
 
@@ -55,7 +55,7 @@ export interface I2 {}").VerifyDiagnostics().VerifyEmit();
 		public void NonExportedInterfaceCanReferenceNonExported()
 		{
 			CreateAssembly(@"
-interface I1 { M() : I2 }
+interface I1 { M() : I2; }
 interface I2 {}").VerifyDiagnostics().VerifyEmit();
 		}
 

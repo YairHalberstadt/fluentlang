@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using DiagnosticErrorListener = FluentLang.Compiler.Parsing.DiagnosticErrorListener;
 
 namespace FluentLang.Compiler.Symbols.Metadata
 {
@@ -29,13 +30,12 @@ namespace FluentLang.Compiler.Symbols.Metadata
 
 			var input = new AntlrInputStream(reader);
 			var lexer = new FluentLangLexer(input);
-
 			var tokenStream = new CommonTokenStream(lexer);
 			var parser = new FluentLangParser(tokenStream);
 
-			// pick up any syntax errors
-			var errorStrategy = new ErrorStrategy(diagnostics);
-			parser.ErrorHandler = errorStrategy;
+			parser.RemoveErrorListeners();
+			parser.AddErrorListener(new DiagnosticErrorListener(diagnostics));
+
 			var t = getT(parser);
 			diagnostics.AddRange(diagnostics);
 			return t;

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Immutable;
 using System.IO;
 using static FluentLang.Compiler.Generated.FluentLangParser;
+using DiagnosticErrorListener = FluentLang.Compiler.Parsing.DiagnosticErrorListener;
 
 namespace FluentLang.Compiler.Symbols.Source
 {
@@ -38,17 +39,15 @@ namespace FluentLang.Compiler.Symbols.Source
 		public Compilation_unitContext GetSyntaxTree()
 		{
 			using var reader = new StringReader(_source);
-
 			var input = new AntlrInputStream(reader);
 			var lexer = new FluentLangLexer(input);
-
 			var tokenStream = new CommonTokenStream(lexer);
 			var parser = new FluentLangParser(tokenStream);
 
-			// pick up any syntax errors
 			var diagnostics = new DiagnosticBag(null!);
-			var errorStrategy = new ErrorStrategy(diagnostics);
-			parser.ErrorHandler = errorStrategy;
+			parser.RemoveErrorListeners();
+			parser.AddErrorListener(new DiagnosticErrorListener(diagnostics));
+
 			var compilationUnit = parser.compilation_unit();
 			_diagnostics = diagnostics.ToImmutableArray();
 			return compilationUnit;

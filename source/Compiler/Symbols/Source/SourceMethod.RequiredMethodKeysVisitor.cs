@@ -1,5 +1,4 @@
-﻿using FluentLang.Compiler.Helpers;
-using FluentLang.Compiler.Symbols.Interfaces;
+﻿using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.Compiler.Symbols.Visitor;
 using System.Collections.Generic;
@@ -58,9 +57,9 @@ namespace FluentLang.Compiler.Symbols.Source
 			{
 				foreach (var patch in objectPatchingExpression.Patches)
 				{
-					if (patch is IMixinPatch { Expression : {Type: IInterface mixedInInterface } })
+					if (patch is IMixinPatch { Expression: { Type: IInterface mixedInInterface } })
 					{
-						foreach(var method in mixedInInterface.Methods)
+						foreach (var method in mixedInInterface.Methods)
 						{
 							AddInterfaceMethodIfNecessary(method);
 						}
