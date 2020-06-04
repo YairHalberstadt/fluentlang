@@ -1,4 +1,4 @@
-﻿using FluentLang.Compiler.Helpers;
+﻿using FluentLang.Shared;
 using System.Collections.Generic;
 using System.Linq;
 

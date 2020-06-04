@@ -1,5 +1,5 @@
-﻿using FluentLang.Compiler.Helpers;
-using FluentLang.Compiler.Symbols.Visitor;
+﻿using FluentLang.Compiler.Symbols.Visitor;
+using FluentLang.Shared;
 using System.Collections.Generic;
 
 namespace FluentLang.Compiler.Symbols.Interfaces

@@ -1,5 +1,5 @@
-﻿using FluentLang.Compiler.Helpers;
-using FluentLang.Compiler.Symbols.Visitor;
+﻿using FluentLang.Compiler.Symbols.Visitor;
+using FluentLang.Shared;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

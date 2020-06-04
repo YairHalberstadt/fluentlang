@@ -2,7 +2,7 @@
 using System.IO;
 using System.Runtime.CompilerServices;
 
-namespace FluentLang.Compiler.Helpers
+namespace FluentLang.Shared
 {
 	public static class ImmutableArrayExtensions
 	{

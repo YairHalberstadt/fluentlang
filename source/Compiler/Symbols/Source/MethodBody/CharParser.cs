@@ -1,5 +1,5 @@
 ﻿using System;
-using FluentLang.Compiler.Helpers;
+using FluentLang.Shared;
 
 namespace FluentLang.Compiler.Symbols.Source.MethodBody
 {

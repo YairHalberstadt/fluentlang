@@ -1,7 +1,7 @@
 ﻿using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.ErrorSymbols;
 using FluentLang.Compiler.Symbols.Interfaces;
+using FluentLang.Shared;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -96,7 +96,7 @@ namespace FluentLang.Compiler.Symbols.Source
 				{
 					possibleTs = getLocalTs(scope)
 						.Where(
-							x => getFullyQualifiedName(x) == name 
+							x => getFullyQualifiedName(x) == name
 							&& getTypeParameters(x).Length == typeArguments.Length)
 						.ToList();
 					if (possibleTs.Count > 0)

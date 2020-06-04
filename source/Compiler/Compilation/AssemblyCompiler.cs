@@ -2,6 +2,7 @@
 using FluentLang.Compiler.Symbols.Interfaces;
 using System.Collections.Immutable;
 using System.IO;
+using System.Threading;
 using Diagnostic = FluentLang.Compiler.Diagnostics.Diagnostic;
 
 namespace FluentLang.Compiler.Compilation
@@ -23,8 +24,10 @@ namespace FluentLang.Compiler.Compilation
 			IAssembly assembly,
 			Stream outputStream,
 			Stream? csharpOutputStream = null,
-			Stream? pdbStream = null)
+			Stream? pdbStream = null,
+			CancellationToken cancellationToken = default)
 		{
+			cancellationToken.ThrowIfCancellationRequested();
 			var diagnostics = assembly.AllDiagnostics;
 			if (diagnostics.Length > 0)
 				return new CompilationResult(
@@ -32,11 +35,14 @@ namespace FluentLang.Compiler.Compilation
 					diagnostics,
 					ImmutableArray<Microsoft.CodeAnalysis.Diagnostic>.Empty);
 
+			cancellationToken.ThrowIfCancellationRequested();
 			csharpOutputStream ??= new MemoryStream();
 			var writer = new StreamWriter(csharpOutputStream);
 			var reader = new StreamReader(csharpOutputStream);
 
 			_fluentlangToCSharpEmitter.Emit(assembly, writer);
+
+			cancellationToken.ThrowIfCancellationRequested();
 
 			csharpOutputStream.Position = 0;
 
@@ -44,7 +50,8 @@ namespace FluentLang.Compiler.Compilation
 				reader,
 				assembly,
 				outputStream,
-				pdbStream);
+				pdbStream,
+				cancellationToken);
 
 			if (!emitResult.Success)
 			{

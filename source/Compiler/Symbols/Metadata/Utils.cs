@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using DiagnosticErrorListener = FluentLang.Compiler.Parsing.DiagnosticErrorListener;
 
 namespace FluentLang.Compiler.Symbols.Metadata
 {
@@ -25,19 +26,9 @@ namespace FluentLang.Compiler.Symbols.Metadata
 
 		public static T Parse<T>(string source, Func<FluentLangParser, T> getT, DiagnosticBag diagnostics) where T : ParserRuleContext
 		{
-			using var reader = new StringReader(source);
+			var parser = ParserFactory.Create(source, diagnostics);
 
-			var input = new AntlrInputStream(reader);
-			var lexer = new FluentLangLexer(input);
-
-			var tokenStream = new CommonTokenStream(lexer);
-			var parser = new FluentLangParser(tokenStream);
-
-			// pick up any syntax errors
-			var errorStrategy = new ErrorStrategy(diagnostics);
-			parser.ErrorHandler = errorStrategy;
 			var t = getT(parser);
-			diagnostics.AddRange(diagnostics);
 			return t;
 		}
 	}

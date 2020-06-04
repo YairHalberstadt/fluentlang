@@ -32,6 +32,7 @@ COLON:                    ':';
 SEMICOLON:                ';';
 DISCARD:                  '_';
 RIGHT_ARROW:              '=>';
+DOT_DOT:                  '..';
 
 //baseTypes
 BOOL:                     'bool';
@@ -138,3 +139,5 @@ fragment UnicodeEscapeSequence
 	;
 
 fragment HexDigit : [0-9] | [A-F] | [a-f];
+
+ErrorChar : . ;

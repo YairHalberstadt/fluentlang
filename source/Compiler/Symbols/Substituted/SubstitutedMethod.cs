@@ -1,7 +1,7 @@
 ﻿using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
+using FluentLang.Shared;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -42,7 +42,7 @@ namespace FluentLang.Compiler.Symbols.Substituted
 			var originalDirectlyRequiredMethodKeys = _original.DirectlyRequiredMethodKeys;
 			var directlyRequiredMethodKeys = _directlyRequiredMethodKeys.Value;
 
-			foreach(var requiredMethod in _original.RequiredMethodKeys)
+			foreach (var requiredMethod in _original.RequiredMethodKeys)
 			{
 				if (index < originalDirectlyRequiredMethodKeys.Length && requiredMethod.Equals(originalDirectlyRequiredMethodKeys[index]))
 				{
@@ -97,6 +97,6 @@ namespace FluentLang.Compiler.Symbols.Substituted
 
 		ImmutableArray<MethodOrInterfaceMethod> IMethod.DirectlyRequiredMethodKeys => _directlyRequiredMethodKeys.Value;
 
-		void ISymbol.EnsureAllLocalDiagnosticsCollected() {}
+		void ISymbol.EnsureAllLocalDiagnosticsCollected() { }
 	}
 }

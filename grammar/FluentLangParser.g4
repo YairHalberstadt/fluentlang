@@ -130,8 +130,9 @@ expression
     | expression operator expression                                      #binary_operator_expression
     | prefix_unary_operator expression                                    #prefix_unary_operator_expression
     | literal                                                             #literal_expression
-    | method_reference invocation                                           #static_invocation_expression
+    | method_reference invocation                                         #static_invocation_expression
     | expression DOT UPPERCASE_IDENTIFIER invocation                      #member_invocation_expression
+    | expression DOT_DOT method_reference invocation                  #piped_static_invocation_expression
     | IF OPEN_PARENS expression CLOSE_PARENS expression ELSE expression   #conditional_expression
     | OPEN_PARENS expression CLOSE_PARENS                                 #parenthesized_expression
     | LOWERCASE_IDENTIFIER                                                #local_reference_expression

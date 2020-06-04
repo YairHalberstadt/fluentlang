@@ -1,8 +1,7 @@
-﻿using FluentLang.Compiler.Helpers;
-using FluentLang.Compiler.Symbols;
+﻿using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.flc.ProjectSystem;
-using FluentLang.flc.Utils;
+using FluentLang.Shared;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;

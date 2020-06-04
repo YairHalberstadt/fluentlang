@@ -6,6 +6,7 @@ using FluentLang.TestUtils;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Xunit;
 using Xunit.Abstractions;
 using Version = FluentLang.Compiler.Symbols.Interfaces.Version;
@@ -200,7 +201,7 @@ namespace A.B.C
 
 		private class MockAssemblyCompiler : IAssemblyCompiler
 		{
-			public CompilationResult CompileAssembly(IAssembly assembly, Stream outputStream, Stream? csharpOutputStream = null, Stream? pdbStream = null)
+			public CompilationResult CompileAssembly(IAssembly assembly, Stream outputStream, Stream? csharpOutputStream = null, Stream? pdbStream = null, CancellationToken cancellationToken = default)
 			{
 				throw new System.NotImplementedException();
 			}

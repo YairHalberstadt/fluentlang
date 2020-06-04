@@ -1,5 +1,4 @@
 ﻿using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.Compiler.Symbols.Source.MethodBody;
@@ -277,10 +276,10 @@ namespace FluentLang.Compiler.Symbols.Source
 				}
 
 				methodStack.Add(method.OriginalDefinition, method);
-				foreach(var requiredMethod in method.DirectlyRequiredMethodKeys)
+				foreach (var requiredMethod in method.DirectlyRequiredMethodKeys)
 				{
 					results.Add(requiredMethod);
-					if(requiredMethod.TryGetMethod(out var childMethod))
+					if (requiredMethod.TryGetMethod(out var childMethod))
 					{
 						if (childMethod.OriginalDefinition == this && !requiredMethod.IsEquivalentToOriginal())
 						{

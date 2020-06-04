@@ -1,6 +1,6 @@
-﻿using FluentLang.Compiler.Helpers;
-using FluentLang.Compiler.Symbols;
+﻿using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
+using FluentLang.Shared;
 using System.Collections.Generic;
 using System.Linq;
 

@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-namespace FluentLang.Compiler.Helpers
+namespace FluentLang.Shared
 {
 	public class ImmutableArrayDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>
 	{
@@ -49,7 +49,7 @@ namespace FluentLang.Compiler.Helpers
 		}
 
 #pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member because of nullability attributes.
-		public bool TryGetValue(TKey key, [MaybeNullWhen(false)]out TValue value)
+		public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
 #pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member because of nullability attributes.
 		{
 			foreach (var (k, v) in _entries)

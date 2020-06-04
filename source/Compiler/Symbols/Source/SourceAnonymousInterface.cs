@@ -1,5 +1,4 @@
 ﻿using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.ErrorSymbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using System;
@@ -56,7 +55,7 @@ namespace FluentLang.Compiler.Symbols.Source
 						var type = _sourceSymbolContext.GetTypeOrError(
 							x.qualified_name().GetQualifiedName(),
 							x.type_argument_list().BindTypeArgumentList(_sourceSymbolContext, _diagnostics),
-                            out var diagnostic); ;
+							out var diagnostic); ;
 						if (diagnostic != null)
 						{
 							_diagnostics.Add(diagnostic(new Location(x)));

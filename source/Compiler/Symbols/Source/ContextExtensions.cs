@@ -1,9 +1,9 @@
 ﻿using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Helpers;
 using FluentLang.Compiler.Symbols.ErrorSymbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.Compiler.Symbols.Source.MethodBody;
+using FluentLang.Shared;
 using System.Collections.Immutable;
 using System.Linq;
 using static FluentLang.Compiler.Generated.FluentLangParser;
@@ -192,6 +192,8 @@ namespace FluentLang.Compiler.Symbols.Source
 				Literal_expressionContext lec => new LiteralExpression(lec, diagnostics),
 				Static_invocation_expressionContext siec
 					=> new StaticInvocationExpression(siec, methodBodySymbolContext, diagnostics),
+				Piped_static_invocation_expressionContext psiec
+					=> new PipedStaticInvocationExpression(psiec, methodBodySymbolContext, diagnostics),
 				Member_invocation_expressionContext miec
 					=> new MemberInvocationExpression(miec, methodBodySymbolContext, diagnostics),
 				Conditional_expressionContext cec => new ConditionalExpression(cec, methodBodySymbolContext, diagnostics),

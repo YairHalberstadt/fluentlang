@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using FluentLang.Compiler.Diagnostics;
-using FluentLang.Compiler.Helpers;
-using FluentLang.Compiler.Symbols.ErrorSymbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using static FluentLang.Compiler.Generated.FluentLangParser;
@@ -50,65 +46,13 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 
 		private IMethod BindMethod()
 		{
-			var methods = _methodBodySymbolContext.SourceSymbolContext.GetPossibleMethods(MethodName, TypeArguments);
-
-			var matching =
-				methods
-				.Where(x => x.Parameters.Length == Arguments.Length)
-				.Select(x =>
-				{
-					Diagnostic? diagnostic = null;
-					if (TypeArguments.Length > 0)
-					{
-						var typeParameters = x.TypeParameters;
-						if (!SourceSymbolContextExtensions.HasValidTypeArguments(
-							TypeArguments,
-							typeParameters,
-							out var diagnosticFunc))
-						{
-							diagnostic = diagnosticFunc(new Location(_context.method_reference()));
-						}
-						var substituted = x.Substitute(
-							SourceSymbolContextExtensions.CreateTypeMap(TypeArguments, typeParameters),
-							new Dictionary<IType, IType>());
-						
-						return (method: substituted, diagnostic);
-					}
-					return (method: x, diagnostic: null);
-				})
-				.Where(x => x.method.Parameters.Zip(Arguments, (p, a) => a.Type.IsSubtypeOf(p.Type)).All(x => x))
-				.ToList();
-
-			if (matching.Count == 1)
-			{
-				var (target, diagnostic) = matching[0];
-
-				if (diagnostic != null)
-				{
-					_diagnostics.Add(diagnostic);
-				}
-
-				_methodBodySymbolContext.WarnIfUseOfMethodWhichCapturesUnassignedLocals(target, _diagnostics, _context.method_reference());
-				return target;
-			}
-				
-
-			if (matching.Count == 0)
-			{
-				_diagnostics.Add(new Diagnostic(
-					new Location(_context.method_reference()),
-					ErrorCode.MethodNotFound,
-					ImmutableArray.Create<object?>(MethodName, Arguments)));
-			}
-			else
-			{
-				_diagnostics.Add(new Diagnostic(
-					new Location(_context.method_reference()),
-					ErrorCode.AmbigiousMethodReference,
-					ImmutableArray.Create<object?>(matching)));
-			}
-
-			return new ErrorMethod(MethodName, Arguments.Length);
+			return StaticInvocationMethodBinder.BindMethod(
+                MethodName,
+                TypeArguments,
+                Arguments,
+                _context.method_reference(),
+                _methodBodySymbolContext,
+                _diagnostics);
 		}
 
 		public QualifiedName MethodName { get; }
@@ -124,6 +68,7 @@ namespace FluentLang.Compiler.Symbols.Source.MethodBody
 		protected override void EnsureAllLocalDiagnosticsCollected()
 		{
 			_ = _arguments.Value;
+			_ = _typeArguments.Value;
 			_ = _method.Value;
 		}
 	}

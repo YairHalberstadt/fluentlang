@@ -1,5 +1,5 @@
-﻿using FluentLang.Compiler.Helpers;
-using FluentLang.Compiler.Symbols.Interfaces;
+﻿using FluentLang.Compiler.Symbols.Interfaces;
+using FluentLang.Shared;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -17,7 +17,7 @@ internal struct MethodOrInterfaceMethod : IEquatable<MethodOrInterfaceMethod>
 	public MethodOrInterfaceMethod(IMethod method, ImmutableArray<IType> typeArguments) : this()
 	{
 		_method = method;
-		_typeArguments = typeArguments.All(x => x is ITypeParameter) 
+		_typeArguments = typeArguments.All(x => x is ITypeParameter)
 			? typeArguments.Cast<ITypeParameter>().ToImmutableArray()
 			: ImmutableArray<ITypeParameter>.Empty;
 	}
@@ -64,7 +64,7 @@ internal struct MethodOrInterfaceMethod : IEquatable<MethodOrInterfaceMethod>
 
 	public override bool Equals(object? obj)
 	{
-		return obj is MethodOrInterfaceMethod method 
+		return obj is MethodOrInterfaceMethod method
 			&& ReferenceEquals(_method, method._method)
 			&& ReferenceEquals(_interfaceMethod, method._interfaceMethod);
 	}
