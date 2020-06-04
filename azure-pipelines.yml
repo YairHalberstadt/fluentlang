@@ -35,6 +35,36 @@ steps:
     arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
+  displayName: Publish App
+  inputs:
+    command: publish
+    # Important: If you zip the publish, the GitHub Pages script will need to unzip it first
+    zipAfterPublish: false
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifacts'
+  inputs:
+    pathtoPublish: $(Build.ArtifactStagingDirectory)/WebIde
+    artifactName: 'Dist'
+
+- script: |
+    git config --global user.name "$NAME"
+    git config --global user.email "$EMAIL"
+    cd $(Build.ArtifactStagingDirectory)/Client/wwwroot
+    git init
+    git checkout -b gh-pages
+    git add -A
+    git commit -m "Create build $(Build.BuildId)"
+    git push -f https://$PAT@github.com/YairHalberstadt/fluentlang.io.git gh-pages
+  displayName: 'Publish to GitHub Pages'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  env:
+    PAT: $(GitHubPAT)
+    NAME: $(GitHubName)
+    EMAIL: $(GitHubEmail)
+
+- task: DotNetCoreCLI@2
   displayName: Nuget Pack
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
