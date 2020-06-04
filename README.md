@@ -244,10 +244,9 @@ Look into more efficient incremental compilation.
 Projects which should be possible for someone else to do with us stepping on each others toes:
 
 1. Look into more efficient incremental compilation. Can we avoid recompiling everything whenever a single file in a single dependency changes?
-2. Report syntax errors when ANTLR automatically recover from them.
-3. Improve syntax error recovery. Currently we discard the entire file if it contains a syntax error. Thats a really bad strategy for an IDE.
-4. Look into APIs for code completion, syntax highlighting, etc.
-5. Come up with design proposals for: Generic interface methods, method subtyping, error handling (exceptions?, result types?)
+1. Improve syntax error recovery. Currently we discard the entire file if it contains a syntax error. Thats a really bad strategy for an IDE.
+1. Look into APIs for code completion, syntax highlighting, etc.
+1. Come up with design proposals for: Generic interface methods, method subtyping, error handling (exceptions?, result types?)
     - Design proposals should be created as issues on this repository with the heading "Proposal:". E.g. "Proposal: design for Method Subtyping".
-6. [Improve diagnostic messages](https://github.com/YairHalberstadt/fluentlang/issues/7)
-7. Create Blazor WebIDE - this is a big task, but completely seperate from the main development, and so perfect for anyone who knows web development well.
+1. [Improve diagnostic messages](https://github.com/YairHalberstadt/fluentlang/issues/7)
+1. Improve Blazor WebIDE. My web design skills are extremely primitive. Any help here would be greatly appreciated.
