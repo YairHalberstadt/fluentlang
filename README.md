@@ -233,9 +233,9 @@ Design and implement generics. See #9, #10.
 
 Implement Standard Libraries. This will be mixed C# Libraries with FluentLang Metadata and FluentLang libraries.
 
-### ToDo
+Create Blazor WebIDE.
 
-Create Blazor WebIDE. This may have to wait till client side blazor stabilizes, and possibly till .Net 5 provides some missing APIs.
+### ToDo
 
 Look into more efficient incremental compilation.
 
