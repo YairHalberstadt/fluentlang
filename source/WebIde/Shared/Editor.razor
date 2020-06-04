@@ -1,0 +1,65 @@
+﻿@inherits LayoutComponentBase
+@inject IJSRuntime JsRuntime
+
+<div class="body">
+    <div class="split left">
+        <textarea class="input pane flex"
+                  @bind-value="Source"
+                  @bind-value:event="oninput">
+        </textarea>
+    </div>
+    <div class="split right">
+        <div class="tab">
+            <button class=@(CurrentTab == Tab.EmittedCSharp ? "tablinks active" : "tablinks")
+                    @onclick=@(() => CurrentTab = Tab.EmittedCSharp)>
+                Emitted CSharp
+            </button>
+            <button class=@(CurrentTab == Tab.Result ? "tablinks active" : "tablinks")
+                    @onclick=@(() => CurrentTab = Tab.Result)>
+                Result
+            </button>
+        </div>
+        <div id="csharp" class="output flex" hidden=@(CurrentTab != Tab.EmittedCSharp)>
+            <header>Emitted CSharp</header>
+            <pre class="output">
+                @*this forces the entire tag to regenerate every time, 
+                  which is necessary as highlight.js changes the tag*@
+                @if (EmittedCSharp != null)
+                {
+                    <code class="lang-csharp">@EmittedCSharp</code>
+                }
+            </pre>
+        </div>
+        <div id="result" class="output flex" hidden=@(CurrentTab != Tab.Result)>
+            <header>Result</header>
+            @Result
+        </div>
+        <div id="diagnostics" class="output diagnostic flex" hidden=@(Diagnostics.IsDefault)>
+            <header>Diagnostics</header>
+            <ul>
+                @if (!Diagnostics.IsDefault)
+                {
+                    @foreach (var diagnostic in Diagnostics)
+                    {
+                        <li>@diagnostic</li>
+                    }
+                }
+            </ul>
+        </div>
+        <div id="runtime-error" class="output diagnostic flex" hidden=@(RuntimeError == null)>
+            <header>Runtime Error</header>
+            @RuntimeError
+        </div>
+    </div>
+</div>
+
+@code {
+
+    Tab CurrentTab = Tab.EmittedCSharp;
+
+    enum Tab
+    {
+        EmittedCSharp,
+        Result,
+    }
+}
