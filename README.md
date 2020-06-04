@@ -6,6 +6,11 @@ FluentLang is an experimental programming language designed to explore the inter
 
 Currently it is very much a work in progress.
 
+## Try It Out!!
+
+Try out the WebIde at https://yairhalberstadt.github.io/fluentlang.io/
+It's currently in progress, so let me know what you think!
+
 ## Building
 
 Command Line: Make sure dotnet core 3.1 is installed. Run `dotnet build` to build, and `dotnet test` to run tests.
