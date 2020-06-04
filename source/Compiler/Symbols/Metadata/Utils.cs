@@ -26,18 +26,9 @@ namespace FluentLang.Compiler.Symbols.Metadata
 
 		public static T Parse<T>(string source, Func<FluentLangParser, T> getT, DiagnosticBag diagnostics) where T : ParserRuleContext
 		{
-			using var reader = new StringReader(source);
-
-			var input = new AntlrInputStream(reader);
-			var lexer = new FluentLangLexer(input);
-			var tokenStream = new CommonTokenStream(lexer);
-			var parser = new FluentLangParser(tokenStream);
-
-			parser.RemoveErrorListeners();
-			parser.AddErrorListener(new DiagnosticErrorListener(diagnostics));
+			var parser = ParserFactory.Create(source, diagnostics);
 
 			var t = getT(parser);
-			diagnostics.AddRange(diagnostics);
 			return t;
 		}
 	}

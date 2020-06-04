@@ -38,15 +38,8 @@ namespace FluentLang.Compiler.Symbols.Source
 
 		public Compilation_unitContext GetSyntaxTree()
 		{
-			using var reader = new StringReader(_source);
-			var input = new AntlrInputStream(reader);
-			var lexer = new FluentLangLexer(input);
-			var tokenStream = new CommonTokenStream(lexer);
-			var parser = new FluentLangParser(tokenStream);
-
 			var diagnostics = new DiagnosticBag(null!);
-			parser.RemoveErrorListeners();
-			parser.AddErrorListener(new DiagnosticErrorListener(diagnostics));
+			var parser = ParserFactory.Create(_source, diagnostics);
 
 			var compilationUnit = parser.compilation_unit();
 			_diagnostics = diagnostics.ToImmutableArray();

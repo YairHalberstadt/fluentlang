@@ -45,7 +45,7 @@ public partial class FluentLangParser : Parser {
 		STRING=33, LITERAL_TRUE=34, LITERAL_FALSE=35, INTEGER_LITERAL=36, REAL_LITERAL=37, 
 		CHARACTER_LITERAL=38, REGULAR_STRING=39, NAMESPACE=40, INTERFACE=41, RETURN=42, 
 		IF=43, ELSE=44, MIXIN=45, EXPORT=46, OPEN=47, LET=48, MATCH=49, UPPERCASE_IDENTIFIER=50, 
-		LOWERCASE_IDENTIFIER=51;
+		LOWERCASE_IDENTIFIER=51, ErrorChar=52;
 	public const int
 		RULE_compilation_unit = 0, RULE_open_directives = 1, RULE_open_directive = 2, 
 		RULE_qualified_name = 3, RULE_namespace_member_declaration = 4, RULE_namespace_declaration = 5, 
@@ -92,7 +92,8 @@ public partial class FluentLangParser : Parser {
 		"DOT_DOT", "BOOL", "INT", "DOUBLE", "CHAR", "STRING", "LITERAL_TRUE", 
 		"LITERAL_FALSE", "INTEGER_LITERAL", "REAL_LITERAL", "CHARACTER_LITERAL", 
 		"REGULAR_STRING", "NAMESPACE", "INTERFACE", "RETURN", "IF", "ELSE", "MIXIN", 
-		"EXPORT", "OPEN", "LET", "MATCH", "UPPERCASE_IDENTIFIER", "LOWERCASE_IDENTIFIER"
+		"EXPORT", "OPEN", "LET", "MATCH", "UPPERCASE_IDENTIFIER", "LOWERCASE_IDENTIFIER", 
+		"ErrorChar"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -3117,7 +3118,7 @@ public partial class FluentLangParser : Parser {
 
 	private static char[] _serializedATN = {
 		'\x3', '\x608B', '\xA72A', '\x8133', '\xB9ED', '\x417C', '\x3BE7', '\x7786', 
-		'\x5964', '\x3', '\x35', '\x18A', '\x4', '\x2', '\t', '\x2', '\x4', '\x3', 
+		'\x5964', '\x3', '\x36', '\x18A', '\x4', '\x2', '\t', '\x2', '\x4', '\x3', 
 		'\t', '\x3', '\x4', '\x4', '\t', '\x4', '\x4', '\x5', '\t', '\x5', '\x4', 
 		'\x6', '\t', '\x6', '\x4', '\a', '\t', '\a', '\x4', '\b', '\t', '\b', 
 		'\x4', '\t', '\t', '\t', '\x4', '\n', '\t', '\n', '\x4', '\v', '\t', '\v', 

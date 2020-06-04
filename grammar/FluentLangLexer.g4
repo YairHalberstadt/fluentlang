@@ -139,3 +139,5 @@ fragment UnicodeEscapeSequence
 	;
 
 fragment HexDigit : [0-9] | [A-F] | [a-f];
+
+ErrorChar : . ;
