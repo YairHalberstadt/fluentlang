@@ -49,6 +49,7 @@ steps:
     artifactName: 'Dist'
 
 - script: |
+    rm -rf **.git
     git config --global user.name "$NAME"
     git config --global user.email "$EMAIL"
     cd $(Build.ArtifactStagingDirectory)/Client/wwwroot
