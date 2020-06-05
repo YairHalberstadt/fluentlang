@@ -22,8 +22,9 @@
         }
     </script>
     <script>
-        window.highlight = (element) => {
-            hljs.highlightBlock(element)
+        window.highlight = (element, text) => {
+            element.children[0].innerText = text;
+            hljs.highlightBlock(element.children[0]);
         }
     </script>
 </head>
