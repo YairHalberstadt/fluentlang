@@ -20,8 +20,6 @@
         <div id="csharp" class="output flex" hidden=@(CurrentTab != Tab.EmittedCSharp)>
             <header>Emitted CSharp</header>
             <pre class="output" @ref="EmittedCSharpRef">
-                @*this forces the entire tag to regenerate every time, 
-                  which is necessary as highlight.js changes the tag*@
                 <code class="lang-csharp" ></code>
             </pre>
         </div>
@@ -50,8 +48,8 @@
 
 @code {
 
-        Tab CurrentTab = Tab.EmittedCSharp;
-        ElementReference EmittedCSharpRef;
+    Tab CurrentTab = Tab.EmittedCSharp;
+    ElementReference EmittedCSharpRef;
 
     enum Tab
     {
@@ -63,8 +61,7 @@
     {
         if (firstRender)
         {
-            using var editorRef = DotNetObjectReference.Create(this);
-            await JsRuntime.InvokeVoidAsync("initEditor", editorRef).AsTask();
+            await JsRuntime.InvokeVoidAsync("initEditor", _thisRef).AsTask();
         }
         if (EmittedCSharp != null)
             await Highlight();

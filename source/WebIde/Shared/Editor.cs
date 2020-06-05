@@ -17,8 +17,15 @@ using System.Threading.Tasks;
 
 namespace FluentLang.WebIde.Shared
 {
-	public partial class Editor : LayoutComponentBase
+	public partial class Editor : LayoutComponentBase, IDisposable
 	{
+		public Editor()
+		{
+			_thisRef = DotNetObjectReference.Create(this);
+		}
+
+		private readonly DotNetObjectReference<Editor> _thisRef;
+
 		private string _source = "";
 
 		[Inject]
@@ -135,5 +142,10 @@ namespace FluentLang.WebIde.Shared
 		private string? Result { get; set; }
 		private string? RuntimeError { get; set; }
 		private ImmutableArray<string> Diagnostics { get; set; }
+
+		public void Dispose()
+		{
+			_thisRef.Dispose();
+		}
 	}
 }
