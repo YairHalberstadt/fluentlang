@@ -1,12 +1,10 @@
-﻿@inherits LayoutComponentBase
+﻿@using System.ComponentModel
+@inherits LayoutComponentBase
 @inject IJSRuntime JsRuntime
 
 <div class="body">
     <div class="split left">
-        <textarea class="input pane flex"
-                  @bind-value="Source"
-                  @bind-value:event="oninput">
-        </textarea>
+        <div id="editor" style="position:absolute; height: 100%; width: 100%">Text</div>
     </div>
     <div class="split right">
         <div class="tab">
@@ -24,9 +22,9 @@
             <pre class="output">
                 @*this forces the entire tag to regenerate every time, 
                   which is necessary as highlight.js changes the tag*@
-                @if (EmittedCSharp != null)
+                @if(EmittedCSharp != null)
                 {
-                    <code class="lang-csharp">@EmittedCSharp</code>
+            <code class="lang-csharp" @ref="EmittedCSharpRef">@EmittedCSharp</code>
                 }
             </pre>
         </div>
@@ -56,10 +54,29 @@
 @code {
 
     Tab CurrentTab = Tab.EmittedCSharp;
+    ElementReference EmittedCSharpRef;
 
     enum Tab
     {
         EmittedCSharp,
         Result,
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var editorRef = DotNetObjectReference.Create(this);
+            await JsRuntime.InvokeVoidAsync("initEditor", editorRef).AsTask();
+        }
+        await Highlight();
+    }
+
+    [JSInvokable, Obsolete("only for js interop", error: true), EditorBrowsable(EditorBrowsableState.Never)]
+    public void SetSource(string source) => Source = source;
+
+    private ValueTask Highlight()
+    {
+        return JsRuntime.InvokeVoidAsync("highlight", EmittedCSharpRef);
     }
 }

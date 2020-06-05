@@ -3,15 +3,15 @@ using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Symbols;
 using FluentLang.Compiler.Symbols.Interfaces;
 using Microsoft.AspNetCore.Components;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.JSInterop;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Loader;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -39,7 +39,7 @@ namespace FluentLang.WebIde.Shared
 			set
 			{
 				CancellationToken token;
-				lock(_lock)
+				lock (_lock)
 				{
 					_cancellationTokenSource?.Cancel();
 					_cancellationTokenSource?.Dispose();
@@ -52,7 +52,7 @@ namespace FluentLang.WebIde.Shared
 					Diagnostics = default;
 					RuntimeError = default;
 				}
-
+				StateHasChanged();
 
 				Task.Run(async () =>
 				{
@@ -87,8 +87,8 @@ namespace FluentLang.WebIde.Shared
 					}
 					else
 					{
-						var emittedCSharp = Encoding.Default.GetString(csharpStream.GetBuffer(), 0, (int)csharpStream.Length);
-
+						csharpStream.Position = 0;
+						var emittedCSharp = CSharpSyntaxTree.ParseText(SourceText.From(csharpStream)).GetRoot().NormalizeWhitespace().ToFullString();
 						await Task.Yield();
 						lock (_lock)
 						{
@@ -127,7 +127,6 @@ namespace FluentLang.WebIde.Shared
 							}
 						}
 					}
-					await Highlight();
 					StateHasChanged();
 				}, token);
 			}
@@ -137,10 +136,5 @@ namespace FluentLang.WebIde.Shared
 		private string? Result { get; set; }
 		private string? RuntimeError { get; set; }
 		private ImmutableArray<string> Diagnostics { get; set; }
-
-		private ValueTask Highlight()
-		{
-			return JsRuntime.InvokeVoidAsync("highlight");
-		}
 	}
 }
