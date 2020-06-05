@@ -30,10 +30,10 @@ namespace FluentLang.Compiler.Emit
 
 			public void Emit(IAssembly assembly, TextWriter textWriter)
 			{
-				textWriter.WriteLine("using FluentLang.Runtime;");
-				textWriter.WriteLine("using FluentLang.Runtime.Metadata;");
-				textWriter.WriteLine("using System;");
-				textWriter.WriteLine("using AssemblyFileVersionAttribute = System.Reflection.AssemblyFileVersionAttribute;");
+				textWriter.Write("using FluentLang.Runtime;");
+				textWriter.Write("using FluentLang.Runtime.Metadata;");
+				textWriter.Write("using System;");
+				textWriter.Write("using AssemblyFileVersionAttribute = System.Reflection.AssemblyFileVersionAttribute;");
 
 				MetadataEmitter.EmitAssemblyNameAttribute(assembly.Name, textWriter);
 				MetadataEmitter.EmitAssemblyFileVersionAttribute(assembly.Version, textWriter);
@@ -51,12 +51,11 @@ namespace FluentLang.Compiler.Emit
 				textWriter.Write("public static class ");
 				textWriter.Write(Utils.GetAssemblyLevelMethodsClassName(assembly.Name.ToString()));
 				textWriter.Write("{");
-				textWriter.WriteLine();
 				foreach (var method in assembly.Methods)
 				{
 					Emit(method, textWriter);
 				}
-				textWriter.WriteLine("}");
+				textWriter.Write("}");
 				textWriter.Flush();
 			}
 
@@ -122,7 +121,7 @@ namespace FluentLang.Compiler.Emit
 					textWriter.Write(paramName);
 				}
 
-				textWriter.WriteLine(")");
+				textWriter.Write(")");
 
 				foreach (var tp in method.TypeParameters)
 				{
@@ -135,18 +134,16 @@ namespace FluentLang.Compiler.Emit
 					}
 				}
 
-				textWriter.WriteLine("{");
+				textWriter.Write("{");
 
 				foreach (var statement in method.Statements)
 				{
 					Emit(statement, method.ReturnType, textWriter);
-					textWriter.WriteLine();
 				}
 
 				foreach (var localMethod in method.LocalMethods)
 				{
 					Emit(localMethod, textWriter);
-					textWriter.WriteLine();
 				}
 
 				textWriter.Write("}");
@@ -208,7 +205,7 @@ namespace FluentLang.Compiler.Emit
 			private void Emit(IMatchExpression me, TextWriter textWriter)
 			{
 				Emit(me.Expression, null, textWriter);
-				textWriter.WriteLine(" switch {");
+				textWriter.Write(" switch {");
 
 				var matchingOptionsIdentifier = _uniqueIdentifierGenerator.GenerateIdentifier();
 				foreach (var arm in me.Arms)
@@ -460,7 +457,7 @@ namespace FluentLang.Compiler.Emit
 				{
 					if (!isFirst || !method.Parameters.IsEmpty)
 					{
-						textWriter.WriteLine(", ");
+						textWriter.Write(", ");
 					}
 					isFirst = false;
 
@@ -919,7 +916,7 @@ namespace FluentLang.Compiler.Emit
 				{
 					textWriter.Write("[assembly: AssemblyFileVersion(");
 					EmitStringLiteral(version.ToString(), textWriter);
-					textWriter.WriteLine(")]");
+					textWriter.Write(")]");
 				}
 
 				internal static void EmitDependencyAttribute(IAssembly dependency, TextWriter textWriter)
@@ -928,14 +925,14 @@ namespace FluentLang.Compiler.Emit
 					EmitStringLiteral(dependency.Name.ToString(), textWriter);
 					textWriter.Write(",");
 					EmitStringLiteral(dependency.Version.ToString(), textWriter);
-					textWriter.WriteLine(")]");
+					textWriter.Write(")]");
 				}
 
 				internal static void EmitAssemblyNameAttribute(QualifiedName name, TextWriter textWriter)
 				{
 					textWriter.Write("[assembly: AssemblyName(");
 					EmitStringLiteral(name.ToString(), textWriter);
-					textWriter.WriteLine(")]");
+					textWriter.Write(")]");
 				}
 			}
 
