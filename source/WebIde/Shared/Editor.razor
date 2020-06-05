@@ -66,10 +66,11 @@
     {
         if (firstRender)
         {
-            var editorRef = DotNetObjectReference.Create(this);
+            using var editorRef = DotNetObjectReference.Create(this);
             await JsRuntime.InvokeVoidAsync("initEditor", editorRef).AsTask();
         }
-        await Highlight();
+        if (EmittedCSharp != null)
+            await Highlight();
     }
 
     [JSInvokable, Obsolete("only for js interop", error: true), EditorBrowsable(EditorBrowsableState.Never)]
