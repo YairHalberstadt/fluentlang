@@ -52,7 +52,7 @@ namespace FluentLang.WebIde.Shared
 					Diagnostics = default;
 					RuntimeError = default;
 				}
-
+				StateHasChanged();
 
 				Task.Run(async () =>
 				{
@@ -127,7 +127,6 @@ namespace FluentLang.WebIde.Shared
 							}
 						}
 					}
-					await Highlight();
 					StateHasChanged();
 				}, token);
 			}
@@ -137,10 +136,5 @@ namespace FluentLang.WebIde.Shared
 		private string? Result { get; set; }
 		private string? RuntimeError { get; set; }
 		private ImmutableArray<string> Diagnostics { get; set; }
-
-		private ValueTask Highlight()
-		{
-			return JsRuntime.InvokeVoidAsync("highlight");
-		}
 	}
 }
