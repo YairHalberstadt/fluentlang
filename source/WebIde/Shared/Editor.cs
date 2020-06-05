@@ -52,7 +52,6 @@ namespace FluentLang.WebIde.Shared
 					Diagnostics = default;
 					RuntimeError = default;
 				}
-				StateHasChanged();
 
 				Task.Run(async () =>
 				{
