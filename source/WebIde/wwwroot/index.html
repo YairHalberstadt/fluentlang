@@ -15,10 +15,12 @@
             src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.0/languages/csharp.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.11/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="scripts/fluentlang-ace-mode.js" type="text/javascript" charset="utf-8"></script>
     <script>
         var initEditor = (editorRef) => {
             editor = ace.edit("editor");
             editor.session.on('change', (_) => { editorRef.invokeMethodAsync('SetSource', editor.getValue()); });
+            editor.getSession().setMode("ace/mode/fluentlang-mode");
         }
     </script>
     <script>
