@@ -19,7 +19,7 @@
         </div>
         <div id="csharp" class="output flex" hidden=@(CurrentTab != Tab.EmittedCSharp)>
             <header>Emitted CSharp</header>
-            <pre class="output" @ref="EmittedCSharpRef">
+            <pre class="output" @ref="EmittedCSharpRef" hidden="@(EmittedCSharp is null)">
                 <code class="lang-csharp" ></code>
             </pre>
         </div>
