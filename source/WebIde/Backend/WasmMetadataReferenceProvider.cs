@@ -31,7 +31,7 @@ namespace FluentLang.WebIde.Backend
 
 			var references = ImmutableArray.CreateBuilder<MetadataReference>();
 
-			MetadataReferences = await _availableAssemblies.ToAsyncEnumerable().SelectAwait(async x =>
+			MetadataReferences = await _availableAssemblies.Distinct().ToAsyncEnumerable().SelectAwait(async x =>
 			{
 				var stream = await _httpClient.GetStreamAsync(new Uri(baseAddress, $"_framework/_bin/{x}"));
 				return MetadataReference.CreateFromStream(stream);
