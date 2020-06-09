@@ -27,6 +27,7 @@ namespace FluentLang.WebIde
 			builder.Services.AddSingleton<IAssemblyCompiler, AssemblyCompiler>();
 			builder.Services.AddSingleton<AssemblyFactory>();
 			builder.Services.AddSingleton<IDiagnosticFormatter, DiagnosticFormatter>();
+			builder.Services.AddSingleton<EditorEngine>();
 			var container = builder.Build();
 			foreach (var requiresAsyncLoad in container.Services.GetServices<IRequiresAsyncInitialize>())
 			{
