@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using Antlr4.Runtime;
+using System.Linq;
 
 namespace FluentLang.Compiler.Diagnostics
 {
@@ -12,32 +13,15 @@ namespace FluentLang.Compiler.Diagnostics
 				ErrorCode.InvalidMetadataAssembly =>
 					diagnostic.AdditionalContext.FirstOrDefault()?.ToString() ?? "",
 				var errorCode =>
-					$"code: {errorCode.ToString()}, text: {diagnostic.Location.GetText().ToString()},  aditionalContext: {string.Join(", ", diagnostic.AdditionalContext)}",
+					$"code: {errorCode}, text: {diagnostic.Location.GetText().ToString()},  aditionalContext: {string.Join(", ", diagnostic.AdditionalContext)}",
 			};
 		}
 
 		public string CreateLocationMessage(Diagnostic diagnostic)
 		{
 			//TODO: store file number.
-			var location = diagnostic.Location;
-			if (location.Token is
-			{
-				Line: var line,
-				Column: var column,
-				StartIndex: var startIndex,
-				StopIndex: var stopIndex
-			})
-			{
-				var tokenLength = stopIndex - startIndex;
-				var (offset, length) = location.TokenRange.GetOffsetAndLength(tokenLength);
-				return $"Line: {line}, Column: {column + offset}..{column + offset + length}";
-			}
-			else if (location.ParseTree is { } parseTree)
-			{
-				//TODO: find a way to implement this
-				return parseTree.GetText();
-			}
-			return "";
+			var location = diagnostic.Location.TextRange;
+			return $"Start: [Ln {location.Start.Line}, Col {location.Start.Column}] End: [Ln {location.End.Line}, Col {location.End.Column}]";
 		}
 	}
 }
