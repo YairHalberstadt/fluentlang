@@ -24,6 +24,19 @@
         }
     </script>
     <script>
+        var Range = require("ace/range").Range
+        var errorMarkers = []
+        function annotate(diagnostics) {
+            var session = editor.getSession();
+            session.setAnnotations(diagnostics);
+            errorMarkers.forEach(marker => session.removeMarker(marker));
+            errorMarkers = diagnostics.map(diagnostic => {
+                return session.addMarker(new Range(diagnostic.row, diagnostic.column, diagnostic.endRow, diagnostic.endColumn),
+                    "marker-highlight-error", "text")
+            });
+        }
+    </script>
+    <script>
         window.highlight = (element, text) => {
             element.children[0].innerText = text;
             hljs.highlightBlock(element.children[0]);

@@ -1,8 +1,8 @@
-﻿@using System.ComponentModel
+﻿
 @using FluentLang.Compiler.Diagnostics
 @inherits LayoutComponentBase
 @inject IJSRuntime JsRuntime
-@inject DiagnosticFormatter DiagnosticFormatter
+@inject IDiagnosticFormatter DiagnosticFormatter
 
 <div class="body">
     <div class="split left">
@@ -68,9 +68,6 @@
         if (EmittedCSharp != null)
             await Highlight();
     }
-
-    [JSInvokable, Obsolete("only for js interop", error: true), EditorBrowsable(EditorBrowsableState.Never)]
-    public void SetSource(string source) => Source = source;
 
     private ValueTask Highlight()
     {

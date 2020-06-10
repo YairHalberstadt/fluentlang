@@ -75,6 +75,10 @@ namespace FluentLang.Compiler.Diagnostics
 
 		public TextPoint Start { get; }
 		public TextPoint End { get; }
+
+		public void Deconstruct(out TextPoint start, out TextPoint end) => (start, end) = (Start, End);
+		public void Deconstruct(out int startLine, out int startColumn, out int endLine, out int endColumn) => 
+			(startLine, startColumn, endLine, endColumn) = (Start.Line, Start.Column, End.Line, End.Column);
 	}
 
 	public struct TextPoint
@@ -84,6 +88,8 @@ namespace FluentLang.Compiler.Diagnostics
 			Line = line;
 			Column = column;
 		}
+
+		public void Deconstruct(out int line, out int column) => (line, column) = (Line, Column);
 
 		public int Line { get; }
 		public int Column { get; }

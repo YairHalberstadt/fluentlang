@@ -276,3 +276,10 @@ footer {
     border: 1px solid #ccc;
     border-top: none;
 }
+
+
+.marker-highlight-error {
+    position: absolute;
+    border-bottom: 1px solid #DE5555;
+    border-radius: 0;
+}

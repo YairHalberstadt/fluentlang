@@ -15,5 +15,10 @@ namespace FluentLang.Shared
 		{
 			return new MemoryStream(bytes.UnsafeAsArray(), writable: false);
 		}
+
+		public static ImmutableArray<T> EmptyIfDefault<T>(this ImmutableArray<T> array)
+		{
+			return array.IsDefault ? ImmutableArray<T>.Empty : array;
+		}
 	}
 }
