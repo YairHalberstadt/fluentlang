@@ -8,7 +8,7 @@ Currently it is very much a work in progress.
 
 ## Try It Out!!
 
-Try out the WebIde at https://yairhalberstadt.github.io/fluentlang.io/
+Try out the WebIde at https://yairhalberstadt.github.io/fluentlang.io
 It's currently in progress, so let me know what you think!
 
 ## Building
@@ -130,9 +130,9 @@ CreateCounter() : Counter
       return {} + Increment, Value;
       Increment(counter : Counter) : Counter
       {
-          value = counter.Value();
+          let value = counter.Value();
           return counter + Value;
-          Value(counter : {}) : int
+          Value(this : {}) : int
           {
               return value + 1;
           }
