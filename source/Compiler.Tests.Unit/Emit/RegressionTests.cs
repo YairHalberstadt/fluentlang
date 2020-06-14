@@ -49,5 +49,37 @@ namespace Sequences {
 				.VerifyDiagnostics()
 				.VerifyEmit();
 		}
+
+		[Fact, WorkItem("https://github.com/YairHalberstadt/fluentlang/issues/20")]
+		public void InternalErrors1()
+		{
+			CreateAssembly(@"interface Counter
+{
+    Increment() : Counter;
+    Value() : int;
+}
+
+CreateCounter() : Counter
+{
+      return {} + Increment, Value;
+      Increment(counter : Counter) : Counter
+      {
+          let value = counter.Value();
+          return counter + Value;
+          Value(this : {}) : int
+          {
+              return value + 1;
+          }
+      }
+
+      Value(counter : {}) : int
+      {
+          return 0;
+      }
+}")
+				.VerifyDiagnostics()
+				.VerifyEmit();
+
+		}
 	}
 }

@@ -103,7 +103,7 @@ namespace FluentLang.Compiler.Emit
 					var parameter = method.Parameters[i];
 					Emit(parameter.Type, textWriter);
 					textWriter.Write(' ');
-					textWriter.Write(parameter.Name);
+					EmitIdentifier(parameter.Name, textWriter); ;
 
 				}
 
@@ -159,7 +159,7 @@ namespace FluentLang.Compiler.Emit
 					{
 						Emit(declarationStatement.Type, textWriter);
 						textWriter.Write(" ");
-						textWriter.Write(identifierName);
+						EmitIdentifier(identifierName, textWriter);
 					}
 					else
 					{
@@ -216,7 +216,7 @@ namespace FluentLang.Compiler.Emit
 					{
 						Emit(type, textWriter);
 						textWriter.Write(" ");
-						textWriter.Write(identifier);
+						EmitIdentifier(identifier, textWriter);
 					}
 					else
 					{
@@ -351,7 +351,7 @@ namespace FluentLang.Compiler.Emit
 
 			private void Emit(ILocalReferenceExpression lre, TextWriter textWriter)
 			{
-				textWriter.Write(lre.Identifier);
+				EmitIdentifier(lre.Identifier, textWriter);
 			}
 
 			private void Emit(IConditionalExpression ce, TextWriter textWriter)
@@ -711,6 +711,12 @@ namespace FluentLang.Compiler.Emit
 					Operator.And => "&&",
 					_ => throw new InvalidEnumArgumentException(nameof(@operator), (int)@operator, typeof(Operator)),
 				});
+			}
+
+			private void EmitIdentifier(string identifier, TextWriter textWriter)
+			{
+				textWriter.Write('@');
+				textWriter.Write(identifier);
 			}
 
 			private static class MetadataEmitter
