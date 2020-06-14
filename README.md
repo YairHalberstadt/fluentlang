@@ -130,9 +130,9 @@ CreateCounter() : Counter
       return {} + Increment, Value;
       Increment(counter : Counter) : Counter
       {
-          value = counter.Value();
+          let value = counter.Value();
           return counter + Value;
-          Value(counter : {}) : int
+          Value(this : {}) : int
           {
               return value + 1;
           }
