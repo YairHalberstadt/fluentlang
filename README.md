@@ -108,10 +108,10 @@ M2(param : {}) : int
 
 ...
 
-bound = {} + M1 + M2;
+let bound = {} + M1 + M2;
 
-resultM1 = bound.M1();
-resultM2 = bound.M2();
+let resultM1 = bound.M1();
+let resultM2 = bound.M2();
 ```
 
 binding creates a new object with the bound methods attached. This new object implements the union of its original interface, and the interface containing the bound methods with their first parameter removed.
