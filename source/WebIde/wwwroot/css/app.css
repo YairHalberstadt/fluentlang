@@ -204,6 +204,7 @@ app {
 
 header,
 footer {
+    line-height: 38px;
     flex: none;
 }
 
@@ -217,6 +218,9 @@ footer {
     overflow-y: hidden;
     display: flex;
     flex-direction: column;
+    border: solid;
+    border-color: lightgrey;
+    border-width: 1px;
 }
 
 .input {
@@ -246,8 +250,6 @@ footer {
 
 .tab {
     overflow: hidden;
-    border: 1px solid #ccc;
-    background-color: #f1f1f1;
     flex: none;
 }
 
@@ -257,16 +259,20 @@ footer {
         border: none;
         outline: none;
         cursor: pointer;
-        padding: 14px 16px;
         transition: 0.3s;
+        margin: 5px 5px;
+        border: outset;
+        border-width: 1px;
+        border-color: lightgray;
+        color: lightgray;
     }
 
         .tab button:hover {
-            background-color: #ddd;
+            filter: brightness(90%);
         }
 
         .tab button.active {
-            background-color: #ccc;
+            border: inset;
         }
 
 /* Style the tab content */
@@ -282,4 +288,12 @@ footer {
     position: absolute;
     border-bottom: 1px solid #DE5555;
     border-radius: 0;
+}
+
+.header {
+    background-color: #4684ee;
+    height: 38px;
+    font-family: sans-serif;
+    text-align: center;
+    color: lightgray;
 }

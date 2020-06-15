@@ -17,16 +17,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.11/ace.js" type="text/javascript" charset="utf-8"></script>
     <script src="scripts/fluentlang-ace-mode.js" type="text/javascript" charset="utf-8"></script>
     <script>
-        var initEditor = (editorRef) => {
+        window.initEditor = (editorRef) => {
             editor = ace.edit("editor");
             editor.session.on('change', (_) => { editorRef.invokeMethodAsync('SetSource', editor.getValue()); });
             editor.getSession().setMode("ace/mode/fluentlang-mode");
+            editorRef.invokeMethodAsync('SetSource', editor.getValue());
         }
     </script>
     <script>
         var Range = require("ace/range").Range
         var errorMarkers = []
-        function annotate(diagnostics) {
+        window.annotate = (diagnostics) => {
             var session = editor.getSession();
             session.setAnnotations(diagnostics);
             errorMarkers.forEach(marker => session.removeMarker(marker));

@@ -2,7 +2,6 @@
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.TestUtils;
 using System.Linq;
-using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
 
