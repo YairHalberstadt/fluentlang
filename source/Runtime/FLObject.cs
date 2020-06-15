@@ -37,4 +37,13 @@ Make sure this is running with the same versions of dependencies as it was compi
 			return new FLObject(_methods.SetItem(methodKey, method));
 		}
 	}
+
+	public static class FLObjectExtensions
+	{
+		public static FLObject ToTemp(this FLObject fLObject, out FLObject temp)
+		{
+			temp = fLObject;
+			return fLObject;
+		}
+	}
 }

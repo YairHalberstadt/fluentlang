@@ -2,6 +2,7 @@
 using FluentLang.Compiler.Symbols.Interfaces.MethodBody;
 using FluentLang.TestUtils;
 using System.Linq;
+using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -223,6 +224,46 @@ interface Patched {
 			var patchedInterface = AssertGetInterface(assembly, "Patched");
 			Assert.Equal(2, patch.Patches.Length);
 			Assert.True(patch.Type.IsEquivalentTo(patchedInterface));
+		}
+
+		[Fact]
+		public void UsesCurrentObjectWhenCallingInstanceMethodFromInstanceMethod()
+		{
+			CreateAssembly(@"
+Main(): int {
+	let counter = CreateCounter();
+	let counter1 = counter.Increment();
+	let counter2 = counter1.Increment();
+	let counter3 = counter2.Increment();
+	return counter3.Value();
+}
+
+interface Counter
+{
+    Increment() : Counter;
+    Value() : int;
+}
+
+CreateCounter() : Counter
+{
+      return {} + Increment, Value;
+      Increment(counter : Counter) : Counter
+      {
+          let value = counter.Value();
+          return counter + Value;
+          Value(this : {}) : int
+          {
+              return value + 1;
+          }
+      }
+
+      Value(counter : {}) : int
+      {
+          return 0;
+      }
+}")
+				.VerifyDiagnostics()
+				.VerifyEmit(expectedResult: 3);
 		}
 	}
 }

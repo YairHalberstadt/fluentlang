@@ -368,11 +368,16 @@ namespace FluentLang.Compiler.Emit
 				var method = mie.Method;
 				var methodKey = _keyGenerator.GenerateMethodKey(method);
 				Emit(mie.Expression, null, textWriter);
-				textWriter.Write(".GetMethod<");
+				textWriter.Write(".ToTemp(out var ");
+				var tempName = _uniqueIdentifierGenerator.GenerateIdentifier();
+				textWriter.Write(tempName);
+				textWriter.Write(").GetMethod<");
 				EmitDelegateType(method.Parameters, method.ReturnType, textWriter);
 				textWriter.Write(">(");
 				EmitMethodKey(methodKey, textWriter);
 				textWriter.Write(")(");
+				textWriter.Write(tempName);
+				if (mie.Arguments.Length > 0) textWriter.Write(",");
 				EmitArguments(mie.Arguments, mie.Method.Parameters, textWriter);
 				textWriter.Write(")");
 			}
@@ -414,7 +419,7 @@ namespace FluentLang.Compiler.Emit
 
 			private void EmitDelegateType(IEnumerable<IParameter> parameters, IType returnType, TextWriter textWriter)
 			{
-				textWriter.Write("Func<");
+				textWriter.Write("Func<FLObject,");
 				foreach (var parameter in parameters)
 				{
 					Emit(parameter.Type, textWriter);
@@ -602,12 +607,12 @@ namespace FluentLang.Compiler.Emit
 					textWriter.Write(", Mixin");
 					textWriter.Write(i);
 				}
-				textWriter.Write(") => { FLObject Target = null; Target = Original");
+				textWriter.Write(") => { return Original");
 				foreach (var patch in ope.Patches)
 				{
 					EmitPatch(patch, textWriter);
 				}
-				textWriter.Write("; return Target; })))(");
+				textWriter.Write("; })))(");
 				Emit(ope.Expression, null, textWriter);
 				foreach (var mie in mixins)
 				{
@@ -624,13 +629,12 @@ namespace FluentLang.Compiler.Emit
 						EmitMethodKey(_keyGenerator.GenerateMethodKeyExcludingFirstParameter(method), textWriter);
 						textWriter.Write(", (");
 						EmitDelegateType(method.Parameters.Skip(1), method.ReturnType, textWriter);
-						textWriter.Write(")((");
+						textWriter.Write(")((Target");
 						var paramsCount = method.Parameters.Length - 1;
+
 						foreach (var i in Enumerable.Range(0, paramsCount))
 						{
-							if (i != 0)
-								textWriter.Write(",");
-							textWriter.Write("Temp");
+							textWriter.Write(",Temp");
 							textWriter.Write(i);
 						}
 						textWriter.Write(") => ");
@@ -660,14 +664,32 @@ namespace FluentLang.Compiler.Emit
 					{
 						foreach (var interfaceMethod in type.Methods)
 						{
-							var key = _keyGenerator.GenerateMethodKey(interfaceMethod);
 							textWriter.Write(".With(");
-							EmitMethodKey(key, textWriter);
-							textWriter.Write(", Mixin");
+							EmitMethodKey(_keyGenerator.GenerateMethodKey(interfaceMethod), textWriter);
+							textWriter.Write(", (");
+							EmitDelegateType(interfaceMethod.Parameters, interfaceMethod.ReturnType, textWriter);
+							textWriter.Write(")((_");
+							foreach (var i in Enumerable.Range(0, interfaceMethod.Parameters.Length))
+							{
+								textWriter.Write(",Temp");
+								textWriter.Write(i);
+							}
+							textWriter.Write(") => ");
+
+							textWriter.Write("Mixin");
 							textWriter.Write(mixinIndex);
-							textWriter.Write(".GetMethod<Delegate>(");
-							EmitMethodKey(key, textWriter);
-							textWriter.Write("))");
+							textWriter.Write(".GetMethod<");
+							EmitDelegateType(interfaceMethod.Parameters, interfaceMethod.ReturnType, textWriter);
+							textWriter.Write(">(");
+							EmitMethodKey(_keyGenerator.GenerateMethodKey(interfaceMethod), textWriter);
+							textWriter.Write(")(Mixin");
+							textWriter.Write(mixinIndex);
+							foreach (var i in Enumerable.Range(0, interfaceMethod.Parameters.Length))
+							{
+								textWriter.Write(",Temp");
+								textWriter.Write(i);
+							}
+							textWriter.Write(")))");
 						}
 					}
 				}

@@ -5,12 +5,14 @@ using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.Compiler.Symbols.Metadata;
 using FluentLang.Shared;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Xunit;
 using Diagnostic = FluentLang.Compiler.Diagnostics.Diagnostic;
@@ -71,18 +73,23 @@ Actual:
 			if (expectedCSharp is { })
 			{
 				var actual = Encoding.Default.GetString(csharpBytes.UnsafeAsArray());
+				var normalizedExpected = NormalizeCSharp(expectedCSharp);
+				var normalizedActual = NormalizeCSharp(actual);
+
 				Assert.True(
-					expectedCSharp == actual,
-					"expected:\n" + expectedCSharp + "\n\nactual:\n" + actual);
+					normalizedExpected == normalizedActual,
+					"expected:\n" + normalizedExpected + "\n\nactual:\n" + normalizedActual);
 			}
 
 			if (compilationResult.Status != CompilationResultStatus.Succeeded)
 			{
+				var csharp = Encoding.Default.GetString(csharpBytes.UnsafeAsArray());
+
 				Assert.False(true,
 					"compiling and emitting csharp failed with diagnostics:\n"
 					+ string.Join('\n', compilationResult.RoslynDiagnostics)
 					+ "\n\ncsharp code was:\n\n"
-					+ Encoding.Default.GetString(csharpBytes.UnsafeAsArray()));
+					+ NormalizeCSharp(csharp));
 			}
 
 			var assemblyLoadContext = new System.Runtime.Loader.AssemblyLoadContext(null, isCollectible: true);
@@ -101,6 +108,11 @@ Actual:
 			assemblyLoadContext.Unload();
 
 			return assembly;
+
+			static string NormalizeCSharp(string source)
+			{
+				return CSharpSyntaxTree.ParseText(source).GetRoot().NormalizeWhitespace().ToString();
+			}
 		}
 
 		private static void VerifyMetadata(
