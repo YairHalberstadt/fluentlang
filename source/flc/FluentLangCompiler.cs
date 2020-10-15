@@ -1,5 +1,4 @@
-﻿using Dependable.Abstractions;
-using FluentLang.Compiler.Compilation;
+﻿using FluentLang.Compiler.Compilation;
 using FluentLang.Compiler.Diagnostics;
 using FluentLang.Compiler.Symbols.Interfaces;
 using FluentLang.flc.DependencyLoading;
@@ -26,14 +25,14 @@ namespace FluentLang.flc
 	{
 		private readonly ILogger<FluentLangCompiler> _logger;
 		private readonly SolutionFactory _solutionFactory;
-		private readonly IScopeFactory<SolutionInfo, IProjectLoader> _projectLoader;
+		private readonly Func<SolutionInfo, IProjectLoader> _projectLoader;
 		private readonly IFileSystem _fileSystem;
 		private readonly IDiagnosticFormatter _diagnosticFormatter;
 
 		public FluentLangCompiler(
 			ILogger<FluentLangCompiler> logger,
 			SolutionFactory solutionFactory,
-			IScopeFactory<SolutionInfo, IProjectLoader> projectLoader,
+			Func<SolutionInfo, IProjectLoader> projectLoader,
 			IFileSystem fileSystem,
 			IDiagnosticFormatter diagnosticFormatter)
 		{
@@ -89,7 +88,7 @@ namespace FluentLang.flc
 				{
 					_logger.LogDebug("Running tests");
 					TestResult? testResults = null;
-					foreach(var (project, assembly) in buildOrder.Zip(assemblies))
+					foreach (var (project, assembly) in buildOrder.Zip(assemblies))
 					{
 						if (project.IsTest)
 						{
@@ -288,9 +287,9 @@ The following diagnostics were reported when compiling the emitted C# to a dll:
 				new List<IAssembly>(),
 				async (projectAssemblies, projectInfo) =>
 				{
-					using var scope = _projectLoader.CreateScope(solution);
+					var projectLoader = _projectLoader(solution);
 
-					var project = await scope.Value.LoadProjectAsync(
+					var project = await projectLoader.LoadProjectAsync(
 							projectInfo,
 							assemblyLoadContext,
 							projectAssemblies,
