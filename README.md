@@ -8,7 +8,8 @@ Currently it is very much a work in progress.
 
 ## Try It Out!!
 
-Try out the WebIde at https://yairhalberstadt.github.io/fluentlang.io
+Try out the WebIde at https://yairhalberstadt.github.io/fluentlang.io.
+
 It's currently in progress, so let me know what you think!
 
 ## Building
