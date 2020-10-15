@@ -125,6 +125,7 @@ namespace FluentLang.flc.DependencyLoading
 
 				var archive = new ZipArchive(downloadResourceResult.PackageStream);
 				var entry = archive.GetEntry(libFile);
+				Release.Assert(entry != null);
 				using var decompressed = new MemoryStream();
 				entry.Open().CopyTo(decompressed);
 				decompressed.Position = 0;

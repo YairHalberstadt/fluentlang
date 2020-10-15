@@ -1,10 +1,11 @@
-﻿using Autofac;
-using FluentLang.flc;
+﻿using FluentLang.flc;
 using FluentLang.flc.DependencyInjection;
 using FluentLang.flc.DependencyLoading;
 using FluentLang.Shared;
 using FluentLang.TestUtils;
 using Microsoft.Extensions.Logging;
+using StrongInject;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO.Abstractions;
@@ -18,7 +19,7 @@ using Xunit.Abstractions;
 
 namespace FluentLang.Compiler.Tests.Unit
 {
-	public class FluentLangCompilerTests
+	public partial class FluentLangCompilerTests
 	{
 		public class BuildTests : TestBase
 		{
@@ -53,11 +54,11 @@ namespace FluentLang.Compiler.Tests.Unit
 					}
 					});
 
-				var builder = CreateBuilder(fileSystem);
-				using var container = builder.Build();
-				var compiler = container.Resolve<FluentLangCompiler>();
-				await compiler.Build("solutionFile", outputDirectory, outputCSharp: false, test: false);
-				Assert.Equal(2560, fileSystem.File.ReadAllBytes(fileSystem.Path.Combine(outputDirectory, "Project", "Project.dll")).Length);
+				await RunCompilerAsync(fileSystem, async compiler =>
+				{
+					await compiler.Build("solutionFile", outputDirectory, outputCSharp: false, test: false);
+					Assert.Equal(2560, fileSystem.File.ReadAllBytes(fileSystem.Path.Combine(outputDirectory, "Project", "Project.dll")).Length);
+				});
 			}
 
 			[Theory]
@@ -91,13 +92,12 @@ namespace FluentLang.Compiler.Tests.Unit
 					}
 					});
 
-				var builder = CreateBuilder(fileSystem);
-				using var container = builder.Build();
-				var compiler = container.Resolve<FluentLangCompiler>();
-				await compiler.Build("solutionFile", outputDirectory, outputCSharp: true, test: false);
-				Assert.Equal(2560, fileSystem.File.ReadAllBytes(fileSystem.Path.Combine(outputDirectory, "Project", "Project.dll")).Length);
+				await RunCompilerAsync(fileSystem, async compiler =>
+				{
+					await compiler.Build("solutionFile", outputDirectory, outputCSharp: true, test: false);
+					Assert.Equal(2560, fileSystem.File.ReadAllBytes(fileSystem.Path.Combine(outputDirectory, "Project", "Project.dll")).Length);
 
-				var expectedCSharp = @"
+					var expectedCSharp = @"
 using FluentLang.Runtime;
 using FluentLang.Runtime.Metadata;
 using System;
@@ -111,21 +111,22 @@ public static class Project_AssemblyLevelMethods
 		return (42);
 	}
 }";
-				var actual =
-					fileSystem.File.ReadAllText(fileSystem.Path.Combine(outputDirectory, "Project", "Project.cs"));
-				Assert.Equal(
-					Normalise(expectedCSharp),
-					Normalise(actual));
+					var actual =
+						fileSystem.File.ReadAllText(fileSystem.Path.Combine(outputDirectory, "Project", "Project.cs"));
+					Assert.Equal(
+						Normalise(expectedCSharp),
+						Normalise(actual));
 
-				static string Normalise(string csharp)
-				{
-					csharp = Regex.Replace(
-						csharp,
-						"\\[assembly: AssemblyFileVersion\\(\"(\\\\u[0-9A-F]*)*\"\\)\\]",
-						"");
-					csharp = Regex.Replace(csharp, "\\s+", "");
-					return csharp;
-				}
+					static string Normalise(string csharp)
+					{
+						csharp = Regex.Replace(
+							csharp,
+							"\\[assembly: AssemblyFileVersion\\(\"(\\\\u[0-9A-F]*)*\"\\)\\]",
+							"");
+						csharp = Regex.Replace(csharp, "\\s+", "");
+						return csharp;
+					}
+				});
 			}
 
 			[Fact]
@@ -162,12 +163,12 @@ public static class Project_AssemblyLevelMethods
 					}
 					});
 
-				var builder = CreateBuilder(fileSystem);
-				using var container = builder.Build();
-				var compiler = container.Resolve<FluentLangCompiler>();
-				await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false, test: false);
-				Assert.Equal(2560, fileSystem.File.ReadAllBytes("Project1/Project1.dll").Length);
-				Assert.Equal(2560, fileSystem.File.ReadAllBytes("Project2/Project2.dll").Length);
+				await RunCompilerAsync(fileSystem, async compiler =>
+				{
+					await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false, test: false);
+					Assert.Equal(2560, fileSystem.File.ReadAllBytes("Project1/Project1.dll").Length);
+					Assert.Equal(2560, fileSystem.File.ReadAllBytes("Project2/Project2.dll").Length);
+				});
 			}
 
 			[Fact]
@@ -208,12 +209,12 @@ public static class Project_AssemblyLevelMethods
 					}
 					});
 
-				var builder = CreateBuilder(fileSystem);
-				using var container = builder.Build();
-				var compiler = container.Resolve<FluentLangCompiler>();
-				await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false, test: false);
-				Assert.False(fileSystem.File.Exists("Project1/Project1.dll"));
-				Assert.False(fileSystem.File.Exists("Project2/Project2.dll"));
+				await RunCompilerAsync(fileSystem, async compiler =>
+				{
+					await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false, test: false);
+					Assert.False(fileSystem.File.Exists("Project1/Project1.dll"));
+					Assert.False(fileSystem.File.Exists("Project2/Project2.dll"));
+				});
 			}
 
 			[Fact]
@@ -251,15 +252,15 @@ public static class Project_AssemblyLevelMethods
 					});
 
 				CreateAssembly("", "assembly").TryGetAssemblyBytes(out var bytes);
-				var builder = CreateBuilder(fileSystem);
 
-				builder.RegisterInstance<IAssemblyLoader>(new MockAssemblyLoader(bytes));
-				using var container = builder.Build();
-				var compiler = container.Resolve<FluentLangCompiler>();
-				await compiler.Build("solutionFile", "", outputCSharp: false, test: false);
+				await using var container = new TestContainerWithAssemblyLoader(fileSystem, LogLevel.Trace, new MockAssemblyLoader(bytes));
+				await container.RunAsync(async compiler =>
+				{
+					await compiler.Build("solutionFile", "", outputCSharp: false, test: false);
 
-				Assert.Equal(bytes, fileSystem.File.ReadAllBytes("Project/assembly.dll"));
-				Assert.Equal(2560, fileSystem.File.ReadAllBytes("Project/Project.dll").Length);
+					Assert.Equal(bytes, fileSystem.File.ReadAllBytes("Project/assembly.dll"));
+					Assert.Equal(2560, fileSystem.File.ReadAllBytes("Project/Project.dll").Length);
+				});
 			}
 			public class MockAssemblyLoader : IAssemblyLoader
 			{
@@ -286,6 +287,10 @@ public static class Project_AssemblyLevelMethods
 
 		public class RunTests : TestBase
 		{
+			public RunTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+			{
+			}
+
 			[Fact]
 			public async Task CanRunProject()
 			{
@@ -313,11 +318,11 @@ public static class Project_AssemblyLevelMethods
 					}
 					});
 
-				var builder = CreateBuilder(fileSystem);
-				using var container = builder.Build();
-				var compiler = container.Resolve<FluentLangCompiler>();
-				var result = await compiler.Run("solutionFile", "Project");
-				Assert.Equal(42, result);
+				await RunCompilerAsync(fileSystem, async compiler =>
+				{
+					var result = await compiler.Run("solutionFile", "Project");
+					Assert.Equal(42, result);
+				});
 			}
 
 			[Fact]
@@ -358,12 +363,12 @@ public static class Project_AssemblyLevelMethods
 					}
 					});
 
-				var builder = CreateBuilder(fileSystem);
-				using var container = builder.Build();
-				var compiler = container.Resolve<FluentLangCompiler>();
-				await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false, test: false);
-				Assert.Equal(41, await compiler.Run("solutionFile", "Project1"));
-				Assert.Equal(42, await compiler.Run("solutionFile", "Project2"));
+				await RunCompilerAsync(fileSystem, async compiler =>
+				{
+					await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false, test: false);
+					Assert.Equal(41, await compiler.Run("solutionFile", "Project1"));
+					Assert.Equal(42, await compiler.Run("solutionFile", "Project2"));
+				});
 			}
 
 			[Fact]
@@ -404,11 +409,11 @@ public static class Project_AssemblyLevelMethods
 					}
 					});
 
-				var builder = CreateBuilder(fileSystem);
-				using var container = builder.Build();
-				var compiler = container.Resolve<FluentLangCompiler>();
-				await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false, test: false);
-				Assert.Equal(42, await compiler.Run("solutionFile", "Project2"));
+				await RunCompilerAsync(fileSystem, async compiler =>
+				{
+					await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false, test: false);
+					Assert.Equal(42, await compiler.Run("solutionFile", "Project2"));
+				});
 			}
 
 			[Fact]
@@ -455,11 +460,11 @@ public static class Project_AssemblyLevelMethods
 					}
 					});
 
-				var builder = CreateBuilder(fileSystem);
-				using var container = builder.Build();
-				var compiler = container.Resolve<FluentLangCompiler>();
-				await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false, test: false);
-				Assert.Null(await compiler.Run("solutionFile", "Project2"));
+				await RunCompilerAsync(fileSystem, async compiler =>
+				{
+					await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false, test: false);
+					Assert.Null(await compiler.Run("solutionFile", "Project2"));
+				});
 			}
 
 			[Fact]
@@ -507,10 +512,10 @@ public static class Project_AssemblyLevelMethods
 					}
 					});
 
-				var builder = CreateBuilder(fileSystem);
-				using var container = builder.Build();
-				var compiler = container.Resolve<FluentLangCompiler>();
-				Assert.True(await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false, test: true));
+				await RunCompilerAsync(fileSystem, async compiler =>
+				{
+					Assert.True(await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false, test: true));
+				});
 			}
 
 			[Fact]
@@ -558,23 +563,45 @@ public static class Project_AssemblyLevelMethods
 					}
 					});
 
-				var builder = CreateBuilder(fileSystem);
-				using var container = builder.Build();
-				var compiler = container.Resolve<FluentLangCompiler>();
-				Assert.False(await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false, test: true));
-			}
-
-			public RunTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-			{
+				await RunCompilerAsync(fileSystem, async compiler =>
+				{
+					Assert.False(await compiler.Build("solutionFile", outputDirectory: "", outputCSharp: false, test: true));
+				});
 			}
 		}
 
-		private static ContainerBuilder CreateBuilder(MockFileSystem fileSystem)
+		private static async Task RunCompilerAsync(MockFileSystem fileSystem, Func<FluentLangCompiler, Task> func)
 		{
-			var builder = new ContainerBuilder();
-			builder.RegisterModule(new FlcModule(LogLevel.Trace));
-			builder.RegisterInstance(fileSystem).As<IFileSystem>();
-			return builder;
+			await using var container = new TestContainer(fileSystem, LogLevel.Trace);
+			await container.RunAsync(func);
+		}
+
+		[RegisterModule(typeof(FlcModule))]
+		public partial class TestContainer : IAsyncContainer<FluentLangCompiler>
+		{
+			[Instance] readonly IFileSystem _fileSystem;
+			[Instance] readonly LogLevel _logLevel;
+
+			public TestContainer(IFileSystem fileSystem, LogLevel logLevel)
+			{
+				_fileSystem = fileSystem;
+				_logLevel = logLevel;
+			}
+		}
+
+		[RegisterModule(typeof(FlcModule))]
+		public partial class TestContainerWithAssemblyLoader : IAsyncContainer<FluentLangCompiler>
+		{
+			[Instance] readonly IFileSystem _fileSystem;
+			[Instance] readonly LogLevel _logLevel;
+			[Instance] readonly IAssemblyLoader _assemblyLoader;
+
+			public TestContainerWithAssemblyLoader(IFileSystem fileSystem, LogLevel logLevel, IAssemblyLoader assemblyLoader)
+			{
+				_fileSystem = fileSystem;
+				_logLevel = logLevel;
+				_assemblyLoader = assemblyLoader;
+			}
 		}
 	}
 }

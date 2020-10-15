@@ -1,6 +1,6 @@
-﻿using Autofac;
-using FluentLang.flc.DependencyInjection;
+﻿using FluentLang.flc.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using StrongInject;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Invocation;
@@ -50,27 +50,21 @@ namespace FluentLang.flc
 			buildCommand.Handler = CommandHandler.Create(
 				async (FileInfo solutionFile, FileInfo outputDirectory, bool outputCSharp, LogLevel verbosity, bool test) =>
 				{
-					var builder = new ContainerBuilder();
-					builder.RegisterModule(new FlcModule(verbosity));
-					using var container = builder.Build();
-					var compiler = container.Resolve<FluentLangCompiler>();
-					var success = await compiler.Build(
+					await using var container = new FlcContainer(verbosity);
+					var success = await container.RunAsync(compiler => compiler.Build(
 						solutionFile.FullName,
 						outputDirectory.FullName,
 						outputCSharp,
 						test,
-						cancellationToken: default);
+						cancellationToken: default));
 					return success ? 0 : 1;
 				});
 
 			runCommand.Handler = CommandHandler.Create(
-				(FileInfo solutionFile, string projectName, LogLevel verbosity) =>
+				async (FileInfo solutionFile, string projectName, LogLevel verbosity) =>
 				{
-					var builder = new ContainerBuilder();
-					builder.RegisterModule(new FlcModule(verbosity));
-					using var container = builder.Build();
-					var compiler = container.Resolve<FluentLangCompiler>();
-					return compiler.Run(solutionFile.FullName, projectName, default).AsTask();
+					await using var container = new FlcContainer(verbosity);
+					await container.RunAsync(compiler => compiler.Run(solutionFile.FullName, projectName, default));
 				});
 
 			await rootCommand.InvokeAsync(args);
